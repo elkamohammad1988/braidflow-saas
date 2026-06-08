@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+}
+
+html {
+  background-color: theme('colors.cream.DEFAULT');
+  color: theme('colors.ink.DEFAULT');
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv05', 'ss01';
+}
+
+::selection {
+  background-color: theme('colors.ink.DEFAULT');
+  color: theme('colors.cream.DEFAULT');
+}
+
+/* Display headings: tighter tracking, optical sizing for the serif. */
+.font-display {
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+/* Subtle, warm scrollbar so dashboards don't show a stark gray track. */
+* {
+  scrollbar-color: theme('colors.ink.muted') transparent;
+}
+
+@layer utilities {
+  /* Editorial grid backdrop used behind hero / marketing sections. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(26, 20, 16, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(26, 20, 16, 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .bg-radial-fade {
+    -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 40%, transparent 100%);
+  }
+}
