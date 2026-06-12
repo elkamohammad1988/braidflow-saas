@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CancelBookingButton } from '@/components/booking/cancel-button';
+import { ReviewForm } from '@/components/review/review-form';
 import { formatMoney } from '@/lib/utils';
 import { formatAppointment } from '@/lib/format-date';
 import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
@@ -31,6 +32,14 @@ export default async function MyBookings() {
     )
     .eq('client_id', user.id)
     .order('scheduled_at', { ascending: false });
+
+  // Which completed bookings has this client already reviewed? Drives the
+  // "Leave a review" prompt below.
+  const { data: myReviews } = await supabase
+    .from('reviews')
+    .select('booking_id')
+    .eq('client_id', user.id);
+  const reviewedBookingIds = new Set((myReviews ?? []).map((r) => r.booking_id));
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -122,6 +131,12 @@ export default async function MyBookings() {
                       <CancelBookingButton bookingId={b.id} />
                     </div>
                   )}
+                {b.status === 'completed' &&
+                  (reviewedBookingIds.has(b.id) ? (
+                    <p className="mt-2 text-sm text-ink-muted">Reviewed · thank you!</p>
+                  ) : (
+                    <ReviewForm bookingId={b.id} />
+                  ))}
               </div>
             </div>
           );
