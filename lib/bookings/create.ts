@@ -1,9 +1,11 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { recordAuditLog } from '@/lib/audit/log';
+import { isSlotBookable } from './slot-check';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 
 export async function createBookingAction(input: CreateBookingInput) {
@@ -25,6 +27,55 @@ export async function createBookingAction(input: CreateBookingInput) {
   if (serviceError || !service || !service.is_active) {
     return { error: 'That service is no longer available.' };
   }
+
+  // --- Server-side slot validation -----------------------------------------
+  // The client only ever surfaces bookable slots, but the request is fully
+  // untrusted: re-validate the requested time from scratch.
+  const requestedStart = new Date(parsed.data.scheduledAt);
+  if (Number.isNaN(requestedStart.getTime())) {
+    return { error: 'Pick a valid time.' };
+  }
+
+  // Future-date guard, with a small skew allowance for clock drift.
+  if (requestedStart.getTime() <= Date.now() + 60_000) {
+    return { error: 'Pick a time in the future.' };
+  }
+
+  const { data: braider } = await admin
+    .from('braiders')
+    .select(
+      'accepting_bookings, availability_rules(day_of_week, start_minute, end_minute), availability_overrides(starts_at, ends_at, kind)'
+    )
+    .eq('id', service.braider_id)
+    .maybeSingle();
+
+  if (!braider || !braider.accepting_bookings) {
+    return { error: 'This braider isn\'t accepting bookings right now.' };
+  }
+
+  // Pull the braider's bookings around the requested day (one day back to catch
+  // an appointment that spills past midnight) for the overlap check.
+  const windowStart = subDays(startOfDay(requestedStart), 1).toISOString();
+  const windowEnd = endOfDay(requestedStart).toISOString();
+  const { data: dayBookings } = await admin
+    .from('bookings')
+    .select('scheduled_at, duration_minutes')
+    .eq('braider_id', service.braider_id)
+    .in('status', ['pending_payment', 'confirmed'])
+    .gte('scheduled_at', windowStart)
+    .lt('scheduled_at', windowEnd);
+
+  const bookable = isSlotBookable(
+    requestedStart,
+    service.duration_minutes,
+    braider.availability_rules ?? [],
+    braider.availability_overrides ?? [],
+    dayBookings ?? []
+  );
+  if (!bookable) {
+    return { error: 'That time isn\'t available. Pick another slot.' };
+  }
+  // -------------------------------------------------------------------------
 
   const { data: booking, error: insertError } = await admin
     .from('bookings')
