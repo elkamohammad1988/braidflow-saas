@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireBraider } from '@/lib/auth/session';
+import { ensureBraiderRecord } from '@/lib/braider/ensure';
 import { SignOutLink } from '@/components/shared/sign-out';
 import { Logo, LogoMark } from '@/components/shared/logo';
 import { DashboardNav } from './dashboard-nav';
@@ -14,7 +15,12 @@ function initials(name: string) {
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await requireBraider();
+  const { user, profile } = await requireBraider();
+
+  // Self-heal: braiders who predate the onboarding trigger (or whose row never
+  // got created) get one on first dashboard load, so their public page and
+  // settings work immediately.
+  await ensureBraiderRecord(user.id, profile.full_name);
 
   const userBlock = (
     <div className="flex items-center gap-3">
