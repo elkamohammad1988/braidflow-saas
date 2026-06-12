@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { notifyReschedule } from '@/lib/email/notifications';
+import { recordAuditLog } from '@/lib/audit/log';
 
 type Result =
   | { ok: true }
@@ -59,6 +60,18 @@ export async function rescheduleBookingAction(
     }
     return { error: 'Could not reschedule that booking.' };
   }
+
+  await recordAuditLog({
+    actorId: user.id,
+    action: 'booking.rescheduled',
+    entityType: 'booking',
+    entityId: bookingId,
+    metadata: {
+      previous_scheduled_at: previousScheduledAt,
+      new_scheduled_at: newTime.toISOString(),
+      moved_by: isClient ? 'client' : 'braider'
+    }
+  });
 
   await notifyReschedule(bookingId, {
     previousScheduledAt,

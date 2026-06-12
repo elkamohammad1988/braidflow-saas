@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { stripe } from '@/lib/stripe/client';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { recordAuditLog } from '@/lib/audit/log';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 
 export async function createBookingAction(input: CreateBookingInput) {
@@ -63,6 +64,20 @@ export async function createBookingAction(input: CreateBookingInput) {
     amount_cents: service.deposit_cents,
     status: 'pending',
     stripe_payment_intent_id: intent.id
+  });
+
+  // Record before redirect — redirect() throws, so nothing after it runs.
+  await recordAuditLog({
+    actorId: user.id,
+    action: 'booking.created',
+    entityType: 'booking',
+    entityId: booking.id,
+    metadata: {
+      braider_id: service.braider_id,
+      service_id: service.id,
+      scheduled_at: parsed.data.scheduledAt,
+      deposit_cents: service.deposit_cents
+    }
   });
 
   redirect(`/bookings/${booking.id}/pay`);

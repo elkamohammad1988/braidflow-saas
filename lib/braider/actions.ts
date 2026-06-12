@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { supabaseServer } from '@/lib/supabase/server';
+import { recordAuditLog } from '@/lib/audit/log';
 import { ensureBraiderRecord } from './ensure';
 import { braiderSettingsSchema, type BraiderSettingsInput } from './validation';
 
@@ -68,6 +69,14 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
     .eq('id', user.id)
     .maybeSingle();
   if (braider?.slug) revalidatePath(`/braiders/${braider.slug}`);
+
+  await recordAuditLog({
+    actorId: user.id,
+    action: 'settings.updated',
+    entityType: 'braider',
+    entityId: user.id,
+    metadata: { accepting_bookings: parsed.data.acceptingBookings }
+  });
 
   return { ok: true as const };
 }

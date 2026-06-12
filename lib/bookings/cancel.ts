@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { notifyCancellation } from '@/lib/email/notifications';
+import { recordAuditLog } from '@/lib/audit/log';
 
 export async function cancelBookingAction(bookingId: string) {
   const supabase = supabaseServer();
@@ -36,6 +37,18 @@ export async function cancelBookingAction(bookingId: string) {
     .eq('id', bookingId);
 
   if (error) return { error: 'Could not cancel that booking.' };
+
+  await recordAuditLog({
+    actorId: user.id,
+    action: 'booking.cancelled',
+    entityType: 'booking',
+    entityId: bookingId,
+    metadata: {
+      cancelled_by: isClient ? 'client' : 'braider',
+      previous_status: booking.status,
+      scheduled_at: booking.scheduled_at
+    }
+  });
 
   await notifyCancellation(bookingId, isClient ? 'client' : 'braider');
 

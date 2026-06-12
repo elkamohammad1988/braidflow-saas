@@ -361,6 +361,44 @@ export type Database = {
           }
         ];
       };
+      audit_logs: {
+        Row: {
+          id: string;
+          actor_id: string | null;
+          action: string;
+          entity_type: string;
+          entity_id: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          actor_id?: string | null;
+          action: string;
+          entity_type: string;
+          entity_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          actor_id?: string | null;
+          action?: string;
+          entity_type?: string;
+          entity_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'audit_logs_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { stripe } from '@/lib/stripe/client';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { notifyDepositRefunded } from '@/lib/email/notifications';
+import { recordAuditLog } from '@/lib/audit/log';
 
 type Result = { ok: true } | { error: string };
 
@@ -76,6 +77,18 @@ export async function refundDepositAction(bookingId: string): Promise<Result> {
       },
       { onConflict: 'stripe_refund_id' }
     );
+
+  await recordAuditLog({
+    actorId: user.id,
+    action: 'booking.refunded',
+    entityType: 'booking',
+    entityId: bookingId,
+    metadata: {
+      amount_cents: refund.amount,
+      stripe_refund_id: refund.id,
+      status: initialStatus
+    }
+  });
 
   if (initialStatus !== 'failed') {
     await notifyDepositRefunded(bookingId, refund.amount);
