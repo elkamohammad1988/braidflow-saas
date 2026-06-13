@@ -23,7 +23,7 @@ export default async function MyBookings() {
   const { user } = await requireSession();
   const supabase = supabaseServer();
 
-  const { data: bookings } = await supabase
+  const { data: bookings, error: bookingsError } = await supabase
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
@@ -33,12 +33,17 @@ export default async function MyBookings() {
     .eq('client_id', user.id)
     .order('scheduled_at', { ascending: false });
 
+  // Surface a real failure as an error (caught by the segment error boundary)
+  // rather than silently rendering the "no bookings yet" empty state.
+  if (bookingsError) throw bookingsError;
+
   // Which completed bookings has this client already reviewed? Drives the
   // "Leave a review" prompt below.
-  const { data: myReviews } = await supabase
+  const { data: myReviews, error: reviewsError } = await supabase
     .from('reviews')
     .select('booking_id')
     .eq('client_id', user.id);
+  if (reviewsError) throw reviewsError;
   const reviewedBookingIds = new Set((myReviews ?? []).map((r) => r.booking_id));
 
   return (

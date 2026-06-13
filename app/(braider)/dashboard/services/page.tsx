@@ -12,11 +12,13 @@ export default async function ServicesPage() {
   const { user } = await requireBraider();
   const supabase = supabaseServer();
 
-  const { data: services } = await supabase
+  const { data: services, error } = await supabase
     .from('services')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, is_active')
     .eq('braider_id', user.id)
     .order('created_at');
+
+  if (error) throw error;
 
   return (
     <div>

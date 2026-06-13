@@ -42,12 +42,20 @@ type BookingContext = {
   depositCents: number;
   serviceName: string;
   clientName: string;
-  clientEmail: string;
+  clientEmail: string | null;
   clientPhone: string | null;
   braiderName: string;
-  braiderEmail: string;
+  braiderEmail: string | null;
   businessName: string;
 };
+
+type SendResult = Awaited<ReturnType<typeof sendEmail>>;
+
+// A send "succeeded" if it was delivered OR intentionally skipped (no API key in
+// dev). Only an actual delivery failure counts against us.
+function sendOk(r: SendResult): boolean {
+  return r.skipped ? true : r.ok;
+}
 
 async function loadBookingContext(bookingId: string): Promise<BookingContext | null> {
   const admin = supabaseAdmin();
@@ -62,7 +70,10 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
     .eq('id', bookingId)
     .maybeSingle();
 
-  if (!data || !data.services || !data.client || !data.braiders) return null;
+  if (!data || !data.services || !data.client || !data.braiders) {
+    console.error('[notify] booking context unavailable', bookingId);
+    return null;
+  }
 
   // Emails live on auth.users — service role can read them via admin auth API.
   const { data: parties } = await admin
@@ -78,7 +89,12 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
     admin.auth.admin.getUserById(parties.braider_id)
   ]);
 
-  if (!clientAuth?.user?.email || !braiderAuth?.user?.email) return null;
+  // A missing email no longer suppresses BOTH messages — we send to whoever we
+  // can reach and log the gap rather than silently dropping everything.
+  const clientEmail = clientAuth?.user?.email ?? null;
+  const braiderEmail = braiderAuth?.user?.email ?? null;
+  if (!clientEmail) console.error('[notify] missing client email for booking', bookingId);
+  if (!braiderEmail) console.error('[notify] missing braider email for booking', bookingId);
 
   return {
     bookingId: data.id,
@@ -87,10 +103,10 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
     depositCents: data.deposit_cents,
     serviceName: data.services.name,
     clientName: data.client.full_name,
-    clientEmail: clientAuth.user.email,
+    clientEmail,
     clientPhone: data.client.phone,
     braiderName: data.braiders.profiles?.full_name ?? data.braiders.business_name,
-    braiderEmail: braiderAuth.user.email,
+    braiderEmail,
     businessName: data.braiders.business_name
   };
 }
@@ -120,23 +136,39 @@ export async function notifyBookingConfirmed(bookingId: string) {
     dashboardUrl: `${siteUrl()}/dashboard/appointments`
   };
 
-  await Promise.allSettled([
-    sendEmail({
-      to: ctx.clientEmail,
-      subject: confirmedClientSubject(clientProps),
-      react: BookingConfirmedClientEmail(clientProps)
-    }),
-    sendEmail({
-      to: ctx.braiderEmail,
-      subject: receivedBraiderSubject(braiderProps),
-      react: BookingReceivedBraiderEmail(braiderProps)
-    })
-  ]);
+  const sends: Promise<SendResult>[] = [];
+  if (ctx.clientEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.clientEmail,
+        subject: confirmedClientSubject(clientProps),
+        react: BookingConfirmedClientEmail(clientProps)
+      })
+    );
+  }
+  if (ctx.braiderEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.braiderEmail,
+        subject: receivedBraiderSubject(braiderProps),
+        react: BookingReceivedBraiderEmail(braiderProps)
+      })
+    );
+  }
+  const settled = await Promise.allSettled(sends);
+  if (settled.some((r) => r.status === 'rejected' || (r.status === 'fulfilled' && !sendOk(r.value)))) {
+    console.error('[notify] confirmation email(s) failed for booking', ctx.bookingId);
+  }
 }
 
-export async function notifyReminder(bookingId: string, proximity: '24h' | '2h' = '24h') {
+export async function notifyReminder(
+  bookingId: string,
+  proximity: '24h' | '2h' = '24h'
+): Promise<{ ok: boolean }> {
   const ctx = await loadBookingContext(bookingId);
-  if (!ctx) return;
+  // A missing context is likely transient (DB / auth lookup) — report failure so
+  // the cron un-claims the reminder and retries on the next tick.
+  if (!ctx) return { ok: false };
 
   const clientProps = {
     clientFirstName: firstName(ctx.clientName),
@@ -158,18 +190,31 @@ export async function notifyReminder(bookingId: string, proximity: '24h' | '2h' 
     proximity
   };
 
-  await Promise.allSettled([
-    sendEmail({
-      to: ctx.clientEmail,
-      subject: reminderClientSubject(clientProps),
-      react: ReminderClientEmail(clientProps)
-    }),
-    sendEmail({
-      to: ctx.braiderEmail,
-      subject: reminderBraiderSubject(braiderProps),
-      react: ReminderBraiderEmail(braiderProps)
-    })
-  ]);
+  const sends: Promise<SendResult>[] = [];
+  if (ctx.clientEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.clientEmail,
+        subject: reminderClientSubject(clientProps),
+        react: ReminderClientEmail(clientProps)
+      })
+    );
+  }
+  if (ctx.braiderEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.braiderEmail,
+        subject: reminderBraiderSubject(braiderProps),
+        react: ReminderBraiderEmail(braiderProps)
+      })
+    );
+  }
+
+  const settled = await Promise.allSettled(sends);
+  const ok =
+    settled.length > 0 &&
+    settled.every((r) => r.status === 'fulfilled' && sendOk(r.value));
+  return { ok };
 }
 
 export async function notifyReschedule(
@@ -202,19 +247,25 @@ export async function notifyReschedule(
   const recipients = meta.movedBy === 'client' ? [toBraider] : [toClient];
 
   await Promise.allSettled(
-    recipients.map((p) =>
-      sendEmail({
-        to: p.audience === 'client' ? ctx.clientEmail : ctx.braiderEmail,
-        subject: rescheduledSubject(p),
-        react: BookingRescheduledEmail(p)
-      })
-    )
+    recipients.flatMap((p) => {
+      const to = p.audience === 'client' ? ctx.clientEmail : ctx.braiderEmail;
+      if (!to) return [];
+      return [
+        sendEmail({
+          to,
+          subject: rescheduledSubject(p),
+          react: BookingRescheduledEmail(p)
+        })
+      ];
+    })
   );
 }
 
 export async function notifyDepositRefunded(bookingId: string, amountCents: number) {
   const ctx = await loadBookingContext(bookingId);
   if (!ctx) return;
+
+  if (!ctx.clientEmail) return;
 
   const props: RefundedProps = {
     clientFirstName: firstName(ctx.clientName),
@@ -252,16 +303,24 @@ export async function notifyCancellation(bookingId: string, cancelledBy: 'client
     scheduledAt: ctx.scheduledAt
   };
 
-  await Promise.allSettled([
-    sendEmail({
-      to: ctx.clientEmail,
-      subject: cancelledSubject(toClient),
-      react: BookingCancelledEmail(toClient)
-    }),
-    sendEmail({
-      to: ctx.braiderEmail,
-      subject: cancelledSubject(toBraider),
-      react: BookingCancelledEmail(toBraider)
-    })
-  ]);
+  const sends: Promise<SendResult>[] = [];
+  if (ctx.clientEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.clientEmail,
+        subject: cancelledSubject(toClient),
+        react: BookingCancelledEmail(toClient)
+      })
+    );
+  }
+  if (ctx.braiderEmail) {
+    sends.push(
+      sendEmail({
+        to: ctx.braiderEmail,
+        subject: cancelledSubject(toBraider),
+        react: BookingCancelledEmail(toBraider)
+      })
+    );
+  }
+  await Promise.allSettled(sends);
 }

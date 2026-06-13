@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { CancelBookingButton } from '@/components/booking/cancel-button';
 import { RefundDepositButton } from '@/components/booking/refund-button';
+import { FinalizeBookingButtons } from '@/components/booking/complete-buttons';
 import { formatMoney } from '@/lib/utils';
 import { relativeDayLabel } from '@/lib/format-date';
 import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
@@ -31,7 +32,7 @@ export default async function AppointmentsPage() {
   const { user } = await requireBraider();
   const supabase = supabaseServer();
 
-  const { data: appointments } = await supabase
+  const { data: appointments, error } = await supabase
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
@@ -41,6 +42,9 @@ export default async function AppointmentsPage() {
     )
     .eq('braider_id', user.id)
     .order('scheduled_at', { ascending: false });
+
+  // A query failure must read as an error, not "no appointments yet".
+  if (error) throw error;
 
   return (
     <div>
@@ -118,6 +122,9 @@ export default async function AppointmentsPage() {
                             <span aria-hidden className="text-ink/20">·</span>
                             <CancelBookingButton bookingId={a.id} />
                           </div>
+                        )}
+                        {status === 'confirmed' && !upcoming && (
+                          <FinalizeBookingButtons bookingId={a.id} />
                         )}
                         {status === 'cancelled' &&
                           (deposit === 'deposit_held' || deposit === 'refund_failed') && (

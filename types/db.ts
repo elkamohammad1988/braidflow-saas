@@ -399,6 +399,24 @@ export type Database = {
           }
         ];
       };
+      stripe_webhook_events: {
+        Row: {
+          id: string;
+          type: string;
+          received_at: string;
+        };
+        Insert: {
+          id: string;
+          type: string;
+          received_at?: string;
+        };
+        Update: {
+          id?: string;
+          type?: string;
+          received_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

@@ -5,6 +5,24 @@ const MAX_VISIBLE = 6;
 
 export async function BraiderReviews({ braiderId }: { braiderId: string }) {
   const supabase = supabaseServer();
+
+  // Aggregate over ALL reviews — the displayed average and count must reflect
+  // every review, not just the slice we render. Computing them from the limited
+  // list below would report, e.g., "5.0 · 6 reviews" for a braider with 100
+  // reviews averaging 3.0 — publicly misleading trust data.
+  const { data: allRatings } = await supabase
+    .from('reviews')
+    .select('rating')
+    .eq('braider_id', braiderId);
+
+  const ratings = allRatings ?? [];
+  if (ratings.length === 0) return null;
+
+  const count = ratings.length;
+  const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / count;
+  const avgDisplay = avg.toFixed(1);
+
+  // Most-recent slice, just for the visible cards.
   const { data: reviews } = await supabase
     .from('reviews')
     .select('id, rating, body, created_at, client:profiles!reviews_client_id_fkey(full_name)')
@@ -13,18 +31,14 @@ export async function BraiderReviews({ braiderId }: { braiderId: string }) {
     .limit(MAX_VISIBLE);
 
   const all = reviews ?? [];
-  if (all.length === 0) return null;
-
-  const avg = all.reduce((sum, r) => sum + r.rating, 0) / all.length;
-  const avgDisplay = avg.toFixed(1);
 
   return (
     <section className="mt-10">
       <div className="flex items-baseline justify-between">
         <h2 className="font-display text-2xl text-ink">What clients say</h2>
         <p className="text-sm text-ink-muted">
-          <span className="font-medium text-ink">{avgDisplay}</span> · {all.length} review
-          {all.length === 1 ? '' : 's'}
+          <span className="font-medium text-ink">{avgDisplay}</span> · {count} review
+          {count === 1 ? '' : 's'}
         </p>
       </div>
 

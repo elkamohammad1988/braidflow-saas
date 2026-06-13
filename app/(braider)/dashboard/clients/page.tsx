@@ -19,12 +19,14 @@ export default async function ClientsPage() {
   const { user } = await requireBraider();
   const supabase = supabaseServer();
 
-  const { data: bookings } = await supabase
+  const { data: bookings, error } = await supabase
     .from('bookings')
     .select(
       'price_cents, scheduled_at, status, client_id, profiles!bookings_client_id_fkey(id, full_name, phone)'
     )
     .eq('braider_id', user.id);
+
+  if (error) throw error;
 
   const map = new Map<string, ClientRow>();
   bookings?.forEach((b) => {

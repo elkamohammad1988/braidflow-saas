@@ -5,6 +5,9 @@ import { endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { recordAuditLog } from '@/lib/audit/log';
+import { captureException } from '@/lib/monitoring';
+import { rateLimit } from '@/lib/rate-limit';
+import { CURRENCY } from '@/lib/constants';
 import { isSlotBookable } from './slot-check';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 
@@ -15,6 +18,14 @@ export async function createBookingAction(input: CreateBookingInput) {
   const supabase = supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'You need to be signed in to book.' };
+
+  // Throttle per user: each attempt creates a pending booking + a Stripe
+  // PaymentIntent, so an abusive loop is both a DB-churn and a Stripe-spend
+  // vector. A normal client never trips this.
+  const limit = rateLimit(`booking:create:${user.id}`, { limit: 8, windowMs: 5 * 60_000 });
+  if (!limit.ok) {
+    return { error: 'You\'re booking very quickly. Please wait a moment and try again.' };
+  }
 
   const admin = supabaseAdmin();
 
@@ -101,21 +112,48 @@ export async function createBookingAction(input: CreateBookingInput) {
     return { error: 'Could not create that booking. Try again.' };
   }
 
-  const intent = await stripe.paymentIntents.create({
-    amount: service.deposit_cents,
-    currency: 'usd',
-    automatic_payment_methods: { enabled: true },
-    metadata: { booking_id: booking.id, kind: 'deposit' },
-    description: `Deposit · ${service.name}`
-  });
+  let intent;
+  try {
+    intent = await stripe.paymentIntents.create({
+      amount: service.deposit_cents,
+      currency: CURRENCY,
+      automatic_payment_methods: { enabled: true },
+      metadata: { booking_id: booking.id, kind: 'deposit' },
+      description: `Deposit · ${service.name}`
+    });
+  } catch (err) {
+    // Roll back the hold so the slot isn't stuck until the expiry cron, and the
+    // user gets a clean error instead of an unhandled rejection.
+    console.error('[booking] PaymentIntent creation failed, rolling back', booking.id, err);
+    captureException(err, { stage: 'payment_intent.create', bookingId: booking.id });
+    await admin.from('bookings').delete().eq('id', booking.id);
+    return { error: 'Could not start payment. Please try again.' };
+  }
 
-  await admin.from('payments').insert({
+  const { error: paymentError } = await admin.from('payments').insert({
     booking_id: booking.id,
     kind: 'deposit',
     amount_cents: service.deposit_cents,
     status: 'pending',
     stripe_payment_intent_id: intent.id
   });
+
+  if (paymentError) {
+    // Without a payments row the deposit could be charged with no local record
+    // and the webhook would match nothing. Cancel the intent and release the
+    // hold rather than proceed.
+    console.error('[booking] payment row insert failed, rolling back', booking.id, paymentError);
+    try {
+      await stripe.paymentIntents.cancel(intent.id);
+    } catch (cancelErr) {
+      // Worst case: a live PaymentIntent with no local payment row. Alert loudly
+      // so it can be reconciled before a client is charged for a phantom booking.
+      console.error('[booking] PI cancel during rollback failed', intent.id, cancelErr);
+      captureException(cancelErr, { stage: 'payment_intent.cancel', paymentIntentId: intent.id });
+    }
+    await admin.from('bookings').delete().eq('id', booking.id);
+    return { error: 'Could not start payment. Please try again.' };
+  }
 
   // Record before redirect — redirect() throws, so nothing after it runs.
   await recordAuditLog({

@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import { supabaseServer } from '@/lib/supabase/server';
 import { BraiderCard } from '@/components/braider/braider-card';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Find a braider',
+  description:
+    'Browse vetted braiders and protective-style stylists with real-time availability. Pick a service, choose a time, and a deposit holds your slot.',
+  alternates: { canonical: '/braiders' }
+};
 
 export default async function BraidersIndex({
   searchParams
@@ -18,7 +26,8 @@ export default async function BraidersIndex({
 
   if (searchParams.city) query.ilike('city', `%${searchParams.city}%`);
 
-  const { data: braiders } = await query;
+  const { data: braiders, error } = await query;
+  if (error) throw error;
 
   const enriched =
     braiders?.map((b) => {

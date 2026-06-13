@@ -85,6 +85,7 @@ export function BookingFlow({ services, slotsByService, braiderSlug: _slug }: Pr
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             maxLength={500}
+            aria-label="Notes for your braider"
             placeholder="Hair texture, length, preferred parting…"
             className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
           />

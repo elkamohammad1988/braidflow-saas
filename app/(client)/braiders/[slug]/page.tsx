@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -8,9 +9,41 @@ import { formatDuration, formatMoney } from '@/lib/utils';
 
 export const revalidate = 60;
 
-export default async function BraiderProfile({ params }: { params: { slug: string } }) {
+export async function generateMetadata({
+  params
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   const supabase = supabaseServer();
   const { data: braider } = await supabase
+    .from('braiders')
+    .select('business_name, bio, city, hero_image_url')
+    .eq('slug', params.slug)
+    .maybeSingle();
+
+  if (!braider) return { title: 'Braider not found' };
+
+  const title = `${braider.business_name} — Book braids${braider.city ? ` in ${braider.city}` : ''}`;
+  const description =
+    braider.bio?.slice(0, 155) ??
+    `Book ${braider.business_name} for braids and protective styles. Real-time availability — a deposit holds your slot.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/braiders/${params.slug}` },
+    openGraph: {
+      title,
+      description,
+      type: 'profile',
+      images: braider.hero_image_url ? [{ url: braider.hero_image_url }] : undefined
+    }
+  };
+}
+
+export default async function BraiderProfile({ params }: { params: { slug: string } }) {
+  const supabase = supabaseServer();
+  const { data: braider, error } = await supabase
     .from('braiders')
     .select(
       'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
@@ -18,6 +51,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
     .eq('slug', params.slug)
     .maybeSingle();
 
+  if (error) throw error;
   if (!braider) notFound();
 
   const services = (braider.services ?? []).filter((s) => s.is_active);

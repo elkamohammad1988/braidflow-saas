@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { formatMoney } from '@/lib/utils';
+import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -130,7 +131,9 @@ function CheckoutForm({ bookingId, depositCents }: { bookingId: string; depositC
       </Button>
 
       <p className="mt-3 text-center text-xs text-ink-muted">
-        By paying, you agree to the braider's cancellation policy.
+        By paying, you agree to the cancellation policy: a full deposit refund if you cancel
+        at least {CANCELLATION_REFUND_WINDOW_HOURS} hours before your appointment; the deposit
+        is non-refundable after that.
       </p>
     </form>
   );

@@ -22,8 +22,8 @@ const columns = [
     heading: 'Company',
     links: [
       { label: 'Contact', href: 'mailto:hello@braidflow.app' },
-      { label: 'Privacy', href: '/pricing' },
-      { label: 'Terms', href: '/pricing' }
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' }
     ]
   }
 ];

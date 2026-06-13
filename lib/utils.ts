@@ -1,11 +1,12 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { CURRENCY_DISPLAY } from '@/lib/constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatMoney(cents: number, currency = 'USD') {
+export function formatMoney(cents: number, currency = CURRENCY_DISPLAY) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,

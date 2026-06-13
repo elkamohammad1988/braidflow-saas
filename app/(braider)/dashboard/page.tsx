@@ -77,6 +77,10 @@ export default async function DashboardOverview() {
     supabase.from('bookings').select('client_id').eq('braider_id', user.id)
   ]);
 
+  const firstError =
+    upcomingRes.error || monthRevenueRes.error || pendingRes.error || distinctClientsRes.error;
+  if (firstError) throw firstError;
+
   const upcomingThisWeek = upcomingRes.data ?? [];
   const monthRevenue = (monthRevenueRes.data ?? []).reduce((sum, b) => sum + b.price_cents, 0);
   const pendingCount = pendingRes.count ?? 0;

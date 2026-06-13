@@ -35,7 +35,7 @@ export default async function PayPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const secret = await getDepositClientSecret(booking.id);
+  const secret = await getDepositClientSecret(booking.id, user.id);
 
   if (secret?.alreadyPaid) {
     redirect(`/bookings/${booking.id}/confirmation`);

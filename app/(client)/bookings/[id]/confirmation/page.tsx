@@ -6,6 +6,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatMoney } from '@/lib/utils';
+import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { ConfirmationPoller } from './poller';
 
 export default async function ConfirmationPage({
@@ -31,6 +32,9 @@ export default async function ConfirmationPage({
   const failed = searchParams.redirect_status === 'failed';
   const isConfirmed = booking.status === 'confirmed' || booking.status === 'completed';
   const stillProcessing = !isConfirmed && !failed && booking.status === 'pending_payment';
+  // The hold may have been released (expiry cron) or otherwise cancelled — give
+  // that an explicit state instead of rendering a blank page.
+  const cancelled = booking.status === 'cancelled' || booking.status === 'no_show';
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-16 text-center">
@@ -106,6 +110,24 @@ export default async function ConfirmationPage({
           </p>
           <Link href={`/bookings/${booking.id}/pay`} className="mt-6 inline-block">
             <Button className="w-full">Try a different card</Button>
+          </Link>
+        </>
+      )}
+
+      {cancelled && (
+        <>
+          <div className="flex justify-center">
+            <Badge tone="danger">Booking not active</Badge>
+          </div>
+          <h1 className="mt-4 font-display text-3xl text-ink">This slot was released.</h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            The hold expired or the booking was cancelled. Any deposit refund follows the
+            cancellation policy — a full refund if cancelled at least{' '}
+            {CANCELLATION_REFUND_WINDOW_HOURS} hours before the appointment. You can book
+            again anytime.
+          </p>
+          <Link href={`/braiders/${booking.braiders?.slug}`} className="mt-6 inline-block">
+            <Button className="w-full">Find another time</Button>
           </Link>
         </>
       )}

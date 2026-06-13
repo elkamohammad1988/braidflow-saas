@@ -1,11 +1,15 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import type { Database } from '@/types/db';
+import { assertRuntimeEnv } from '@/lib/env';
 
 const BRAIDER_PREFIX = '/dashboard';
 const CLIENT_GATED = ['/bookings'];
 
 export async function updateSession(request: NextRequest) {
+  // Fail fast on a misconfigured deploy rather than crashing opaquely below.
+  assertRuntimeEnv();
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(

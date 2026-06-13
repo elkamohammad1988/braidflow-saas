@@ -21,6 +21,13 @@ type Args = {
 
 export async function sendEmail({ to, subject, react, replyTo }: Args) {
   const r = client();
+  if (!process.env.EMAIL_FROM && process.env.NODE_ENV === 'production') {
+    console.error(
+      '[email] EMAIL_FROM is unset in production — falling back to the Resend ' +
+        'sandbox sender, which has poor deliverability and only reaches the ' +
+        'account owner. Set EMAIL_FROM to a verified domain.'
+    );
+  }
   const from = process.env.EMAIL_FROM ?? 'BraidFlow <onboarding@resend.dev>';
 
   if (!r) {

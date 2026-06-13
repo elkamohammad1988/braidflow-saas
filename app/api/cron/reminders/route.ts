@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { addHours } from 'date-fns';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { notifyReminder } from '@/lib/email/notifications';
+import { isAuthorizedCron } from '@/lib/cron/auth';
+import { assertRuntimeEnv } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,52 +14,30 @@ type WindowKind = '24h' | '2h';
 // still gets caught on the next tick.
 type Window = {
   name: WindowKind;
+  column: 'reminder_sent_at' | 'final_reminder_sent_at';
   startHours: number;
   endHours: number;
-  claim: (admin: ReturnType<typeof supabaseAdmin>, nowIso: string, startIso: string, endIso: string) => Promise<{ ids: string[]; error: unknown }>;
 };
 
 const WINDOWS: Window[] = [
-  {
-    name: '24h',
-    startHours: 23,
-    endHours: 25,
-    async claim(admin, nowIso, startIso, endIso) {
-      const { data, error } = await admin
-        .from('bookings')
-        .update({ reminder_sent_at: nowIso })
-        .eq('status', 'confirmed')
-        .is('reminder_sent_at', null)
-        .gte('scheduled_at', startIso)
-        .lt('scheduled_at', endIso)
-        .select('id');
-      return { ids: (data ?? []).map((b) => b.id), error };
-    }
-  },
-  {
-    name: '2h',
-    startHours: 1,
-    endHours: 3,
-    async claim(admin, nowIso, startIso, endIso) {
-      const { data, error } = await admin
-        .from('bookings')
-        .update({ final_reminder_sent_at: nowIso })
-        .eq('status', 'confirmed')
-        .is('final_reminder_sent_at', null)
-        .gte('scheduled_at', startIso)
-        .lt('scheduled_at', endIso)
-        .select('id');
-      return { ids: (data ?? []).map((b) => b.id), error };
-    }
-  }
+  { name: '24h', column: 'reminder_sent_at', startHours: 23, endHours: 25 },
+  { name: '2h', column: 'final_reminder_sent_at', startHours: 1, endHours: 3 }
 ];
+
+// Build a typed single-column update for the window's reminder timestamp. A
+// computed property key would widen to a string index signature that Supabase's
+// generated Update type rejects, so branch on the literal column instead.
+function reminderUpdate(column: Window['column'], value: string | null) {
+  return column === 'reminder_sent_at'
+    ? { reminder_sent_at: value }
+    : { final_reminder_sent_at: value };
+}
 
 type RunResult = { window: WindowKind; claimed: number; failed: number };
 
 export async function GET(req: Request) {
-  const auth = req.headers.get('authorization');
-  const secret = process.env.CRON_SECRET;
-  if (!secret || auth !== `Bearer ${secret}`) {
+  assertRuntimeEnv();
+  if (!isAuthorizedCron(req)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
@@ -72,7 +52,14 @@ export async function GET(req: Request) {
 
     // Atomic claim — the partial-index'd update guarantees a row is only ever
     // picked up by one cron run, so we can't double-send even on concurrent hits.
-    const { ids, error } = await w.claim(admin, nowIso, startIso, endIso);
+    const { data, error } = await admin
+      .from('bookings')
+      .update(reminderUpdate(w.column, nowIso))
+      .eq('status', 'confirmed')
+      .is(w.column, null)
+      .gte('scheduled_at', startIso)
+      .lt('scheduled_at', endIso)
+      .select('id');
 
     if (error) {
       console.error(`[cron/reminders] ${w.name} claim failed`, error);
@@ -80,9 +67,20 @@ export async function GET(req: Request) {
       continue;
     }
 
-    const sendResults = await Promise.allSettled(ids.map((id) => notifyReminder(id, w.name)));
-    const failed = sendResults.filter((r) => r.status === 'rejected').length;
-    results.push({ window: w.name, claimed: ids.length, failed });
+    const ids = (data ?? []).map((b) => b.id);
+    const sendResults = await Promise.all(ids.map((id) => notifyReminder(id, w.name)));
+
+    // Un-claim sends that failed so the next tick retries them (still bounded by
+    // the time window). A duplicate reminder is preferable to a silent miss.
+    const failedIds = ids.filter((_, i) => !sendResults[i]?.ok);
+    if (failedIds.length > 0) {
+      await admin
+        .from('bookings')
+        .update(reminderUpdate(w.column, null))
+        .in('id', failedIds);
+    }
+
+    results.push({ window: w.name, claimed: ids.length, failed: failedIds.length });
   }
 
   return NextResponse.json({ ok: true, runs: results });

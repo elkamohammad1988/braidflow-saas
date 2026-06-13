@@ -51,7 +51,8 @@ provider's calendar.
 - **Self-serve booking** — service picker, real-time availability, slot selection
 - **Stripe deposits** — card checkout via Elements, webhook-confirmed bookings
 - **Braider dashboard** — overview stats, calendar, appointments, clients, services, availability, settings
-- **Lifecycle flows** — reschedule (deposit carries over), cancel, and Stripe refunds
+- **Lifecycle flows** — reschedule (deposit carries over), cancel, Stripe refunds, and
+  post-appointment close-out (braider marks each booking completed or no-show)
 - **Automated reminders** — 24h + 2h before each appointment via idempotent hourly cron
 - **Transactional email** — confirmation, reminders, cancellation, reschedule, and refund templates
 
@@ -147,9 +148,22 @@ psql $SUPABASE_DB_URL -f db/migrations/0001_reminders.sql
 psql $SUPABASE_DB_URL -f db/migrations/0002_refunds.sql
 psql $SUPABASE_DB_URL -f db/migrations/0003_final_reminders.sql
 psql $SUPABASE_DB_URL -f db/migrations/0004_reviews.sql
+psql $SUPABASE_DB_URL -f db/migrations/0005_braider_onboarding.sql
+psql $SUPABASE_DB_URL -f db/migrations/0006_audit_logs.sql
+psql $SUPABASE_DB_URL -f db/migrations/0007_profiles_role_lock.sql
+psql $SUPABASE_DB_URL -f db/migrations/0008_webhook_events_and_client_reads.sql
 # optional demo data (see seed.sql header for the 2-account setup):
 psql $SUPABASE_DB_URL -f db/seed.sql
 ```
+
+> Run every migration in order — they're forward-only and additive. `0005`
+> creates the `braiders` row on braider signup (skip it and braider accounts
+> have no public booking page); `0006` creates the `audit_logs` table that the
+> server actions and crons write to; `0007` locks the `profiles.role` column so
+> a user can't promote themselves to a braider (it must run, or self-signup is a
+> privilege-escalation hole); `0008` adds the Stripe webhook idempotency table
+> and the RLS policy that lets a braider read their own clients' names/phones on
+> the dashboard.
 
 Then regenerate types from your live schema:
 
@@ -162,7 +176,14 @@ npm run db:types
 In Supabase Dashboard → Authentication → URL Configuration:
 
 - **Site URL**: must match `NEXT_PUBLIC_SITE_URL` (e.g. `http://localhost:3000`)
-- **Redirect URLs**: add your production URL when you deploy
+- **Redirect URLs**: add `<site>/auth/callback` for every environment you run
+  (e.g. `http://localhost:3000/auth/callback` and your production URL). The
+  email confirmation link redirects here to establish the session.
+
+**Email confirmation:** if *Confirm email* is enabled (Authentication →
+Providers → Email — the default), signup shows a "check your inbox" screen and
+the user lands back on `/auth/callback` after clicking the link. If you disable
+it, signup signs the user straight in. Either way works out of the box.
 
 ### Stripe
 
@@ -244,8 +265,8 @@ types/db.ts        Supabase-generated types
 These are scoped out on purpose — straightforward extensions, not blockers:
 
 - SMS reminders (email only — extend `lib/email/send.ts`-style abstraction with Twilio)
-- Reviews write-form (DB schema + RLS + public read display are wired in `db/migrations/0004_reviews.sql` and `components/braider/reviews.tsx`; the post-appointment review form is the small remaining piece)
 - Stripe Connect (deposits land in the platform Stripe account; add Connect onboarding for direct payouts)
+- Braider subscription billing (the Pro/Studio pricing tiers are marketing copy; deposit collection is the only money flow wired today)
 - Multi-stylist studio accounts (Studio pricing tier is wired, the multi-braider data model is not)
 
 ## Selling this codebase?

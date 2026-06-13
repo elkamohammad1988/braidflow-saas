@@ -11,7 +11,7 @@ export default async function CalendarPage() {
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekEnd = endOfDay(addDays(weekStart, 6));
 
-  const { data: bookings } = await supabase
+  const { data: bookings, error } = await supabase
     .from('bookings')
     .select(
       'id, scheduled_at, duration_minutes, status, price_cents, services(name), profiles!bookings_client_id_fkey(full_name)'
@@ -21,6 +21,8 @@ export default async function CalendarPage() {
     .lte('scheduled_at', weekEnd.toISOString())
     .in('status', ['pending_payment', 'confirmed'])
     .order('scheduled_at');
+
+  if (error) throw error;
 
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const byDay = new Map<string, typeof bookings>();

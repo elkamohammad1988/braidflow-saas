@@ -6,8 +6,11 @@ export type AuditAction =
   | 'booking.created'
   | 'booking.rescheduled'
   | 'booking.cancelled'
+  | 'booking.completed'
+  | 'booking.no_show'
   | 'booking.refunded'
   | 'booking.expired'
+  | 'payment.disputed'
   | 'settings.updated';
 
 type AuditEntry = {
