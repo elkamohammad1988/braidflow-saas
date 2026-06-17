@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   DetailRow,
   Divider,
@@ -9,12 +8,14 @@ import {
   Signoff
 } from '../components';
 import { formatMoney } from '@/lib/utils';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 export type ReminderClientProps = {
   clientFirstName: string;
   businessName: string;
   serviceName: string;
   scheduledAt: string;
+  timeZone: string;
   balanceCents: number;
   bookingUrl: string;
   proximity?: '24h' | '2h';
@@ -26,10 +27,14 @@ export const reminderClientSubject = (p: ReminderClientProps) =>
     : `Tomorrow with ${p.businessName}`;
 
 export function ReminderClientEmail(p: ReminderClientProps) {
-  const when = new Date(p.scheduledAt);
   const isSoon = p.proximity === '2h';
+  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a');
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+    p.scheduledAt,
+    p.timeZone
+  )}`;
   return (
-    <EmailShell preview={isSoon ? `Today at ${format(when, 'h:mm a')}` : `Tomorrow at ${format(when, 'h:mm a')}`}>
+    <EmailShell preview={isSoon ? `Today at ${time}` : `Tomorrow at ${time}`}>
       <H1>{isSoon ? 'See you soon.' : "Tomorrow's the day."}</H1>
       <P>
         Hi {p.clientFirstName},{' '}
@@ -41,7 +46,7 @@ export function ReminderClientEmail(p: ReminderClientProps) {
       <Divider />
 
       <DetailRow label="Service" value={p.serviceName} />
-      <DetailRow label="When" value={format(when, "EEE, MMM d 'at' h:mm a")} />
+      <DetailRow label="When" value={whenLabel} />
       <DetailRow label="Balance" value={formatMoney(p.balanceCents)} />
 
       <Divider />

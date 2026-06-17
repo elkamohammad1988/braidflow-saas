@@ -49,6 +49,12 @@ export type Database = {
           hero_image_url: string | null;
           instagram_handle: string | null;
           accepting_bookings: boolean;
+          timezone: string;
+          stripe_account_id: string | null;
+          charges_enabled: boolean;
+          payouts_enabled: boolean;
+          stripe_onboarding_complete: boolean;
+          onboarding_completed_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -60,6 +66,12 @@ export type Database = {
           hero_image_url?: string | null;
           instagram_handle?: string | null;
           accepting_bookings?: boolean;
+          timezone?: string;
+          stripe_account_id?: string | null;
+          charges_enabled?: boolean;
+          payouts_enabled?: boolean;
+          stripe_onboarding_complete?: boolean;
+          onboarding_completed_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -71,6 +83,12 @@ export type Database = {
           hero_image_url?: string | null;
           instagram_handle?: string | null;
           accepting_bookings?: boolean;
+          timezone?: string;
+          stripe_account_id?: string | null;
+          charges_enabled?: boolean;
+          payouts_enabled?: boolean;
+          stripe_onboarding_complete?: boolean;
+          onboarding_completed_at?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -197,7 +215,7 @@ export type Database = {
       bookings: {
         Row: {
           id: string;
-          client_id: string;
+          client_id: string | null;
           braider_id: string;
           service_id: string;
           scheduled_at: string;
@@ -206,6 +224,10 @@ export type Database = {
           price_cents: number;
           deposit_cents: number;
           client_notes: string | null;
+          guest_name: string | null;
+          guest_email: string | null;
+          guest_phone: string | null;
+          guest_token: string | null;
           reminder_sent_at: string | null;
           final_reminder_sent_at: string | null;
           created_at: string;
@@ -213,7 +235,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          client_id: string;
+          client_id?: string | null;
           braider_id: string;
           service_id: string;
           scheduled_at: string;
@@ -222,13 +244,17 @@ export type Database = {
           price_cents: number;
           deposit_cents: number;
           client_notes?: string | null;
+          guest_name?: string | null;
+          guest_email?: string | null;
+          guest_phone?: string | null;
+          guest_token?: string | null;
           reminder_sent_at?: string | null;
           final_reminder_sent_at?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
-          client_id?: string;
+          client_id?: string | null;
           braider_id?: string;
           service_id?: string;
           scheduled_at?: string;
@@ -237,6 +263,10 @@ export type Database = {
           price_cents?: number;
           deposit_cents?: number;
           client_notes?: string | null;
+          guest_name?: string | null;
+          guest_email?: string | null;
+          guest_phone?: string | null;
+          guest_token?: string | null;
           reminder_sent_at?: string | null;
           final_reminder_sent_at?: string | null;
           created_at?: string;

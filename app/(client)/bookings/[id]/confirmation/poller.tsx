@@ -8,7 +8,17 @@ import { Spinner } from '@/components/ui/spinner';
 const POLL_MS = 1500;
 const TIMEOUT_MS = 30_000;
 
-export function ConfirmationPoller({ bookingId: _id }: { bookingId: string }) {
+export function ConfirmationPoller({
+  bookingId: _id,
+  fallbackHref = '/bookings',
+  fallbackLabel = 'Go to my bookings'
+}: {
+  bookingId: string;
+  // Where to send the customer if confirmation is slow. Guests have no /bookings
+  // list, so they get a link back to the braider instead.
+  fallbackHref?: string;
+  fallbackLabel?: string;
+}) {
   const router = useRouter();
   const startedAt = useRef(Date.now());
   const [timedOut, setTimedOut] = useState(false);
@@ -35,10 +45,10 @@ export function ConfirmationPoller({ bookingId: _id }: { bookingId: string }) {
           confirmation as soon as it clears.
         </p>
         <Link
-          href="/bookings"
+          href={fallbackHref}
           className="mt-4 inline-block font-medium text-ink hover:underline underline-offset-4"
         >
-          Go to my bookings
+          {fallbackLabel}
         </Link>
       </div>
     );

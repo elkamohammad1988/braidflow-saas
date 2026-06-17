@@ -71,7 +71,18 @@ Run against the production database (SQL Editor or `psql`), **in order**:
       `profiles.role` so a user can't self-promote to braider (privilege-escalation hole otherwise).
 - [ ] `db/migrations/0008_webhook_events_and_client_reads.sql` — Stripe webhook
       idempotency table + RLS letting a braider read their own clients' details.
+- [ ] `db/migrations/0009_braider_timezone.sql` — adds `braiders.timezone`
+      (NOT NULL). Slot generation reads it; skip it and availability breaks.
+- [ ] `db/migrations/0010_stripe_connect.sql` — Stripe Connect columns on
+      `braiders` (`stripe_account_id`, `charges_enabled`, `payouts_enabled`,
+      `stripe_onboarding_complete`, `onboarding_completed_at`). **Required for
+      bookings**: until a braider's account has `charges_enabled`, the booking
+      flow is gated off (server + UI).
+- [ ] `db/migrations/0011_security_fixes.sql` — **must run.** Locks down the
+      `availability_overrides` public-read leak and the `reviews` UPDATE policy.
 - [ ] (Optional) `db/seed.sql` for demo data — **do not** run on real production.
+      Note: seeded braiders have no Stripe account, so they can't take bookings
+      until they complete Connect onboarding (Stripe test mode auto-fills it).
 
 > Sanity check: in Supabase → Authentication → Policies, confirm **RLS is
 > enabled on every table**. The trust boundary lives in the database.
@@ -115,6 +126,9 @@ Supabase's built-in email is heavily rate-limited and meant for testing only.
   - [ ] `refund.updated`
   - [ ] `refund.failed`
   - [ ] `charge.dispute.created`
+  - [ ] `account.updated` — keeps each braider's Connect capability flags
+        (`charges_enabled` etc.) in sync. Without it, a braider who finishes
+        onboarding may stay gated until they hit the manual refresh.
 - [ ] Copy the endpoint's **Signing secret** → `STRIPE_WEBHOOK_SECRET`.
 - [ ] Confirm your Stripe account can actually accept charges and pay out
       (business details, bank account).
@@ -122,6 +136,24 @@ Supabase's built-in email is heavily rate-limited and meant for testing only.
 > The webhook is the source of truth: it promotes bookings to `confirmed` and
 > sends confirmation email. Handlers are idempotent (deduped on event id), so
 > Stripe's at-least-once retries are safe.
+
+### 3a. Stripe Connect (braiders receive deposits)
+
+Deposits are **destination charges** routed to each braider's own connected
+account — the braider is the merchant of record and keeps 100% (no platform fee
+in beta). The platform account stays the integrator, so the webhook above is
+unchanged.
+
+- [ ] Enable **Connect** (Stripe → Connect → Get started) and use **Express**
+      accounts.
+- [ ] Confirm the platform account's **Connect settings** allow creating Express
+      accounts and that `card_payments` + `transfers` capabilities are available.
+- [ ] No new env vars are needed — onboarding uses `STRIPE_SECRET_KEY` and the
+      return/refresh URLs are derived from `NEXT_PUBLIC_SITE_URL`
+      (`/dashboard/connect/return`, `/dashboard/connect/refresh`).
+- [ ] After deploy: from a braider dashboard, click **Connect Stripe**, complete
+      the hosted onboarding, and confirm the booking flow unlocks once the
+      account reaches `charges_enabled`.
 
 ---
 

@@ -6,6 +6,7 @@ import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { notifyReschedule } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { isSlotBookable } from './slot-check';
+import { authorizeBookingMutation } from './access';
 
 type Result =
   | { ok: true }
@@ -13,11 +14,11 @@ type Result =
 
 export async function rescheduleBookingAction(
   bookingId: string,
-  newScheduledAt: string
+  newScheduledAt: string,
+  token?: string
 ): Promise<Result> {
   const supabase = supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'You need to be signed in.' };
 
   const newTime = new Date(newScheduledAt);
   if (Number.isNaN(newTime.getTime())) return { error: 'Invalid time.' };
@@ -30,15 +31,18 @@ export async function rescheduleBookingAction(
   const admin = supabaseAdmin();
   const { data: booking } = await admin
     .from('bookings')
-    .select('id, client_id, braider_id, status, scheduled_at, duration_minutes')
+    .select('id, client_id, braider_id, guest_token, status, scheduled_at, duration_minutes')
     .eq('id', bookingId)
     .maybeSingle();
 
   if (!booking) return { error: 'Booking not found.' };
 
-  const isClient = booking.client_id === user.id;
-  const isBraider = booking.braider_id === user.id;
-  if (!isClient && !isBraider) return { error: 'Not your booking.' };
+  // Owner (session) or guest (capability token). A guest reschedules as the
+  // client party; a braider rescheduling their own booking is allowed even while
+  // paused (handled below).
+  const actor = await authorizeBookingMutation(booking, user?.id ?? null, token);
+  if ('error' in actor) return { error: actor.error };
+  const isClient = actor.role === 'client' || actor.role === 'guest';
 
   if (booking.status !== 'pending_payment' && booking.status !== 'confirmed') {
     return { error: 'That booking can\'t be rescheduled.' };
@@ -56,7 +60,7 @@ export async function rescheduleBookingAction(
   const { data: braider } = await admin
     .from('braiders')
     .select(
-      'accepting_bookings, availability_rules(day_of_week, start_minute, end_minute), availability_overrides(starts_at, ends_at, kind)'
+      'accepting_bookings, timezone, availability_rules(day_of_week, start_minute, end_minute), availability_overrides(starts_at, ends_at, kind)'
     )
     .eq('id', booking.braider_id)
     .maybeSingle();
@@ -81,6 +85,7 @@ export async function rescheduleBookingAction(
 
   const bookable = isSlotBookable(
     newTime,
+    braider.timezone,
     booking.duration_minutes,
     braider.availability_rules ?? [],
     braider.availability_overrides ?? [],
@@ -110,7 +115,7 @@ export async function rescheduleBookingAction(
   }
 
   await recordAuditLog({
-    actorId: user.id,
+    actorId: actor.userId,
     action: 'booking.rescheduled',
     entityType: 'booking',
     entityId: bookingId,

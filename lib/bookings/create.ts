@@ -6,10 +6,11 @@ import { stripe } from '@/lib/stripe/client';
 import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { CURRENCY } from '@/lib/constants';
 import { isSlotBookable } from './slot-check';
 import { createBookingSchema, type CreateBookingInput } from './validation';
+import { generateGuestToken } from './guest-token';
 
 export async function createBookingAction(input: CreateBookingInput) {
   const parsed = createBookingSchema.safeParse(input);
@@ -17,12 +18,24 @@ export async function createBookingAction(input: CreateBookingInput) {
 
   const supabase = supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'You need to be signed in to book.' };
 
-  // Throttle per user: each attempt creates a pending booking + a Stripe
-  // PaymentIntent, so an abusive loop is both a DB-churn and a Stripe-spend
-  // vector. A normal client never trips this.
-  const limit = rateLimit(`booking:create:${user.id}`, { limit: 8, windowMs: 5 * 60_000 });
+  // A guest (not signed in) books with the contact details from the form. An
+  // authenticated client books against their account and any guest fields are
+  // ignored. Guest bookings get a capability token so they can manage the
+  // booking later without an account.
+  const guest = user ? null : parsed.data.guest ?? null;
+  if (!user && !guest) {
+    return { error: 'Add your name and email so we can confirm your booking.' };
+  }
+  const guestToken = guest ? generateGuestToken() : null;
+
+  // Throttle each attempt — it creates a pending booking + a Stripe
+  // PaymentIntent, so an abusive loop is both DB churn and Stripe spend. Keyed
+  // per user when signed in, otherwise per client IP (guests have no id), with a
+  // tighter window for the unauthenticated path. A normal client never trips this.
+  const limit = user
+    ? rateLimit(`booking:create:${user.id}`, { limit: 8, windowMs: 5 * 60_000 })
+    : rateLimit(`booking:create:ip:${clientIpKey()}`, { limit: 5, windowMs: 15 * 60_000 });
   if (!limit.ok) {
     return { error: 'You\'re booking very quickly. Please wait a moment and try again.' };
   }
@@ -55,7 +68,7 @@ export async function createBookingAction(input: CreateBookingInput) {
   const { data: braider } = await admin
     .from('braiders')
     .select(
-      'accepting_bookings, availability_rules(day_of_week, start_minute, end_minute), availability_overrides(starts_at, ends_at, kind)'
+      'accepting_bookings, timezone, stripe_account_id, charges_enabled, availability_rules(day_of_week, start_minute, end_minute), availability_overrides(starts_at, ends_at, kind)'
     )
     .eq('id', service.braider_id)
     .maybeSingle();
@@ -63,6 +76,15 @@ export async function createBookingAction(input: CreateBookingInput) {
   if (!braider || !braider.accepting_bookings) {
     return { error: 'This braider isn\'t accepting bookings right now.' };
   }
+
+  // Hard gate: a braider can only take deposits once their Stripe Connect account
+  // can accept charges. Without this we'd create a PaymentIntent that can't be
+  // routed to them. The booking page hides the flow in this state, but the
+  // request is untrusted — enforce it here too.
+  if (!braider.charges_enabled || !braider.stripe_account_id) {
+    return { error: 'This braider hasn\'t finished setting up payments yet. Please check back soon.' };
+  }
+  const connectedAccountId = braider.stripe_account_id;
 
   // Pull the braider's bookings around the requested day (one day back to catch
   // an appointment that spills past midnight) for the overlap check.
@@ -78,6 +100,7 @@ export async function createBookingAction(input: CreateBookingInput) {
 
   const bookable = isSlotBookable(
     requestedStart,
+    braider.timezone,
     service.duration_minutes,
     braider.availability_rules ?? [],
     braider.availability_overrides ?? [],
@@ -91,7 +114,7 @@ export async function createBookingAction(input: CreateBookingInput) {
   const { data: booking, error: insertError } = await admin
     .from('bookings')
     .insert({
-      client_id: user.id,
+      client_id: user?.id ?? null,
       braider_id: service.braider_id,
       service_id: service.id,
       scheduled_at: parsed.data.scheduledAt,
@@ -99,6 +122,10 @@ export async function createBookingAction(input: CreateBookingInput) {
       price_cents: service.price_cents,
       deposit_cents: service.deposit_cents,
       client_notes: parsed.data.clientNotes ?? null,
+      guest_name: guest?.name ?? null,
+      guest_email: guest?.email ?? null,
+      guest_phone: guest?.phone ?? null,
+      guest_token: guestToken,
       status: 'pending_payment'
     })
     .select('id')
@@ -118,6 +145,12 @@ export async function createBookingAction(input: CreateBookingInput) {
       amount: service.deposit_cents,
       currency: CURRENCY,
       automatic_payment_methods: { enabled: true },
+      // Destination charge: the braider is the merchant of record and receives
+      // the full deposit in their connected account. No application_fee_amount —
+      // the platform takes no cut during beta (see lib/constants PLATFORM_FEE_BPS
+      // for the future model). Refunds reverse this transfer (see refund.ts).
+      on_behalf_of: connectedAccountId,
+      transfer_data: { destination: connectedAccountId },
       metadata: { booking_id: booking.id, kind: 'deposit' },
       description: `Deposit · ${service.name}`
     });
@@ -157,7 +190,7 @@ export async function createBookingAction(input: CreateBookingInput) {
 
   // Record before redirect — redirect() throws, so nothing after it runs.
   await recordAuditLog({
-    actorId: user.id,
+    actorId: user?.id ?? null,
     action: 'booking.created',
     entityType: 'booking',
     entityId: booking.id,
@@ -165,9 +198,12 @@ export async function createBookingAction(input: CreateBookingInput) {
       braider_id: service.braider_id,
       service_id: service.id,
       scheduled_at: parsed.data.scheduledAt,
-      deposit_cents: service.deposit_cents
+      deposit_cents: service.deposit_cents,
+      guest: Boolean(guest)
     }
   });
 
-  redirect(`/bookings/${booking.id}/pay`);
+  // Guests carry their capability token through to the pay page (and onward);
+  // authenticated clients are recognised by their session.
+  redirect(guestToken ? `/bookings/${booking.id}/pay?t=${guestToken}` : `/bookings/${booking.id}/pay`);
 }

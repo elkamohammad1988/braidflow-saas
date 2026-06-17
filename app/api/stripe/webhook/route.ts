@@ -6,6 +6,8 @@ import { notifyBookingConfirmed } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureMessage } from '@/lib/monitoring';
 import { assertRuntimeEnv } from '@/lib/env';
+import { readAccountStatus } from '@/lib/stripe/connect';
+import { applyConnectStatus } from '@/lib/braider/connect-sync';
 
 export const runtime = 'nodejs';
 
@@ -142,6 +144,16 @@ export async function POST(req: Request) {
           );
         }
       }
+      break;
+    }
+
+    case 'account.updated': {
+      // A braider's Connect account changed (finished onboarding, capability
+      // flipped, requirements due). Mirror the capability flags onto their row so
+      // the booking gate reflects reality. Keyed by stripe_account_id; no-ops if
+      // the account isn't linked to a braider.
+      const account = event.data.object as Stripe.Account;
+      await applyConnectStatus(admin, account.id, readAccountStatus(account));
       break;
     }
 

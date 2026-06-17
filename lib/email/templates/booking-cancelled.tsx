@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
 import { DetailRow, Divider, EmailShell, H1, P, Signoff } from '../components';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 export type CancelledProps = {
   recipientFirstName: string;
@@ -8,6 +8,7 @@ export type CancelledProps = {
   otherPartyName: string;
   serviceName: string;
   scheduledAt: string;
+  timeZone: string;
 };
 
 export const cancelledSubject = (p: CancelledProps) =>
@@ -16,34 +17,39 @@ export const cancelledSubject = (p: CancelledProps) =>
     : `${p.otherPartyName} cancelled their appointment`;
 
 export function BookingCancelledEmail(p: CancelledProps) {
-  const when = new Date(p.scheduledAt);
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+    p.scheduledAt,
+    p.timeZone
+  )}`;
   const headline =
     p.audience === 'client' ? 'Your appointment is off.' : 'A booking was cancelled.';
 
   return (
-    <EmailShell preview={`Cancelled: ${p.serviceName} on ${format(when, 'MMM d')}`}>
+    <EmailShell
+      preview={`Cancelled: ${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d')}`}
+    >
       <H1>{headline}</H1>
 
       {p.audience === 'client' ? (
         <P>
           Hi {p.recipientFirstName}, {p.otherPartyName} cancelled your {p.serviceName} appointment on{' '}
-          {format(when, "EEE, MMM d 'at' h:mm a")}.
+          {whenLabel}.
         </P>
       ) : p.cancelledBy === 'client' ? (
         <P>
           Hi {p.recipientFirstName}, {p.otherPartyName} cancelled their {p.serviceName} appointment on{' '}
-          {format(when, "EEE, MMM d 'at' h:mm a")}. The slot is open again.
+          {whenLabel}. The slot is open again.
         </P>
       ) : (
         <P>
           Hi {p.recipientFirstName}, we've cancelled the {p.serviceName} appointment with {p.otherPartyName} on{' '}
-          {format(when, "EEE, MMM d 'at' h:mm a")} on your behalf.
+          {whenLabel} on your behalf.
         </P>
       )}
 
       <Divider />
       <DetailRow label="Service" value={p.serviceName} />
-      <DetailRow label="When" value={format(when, "EEE, MMM d 'at' h:mm a")} />
+      <DetailRow label="When" value={whenLabel} />
       <DetailRow
         label={p.audience === 'client' ? 'Braider' : 'Client'}
         value={p.otherPartyName}

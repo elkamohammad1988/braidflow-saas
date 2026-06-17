@@ -24,10 +24,25 @@ create table braiders (
   hero_image_url text,
   instagram_handle text,
   accepting_bookings boolean not null default true,
+  -- IANA timezone (e.g. 'America/New_York'). Availability minutes-of-day are
+  -- interpreted in this zone, and appointment times are rendered in it. See
+  -- migration 0009.
+  timezone text not null default 'America/New_York',
+  -- Stripe Connect (Express). Deposits route to this connected account; a braider
+  -- cannot accept bookings until charges are enabled. Flags are synced from the
+  -- account.updated webhook and the onboarding return route. See migration 0010.
+  stripe_account_id text,
+  charges_enabled boolean not null default false,
+  payouts_enabled boolean not null default false,
+  stripe_onboarding_complete boolean not null default false,
+  onboarding_completed_at timestamptz,
   created_at timestamptz not null default now()
 );
 
 create index on braiders (city) where accepting_bookings;
+create unique index braiders_stripe_account_id_key
+  on braiders (stripe_account_id)
+  where stripe_account_id is not null;
 
 create table services (
   id uuid primary key default gen_random_uuid(),
@@ -69,7 +84,9 @@ create index on availability_overrides (braider_id, starts_at);
 
 create table bookings (
   id uuid primary key default gen_random_uuid(),
-  client_id uuid not null references profiles(id) on delete restrict,
+  -- Null for guest bookings (no account). Guests are identified by the guest_*
+  -- columns below and authorize actions with guest_token. See migration 0012.
+  client_id uuid references profiles(id) on delete restrict,
   braider_id uuid not null references braiders(id) on delete restrict,
   service_id uuid not null references services(id) on delete restrict,
   scheduled_at timestamptz not null,
@@ -78,7 +95,18 @@ create table bookings (
   price_cents int not null,
   deposit_cents int not null,
   client_notes text,
+  -- Guest checkout: contact details collected at booking time instead of a
+  -- profile, plus a capability token that authorizes managing the booking.
+  guest_name text,
+  guest_email text,
+  guest_phone text,
+  guest_token text,
   created_at timestamptz not null default now(),
+  -- Every booking is reachable by an account OR a guest (email + token).
+  constraint booking_has_owner check (
+    client_id is not null
+    or (guest_email is not null and guest_token is not null)
+  ),
   -- Range column used to enforce no-overlap per braider via the gist exclusion
   -- below. This is a PLAIN column (not GENERATED): the expression
   -- `scheduled_at + interval` is only STABLE, not IMMUTABLE, and Postgres
@@ -94,6 +122,12 @@ create table bookings (
 
 create index on bookings (client_id, scheduled_at desc);
 create index on bookings (braider_id, scheduled_at);
+create unique index bookings_guest_token_key
+  on bookings (guest_token)
+  where guest_token is not null;
+create index bookings_guest_email_idx
+  on bookings (lower(guest_email))
+  where guest_email is not null;
 
 -- Populate time_range from scheduled_at + duration. Runs BEFORE the row is
 -- written so the gist exclusion constraint sees the computed range. This

@@ -49,19 +49,30 @@ type Props = {
   clientSecret: string;
   bookingId: string;
   depositCents: number;
+  // Query string (e.g. `?t=<token>`) appended to the post-payment return URL so a
+  // guest stays authorized on the confirmation page. Empty for signed-in clients.
+  returnQuery?: string;
 };
 
-export function Checkout({ clientSecret, bookingId, depositCents }: Props) {
+export function Checkout({ clientSecret, bookingId, depositCents, returnQuery = '' }: Props) {
   const options = useMemo(() => ({ clientSecret, appearance }), [clientSecret]);
 
   return (
     <Elements stripe={stripePromise} options={options}>
-      <CheckoutForm bookingId={bookingId} depositCents={depositCents} />
+      <CheckoutForm bookingId={bookingId} depositCents={depositCents} returnQuery={returnQuery} />
     </Elements>
   );
 }
 
-function CheckoutForm({ bookingId, depositCents }: { bookingId: string; depositCents: number }) {
+function CheckoutForm({
+  bookingId,
+  depositCents,
+  returnQuery
+}: {
+  bookingId: string;
+  depositCents: number;
+  returnQuery: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [ready, setReady] = useState(false);
@@ -78,7 +89,7 @@ function CheckoutForm({ bookingId, depositCents }: { bookingId: string; depositC
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/bookings/${bookingId}/confirmation`
+        return_url: `${window.location.origin}/bookings/${bookingId}/confirmation${returnQuery}`
       }
     });
 

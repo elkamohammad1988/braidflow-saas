@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { requireBraider } from '@/lib/auth/session';
 import { ensureBraiderRecord } from '@/lib/braider/ensure';
+import { supabaseAdmin } from '@/lib/supabase/server';
 import { SignOutLink } from '@/components/shared/sign-out';
 import { Logo, LogoMark } from '@/components/shared/logo';
+import { ConnectBanner } from '@/components/braider/connect-banner';
 import { DashboardNav } from './dashboard-nav';
 
 function initials(name: string) {
@@ -21,6 +23,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // got created) get one on first dashboard load, so their public page and
   // settings work immediately.
   await ensureBraiderRecord(user.id, profile.full_name);
+
+  // Until Stripe can take charges for this braider, clients can't book (enforced
+  // server-side in createBookingAction); surface a persistent banner to fix it.
+  const { data: connect } = await supabaseAdmin()
+    .from('braiders')
+    .select('charges_enabled, stripe_onboarding_complete')
+    .eq('id', user.id)
+    .maybeSingle();
+  const needsConnect = !connect?.charges_enabled;
 
   const userBlock = (
     <div className="flex items-center gap-3">
@@ -85,7 +96,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         {/* Main */}
         <main className="min-w-0 flex-1 px-5 py-8 md:px-10 md:py-12">
-          <div className="mx-auto max-w-5xl">{children}</div>
+          <div className="mx-auto max-w-5xl">
+            {needsConnect && (
+              <ConnectBanner onboardingComplete={connect?.stripe_onboarding_complete ?? false} />
+            )}
+            {children}
+          </div>
         </main>
       </div>
     </div>

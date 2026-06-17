@@ -9,6 +9,7 @@ import { CancelBookingButton } from '@/components/booking/cancel-button';
 import { ReviewForm } from '@/components/review/review-form';
 import { formatMoney } from '@/lib/utils';
 import { formatAppointment } from '@/lib/format-date';
+import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
 
 const STATUS_TONE = {
@@ -27,7 +28,7 @@ export default async function MyBookings() {
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
-       services(name), braiders(business_name, slug),
+       services(name), braiders(business_name, slug, timezone),
        payments(kind, status, amount_cents)`
     )
     .eq('client_id', user.id)
@@ -94,7 +95,7 @@ export default async function MyBookings() {
                   </Link>
                 </p>
                 <p className="mt-2 text-sm text-ink-muted">
-                  {formatAppointment(new Date(b.scheduled_at))}
+                  {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
                 </p>
               </div>
               <div className="text-right">

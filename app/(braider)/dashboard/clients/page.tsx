@@ -22,7 +22,7 @@ export default async function ClientsPage() {
   const { data: bookings, error } = await supabase
     .from('bookings')
     .select(
-      'price_cents, scheduled_at, status, client_id, profiles!bookings_client_id_fkey(id, full_name, phone)'
+      'price_cents, scheduled_at, status, client_id, guest_name, guest_email, guest_phone, profiles!bookings_client_id_fkey(id, full_name, phone)'
     )
     .eq('braider_id', user.id);
 
@@ -30,11 +30,28 @@ export default async function ClientsPage() {
 
   const map = new Map<string, ClientRow>();
   bookings?.forEach((b) => {
-    if (!b.profiles) return;
-    const existing = map.get(b.client_id) ?? {
-      id: b.client_id,
-      name: b.profiles.full_name,
-      phone: b.profiles.phone,
+    // Group registered clients by their account; guests (no account) by their
+    // email, so a repeat guest still rolls up into one row. Skip anything we
+    // can't attribute to a person.
+    let key: string;
+    let name: string;
+    let phone: string | null;
+    if (b.client_id && b.profiles) {
+      key = b.client_id;
+      name = b.profiles.full_name;
+      phone = b.profiles.phone;
+    } else if (b.guest_email) {
+      key = `guest:${b.guest_email.toLowerCase()}`;
+      name = b.guest_name ?? b.guest_email;
+      phone = b.guest_phone;
+    } else {
+      return;
+    }
+
+    const existing = map.get(key) ?? {
+      id: key,
+      name,
+      phone,
       visits: 0,
       lifetimeCents: 0,
       lastVisit: null
@@ -43,7 +60,7 @@ export default async function ClientsPage() {
     if (b.status === 'completed') existing.lifetimeCents += b.price_cents;
     const visitDate = new Date(b.scheduled_at);
     if (!existing.lastVisit || visitDate > existing.lastVisit) existing.lastVisit = visitDate;
-    map.set(b.client_id, existing);
+    map.set(key, existing);
   });
 
   const clients = Array.from(map.values()).sort(

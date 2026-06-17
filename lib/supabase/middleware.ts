@@ -4,7 +4,6 @@ import type { Database } from '@/types/db';
 import { assertRuntimeEnv } from '@/lib/env';
 
 const BRAIDER_PREFIX = '/dashboard';
-const CLIENT_GATED = ['/bookings'];
 
 export async function updateSession(request: NextRequest) {
   // Fail fast on a misconfigured deploy rather than crashing opaquely below.
@@ -29,10 +28,13 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const requiresAuth =
-    path.startsWith(BRAIDER_PREFIX) ||
-    CLIENT_GATED.some((p) => path.startsWith(p)) ||
-    path.includes('/book');
+
+  // The booking page (`/book`) is public — guests must be able to book without an
+  // account. The `/bookings` LIST is owner-only, but the per-booking pages
+  // (`/bookings/<id>/pay|confirmation|reschedule`) self-authorize via the owner's
+  // session OR a guest capability token, so they're not gated here.
+  const isBookingsList = path === '/bookings' || path === '/bookings/';
+  const requiresAuth = path.startsWith(BRAIDER_PREFIX) || isBookingsList;
 
   if (requiresAuth && !user) {
     const url = request.nextUrl.clone();

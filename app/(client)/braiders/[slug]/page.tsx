@@ -46,7 +46,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   const { data: braider, error } = await supabase
     .from('braiders')
     .select(
-      'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
+      'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, charges_enabled, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
     )
     .eq('slug', params.slug)
     .maybeSingle();
@@ -55,6 +55,8 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   if (!braider) notFound();
 
   const services = (braider.services ?? []).filter((s) => s.is_active);
+  // Bookable only when accepting AND Stripe can take charges for them.
+  const open = braider.accepting_bookings && braider.charges_enabled;
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
@@ -127,7 +129,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
               Pick a service and a time that works. Deposit holds your slot.
             </p>
             <div className="mt-5">
-              {braider.accepting_bookings ? (
+              {open ? (
                 <Link href={`/braiders/${braider.slug}/book`}>
                   <Button className="w-full">See available times</Button>
                 </Link>

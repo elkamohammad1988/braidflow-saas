@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Check } from 'lucide-react';
 import { formatAppointment } from '@/lib/format-date';
-import { requireSession } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/server';
+import { resolveBookingViewer } from '@/lib/bookings/access';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { CancelBookingButton } from '@/components/booking/cancel-button';
 import { formatMoney } from '@/lib/utils';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
+import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { ConfirmationPoller } from './poller';
 
 export default async function ConfirmationPage({
@@ -14,20 +17,22 @@ export default async function ConfirmationPage({
   searchParams
 }: {
   params: { id: string };
-  searchParams: { redirect_status?: string };
+  searchParams: { redirect_status?: string; t?: string };
 }) {
-  const { user } = await requireSession();
-  const supabase = supabaseServer();
+  const token = searchParams.t;
+  const { viewer } = await resolveBookingViewer(params.id, token);
+  const isGuest = viewer.kind === 'guest';
+  const tokenQuery = isGuest && token ? `?t=${encodeURIComponent(token)}` : '';
 
-  const { data: booking } = await supabase
+  const { data: booking } = await supabaseAdmin()
     .from('bookings')
     .select(
-      'id, client_id, scheduled_at, status, price_cents, deposit_cents, services(name), braiders(business_name, slug)'
+      'id, client_id, scheduled_at, status, price_cents, deposit_cents, services(name), braiders(business_name, slug, timezone)'
     )
     .eq('id', params.id)
     .maybeSingle();
 
-  if (!booking || booking.client_id !== user.id) notFound();
+  if (!booking) notFound();
 
   const failed = searchParams.redirect_status === 'failed';
   const isConfirmed = booking.status === 'confirmed' || booking.status === 'completed';
@@ -36,19 +41,25 @@ export default async function ConfirmationPage({
   // that an explicit state instead of rendering a blank page.
   const cancelled = booking.status === 'cancelled' || booking.status === 'no_show';
 
+  const upcoming = new Date(booking.scheduled_at) > new Date();
+  const canManage = isConfirmed && upcoming;
+
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-16 text-center">
       {isConfirmed && (
         <>
           <div className="flex justify-center">
-            <Badge tone="success">Booking confirmed</Badge>
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-moss/10 text-moss ring-1 ring-inset ring-moss/20 motion-safe:animate-fade-in-up">
+              <Check className="h-8 w-8" strokeWidth={2.5} />
+            </span>
           </div>
-          <h1 className="mt-4 font-display text-3xl text-ink">You're on the books.</h1>
-          <p className="mt-2 text-sm text-ink-muted">
-            We'll send a reminder before your appointment.
+          <h1 className="mt-5 font-display text-3xl text-ink">You're on the books.</h1>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+            {isGuest ? 'Your confirmation is on its way by email. ' : ''}We&rsquo;ll remind you
+            before your appointment.
           </p>
 
-          <dl className="mx-auto mt-8 w-full max-w-sm space-y-1 rounded-card border border-ink/5 bg-white px-6 py-5 text-left text-sm shadow-soft">
+          <dl className="mx-auto mt-8 w-full max-w-sm space-y-1 rounded-card border border-line bg-paper px-6 py-5 text-left text-sm shadow-soft">
             <div className="flex justify-between">
               <dt className="text-ink-muted">Braider</dt>
               <dd className="text-ink">{booking.braiders?.business_name}</dd>
@@ -60,7 +71,10 @@ export default async function ConfirmationPage({
             <div className="flex justify-between">
               <dt className="text-ink-muted">When</dt>
               <dd className="text-ink">
-                {formatAppointment(new Date(booking.scheduled_at))}
+                {formatAppointment(
+                  booking.scheduled_at,
+                  booking.braiders?.timezone ?? DEFAULT_TIMEZONE
+                )}
               </dd>
             </div>
             <div className="flex justify-between pt-2">
@@ -75,14 +89,39 @@ export default async function ConfirmationPage({
             </div>
           </dl>
 
-          <div className="mt-8 flex flex-col gap-2">
-            <Link href="/bookings">
-              <Button className="w-full">See all my bookings</Button>
-            </Link>
-            <Link href={`/braiders/${booking.braiders?.slug}`}>
-              <Button variant="ghost" className="w-full">Back to braider</Button>
-            </Link>
-          </div>
+          {isGuest ? (
+            <>
+              {canManage && (
+                <div className="mt-6 flex items-center justify-center gap-4 text-sm">
+                  <Link
+                    href={`/bookings/${booking.id}/reschedule${tokenQuery}`}
+                    className="font-medium text-ink hover:underline underline-offset-4"
+                  >
+                    Reschedule
+                  </Link>
+                  <span aria-hidden className="text-ink/20">·</span>
+                  <CancelBookingButton bookingId={booking.id} token={token} />
+                </div>
+              )}
+              <p className="mt-6 text-xs text-ink-muted">
+                Keep the email we sent you — it has the link to manage this booking anytime.
+              </p>
+              <div className="mt-6">
+                <Link href={`/braiders/${booking.braiders?.slug}`}>
+                  <Button variant="ghost" className="w-full">Back to braider</Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="mt-8 flex flex-col gap-2">
+              <Link href="/bookings">
+                <Button className="w-full">See all my bookings</Button>
+              </Link>
+              <Link href={`/braiders/${booking.braiders?.slug}`}>
+                <Button variant="ghost" className="w-full">Back to braider</Button>
+              </Link>
+            </div>
+          )}
         </>
       )}
 
@@ -95,7 +134,11 @@ export default async function ConfirmationPage({
           <p className="mt-2 text-sm text-ink-muted">
             Your card went through. We're confirming with the braider's schedule.
           </p>
-          <ConfirmationPoller bookingId={booking.id} />
+          <ConfirmationPoller
+            bookingId={booking.id}
+            fallbackHref={isGuest ? `/braiders/${booking.braiders?.slug}` : '/bookings'}
+            fallbackLabel={isGuest ? 'Back to braider' : 'Go to my bookings'}
+          />
         </>
       )}
 
@@ -108,7 +151,7 @@ export default async function ConfirmationPage({
           <p className="mt-2 text-sm text-ink-muted">
             Your card was declined. Your slot is held for a few more minutes.
           </p>
-          <Link href={`/bookings/${booking.id}/pay`} className="mt-6 inline-block">
+          <Link href={`/bookings/${booking.id}/pay${tokenQuery}`} className="mt-6 inline-block">
             <Button className="w-full">Try a different card</Button>
           </Link>
         </>
@@ -134,4 +177,3 @@ export default async function ConfirmationPage({
     </div>
   );
 }
-

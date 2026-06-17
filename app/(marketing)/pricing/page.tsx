@@ -2,93 +2,48 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Pricing — BraidFlow',
   description:
-    'Simple, honest pricing for braiders. Start free, upgrade when you outgrow it. No cut of your services, ever.'
+    'BraidFlow is free while we’re in beta. No monthly fee, and we take 0% of your deposits — you keep 100%.',
+  alternates: { canonical: '/pricing' }
 };
 
-type Tier = {
-  name: string;
-  price: string;
-  cadence?: string;
-  blurb: string;
-  cta: { label: string; href: string };
-  highlighted?: boolean;
-  features: string[];
-};
-
-const tiers: Tier[] = [
-  {
-    name: 'Starter',
-    price: '$0',
-    cadence: 'forever',
-    blurb: 'Everything you need to take your first ten bookings online.',
-    cta: { label: 'Start free', href: '/signup?role=braider' },
-    features: [
-      'Up to 10 bookings / month',
-      'Stripe deposits (you keep 100%)',
-      'Your own booking page',
-      'Weekly availability + day blocks',
-      'Email confirmations',
-      'Mobile-friendly client view'
-    ]
-  },
-  {
-    name: 'Pro',
-    price: '$29',
-    cadence: '/ month',
-    blurb: 'For braiders running a full week. Unlimited bookings and reminders that cut no-shows.',
-    cta: { label: 'Start 14-day trial', href: '/signup?role=braider&plan=pro' },
-    highlighted: true,
-    features: [
-      'Unlimited bookings',
-      'Automatic 24h + 2h reminders',
-      'Custom deposit per service',
-      'Reschedule + cancel grace window',
-      'Client notes + history',
-      'Priority email support'
-    ]
-  },
-  {
-    name: 'Studio',
-    price: '$79',
-    cadence: '/ month',
-    blurb: 'For shops with multiple chairs. Everything in Pro, plus team tools.',
-    cta: { label: 'Talk to us', href: 'mailto:hello@braidflow.app?subject=Studio%20plan' },
-    features: [
-      'Up to 5 braiders on one account',
-      'Per-braider availability + services',
-      'Shared client list across the shop',
-      'Revenue reports per braider',
-      'Custom branding (logo, colors)',
-      'Personal onboarding call'
-    ]
-  }
+// Everything listed here is shipped and working today. Paid plans are not built
+// yet, so this page makes no claim about trials, booking limits, team seats,
+// reports, or exports until those exist. Keep it honest.
+const included = [
+  'Your own branded booking page',
+  'Stripe deposits — you keep 100%',
+  'Weekly availability + day blocks',
+  'Per-service deposit amounts',
+  'Automatic 24h + 2h email reminders',
+  'Reschedule + cancel with a refund window you set',
+  'Client notes and booking history',
+  'Reviews from completed appointments'
 ];
 
 const faqs: { q: string; a: string }[] = [
   {
+    q: 'How much does BraidFlow cost?',
+    a: "It's free while we're in beta. There's no monthly fee, and we take 0% of your deposits — you keep every dollar. Stripe charges its standard processing fee (~2.9% + 30¢) on the deposit; that goes to Stripe, not us."
+  },
+  {
+    q: 'Will it always be free?',
+    a: "We'll introduce paid plans later as we add more. You'll get plenty of notice before anything changes, and we'll never switch a feature you're relying on to paid without telling you first."
+  },
+  {
     q: 'Do you take a cut of my services?',
-    a: "No. Ever. You pay a flat monthly price and keep 100% of what your clients pay. Stripe takes its standard processing fee on the deposit (~2.9% + 30¢); we don't add anything on top."
-  },
-  {
-    q: 'What happens if I outgrow the free plan mid-month?',
-    a: "You can still take the 11th booking — we'll never block a client from paying you. We'll let you know it's time to upgrade and give you the rest of the month to decide."
-  },
-  {
-    q: 'Can I cancel anytime?',
-    a: "Yes. Cancel in one click from your settings. You keep access until the end of the billing period and your data stays exportable forever."
+    a: 'No. During the beta our commission is 0%. Deposits go straight to your connected Stripe account — we never touch the money beyond routing it to you.'
   },
   {
     q: 'Do my clients pay anything to use BraidFlow?',
-    a: "No. They book and pay the deposit — same flow they'd use on any salon site. They never see a BraidFlow fee."
+    a: 'No. They book and pay their deposit — the same flow they’d use on any salon site. They never see a BraidFlow fee.'
   },
   {
-    q: 'I share a shop with my sister / cousin / partner. Which plan?',
-    a: "Studio. One account, separate calendars and services per braider, shared client list so you don't double-book each other."
+    q: 'What do I need to start taking deposits?',
+    a: 'A Stripe account. You connect it from your dashboard in about two minutes (Stripe handles the details), and then clients can book. Until it’s connected, your booking page stays paused.'
   },
   {
     q: "What if Stripe isn't available in my country?",
@@ -104,83 +59,53 @@ export default function PricingPage() {
           Pricing
         </span>
         <h1 className="mx-auto mt-5 max-w-3xl font-display text-5xl leading-[1.05] tracking-tight text-ink md:text-6xl">
-          One flat price. You keep every dollar your clients pay.
+          Free while we’re in beta.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-ink-muted">
-          Start free. Upgrade when your week gets busy enough that the cost pays for itself in one
-          saved no-show.
+          No monthly fee. No cut of your services. You keep 100% of every deposit — we just route
+          it straight to your Stripe account.
         </p>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid items-start gap-6 md:grid-cols-3">
-          {tiers.map((tier) => (
-            <div
-              key={tier.name}
-              className={cn(
-                'relative flex flex-col rounded-xl2 border p-8',
-                tier.highlighted
-                  ? 'border-ink bg-ink text-cream shadow-lifted md:-mt-3 md:pb-10'
-                  : 'border-line bg-paper text-ink shadow-card'
-              )}
-            >
-              {tier.highlighted && (
-                <p className="absolute -top-3 left-8 inline-flex w-fit items-center gap-1.5 rounded-full bg-clay px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cream shadow-sm">
-                  Most popular
-                </p>
-              )}
-              <p className="font-display text-2xl">{tier.name}</p>
-              <p className={cn('mt-3 text-sm leading-relaxed', tier.highlighted ? 'text-cream/70' : 'text-ink-muted')}>
-                {tier.blurb}
-              </p>
-              <div className="mt-6 flex items-baseline gap-1.5">
-                <span className="font-display text-5xl tracking-tight">{tier.price}</span>
-                {tier.cadence && (
-                  <span className={cn('text-sm', tier.highlighted ? 'text-cream/60' : 'text-ink-muted')}>
-                    {tier.cadence}
+      <section className="mx-auto max-w-2xl px-6 pb-20">
+        <div className="relative flex flex-col rounded-xl2 border border-ink bg-ink p-8 text-cream shadow-lifted md:p-10">
+          <p className="absolute -top-3 left-8 inline-flex w-fit items-center gap-1.5 rounded-full bg-clay px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cream shadow-sm">
+            Beta
+          </p>
+          <p className="font-display text-2xl">Everything, free</p>
+          <div className="mt-4 flex items-baseline gap-1.5">
+            <span className="font-display text-6xl tracking-tight">$0</span>
+            <span className="text-sm text-cream/60">while in beta</span>
+          </div>
+          <p className="mt-3 text-sm leading-relaxed text-cream/70">
+            The full product, no limits we’re hiding. We’ll add paid plans down the road — with
+            notice — but everything below is yours today.
+          </p>
+
+          <Link href="/signup?role=braider" className="mt-7">
+            <Button variant="secondary" size="lg" className="w-full">
+              Start free
+              <ArrowRight />
+            </Button>
+          </Link>
+
+          <div className="mt-8 border-t border-cream/15 pt-6">
+            <ul className="grid gap-3.5 text-sm sm:grid-cols-2">
+              {included.map((feature) => (
+                <li key={feature} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cream/15 text-cream">
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </span>
-                )}
-              </div>
-
-              <Link href={tier.cta.href} className="mt-6">
-                <Button
-                  variant={tier.highlighted ? 'secondary' : 'primary'}
-                  size="lg"
-                  className="w-full"
-                >
-                  {tier.cta.label}
-                  <ArrowRight />
-                </Button>
-              </Link>
-
-              <div
-                className={cn(
-                  'mt-8 border-t pt-6',
-                  tier.highlighted ? 'border-cream/15' : 'border-line'
-                )}
-              >
-                <ul className="space-y-3.5 text-sm">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <span
-                        className={cn(
-                          'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
-                          tier.highlighted ? 'bg-cream/15 text-cream' : 'bg-moss/10 text-moss'
-                        )}
-                      >
-                        <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                      </span>
-                      <span className={tier.highlighted ? 'text-cream/90' : 'text-ink'}>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
+                  <span className="text-cream/90">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-ink-muted">
-          All plans include unlimited services, RLS-protected data, and one-click data export.
+        <p className="mt-6 text-center text-sm text-ink-muted">
+          Stripe’s standard processing fee (~2.9% + 30¢) applies to each deposit and goes to Stripe,
+          not us.
         </p>
       </section>
 
@@ -205,11 +130,11 @@ export default function PricingPage() {
           <div className="absolute inset-0 bg-grid opacity-[0.15]" aria-hidden />
           <div className="relative">
             <p className="font-display text-3xl leading-tight tracking-tight md:text-4xl">
-              One no-show pays for the year.
+              One no-show is one too many.
             </p>
             <p className="mt-3 max-w-lg leading-relaxed text-cream/70">
               Most braiders we talk to lose 1–2 appointments a month to ghosting. Deposits up front
-              stop that.
+              stop that — and right now the whole thing is free.
             </p>
             <div className="mt-7">
               <Link href="/signup?role=braider">

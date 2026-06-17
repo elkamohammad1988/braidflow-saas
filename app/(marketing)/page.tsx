@@ -315,8 +315,8 @@ export default function Home() {
               Start free. Keep what you earn.
             </p>
             <p className="mt-3 max-w-lg leading-relaxed text-cream/70">
-              One saved no-show pays for the year. Set up your page in fifteen minutes — no credit
-              card to start.
+              Free while we’re in beta — and you keep 100% of every deposit. Set up your page in
+              fifteen minutes, no credit card to start.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link href="/signup?role=braider">

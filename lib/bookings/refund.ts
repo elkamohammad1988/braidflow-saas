@@ -59,6 +59,10 @@ export async function issueDepositRefund(
     refund = await stripe.refunds.create(
       {
         payment_intent: deposit.stripe_payment_intent_id,
+        // The deposit was a destination charge to the braider's connected
+        // account, so reverse the transfer to claw the funds back from their
+        // balance — otherwise the platform would eat the refund.
+        reverse_transfer: true,
         metadata: { booking_id: bookingId }
       },
       { idempotencyKey }

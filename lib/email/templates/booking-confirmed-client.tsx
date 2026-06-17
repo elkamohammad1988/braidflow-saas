@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   DetailRow,
   Divider,
@@ -9,12 +8,14 @@ import {
   Signoff
 } from '../components';
 import { formatMoney } from '@/lib/utils';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 export type ConfirmedClientProps = {
   clientFirstName: string;
   businessName: string;
   serviceName: string;
   scheduledAt: string;
+  timeZone: string;
   priceCents: number;
   depositCents: number;
   bookingUrl: string;
@@ -24,9 +25,14 @@ export const confirmedClientSubject = (p: ConfirmedClientProps) =>
   `You're booked with ${p.businessName}`;
 
 export function BookingConfirmedClientEmail(p: ConfirmedClientProps) {
-  const when = new Date(p.scheduledAt);
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+    p.scheduledAt,
+    p.timeZone
+  )}`;
   return (
-    <EmailShell preview={`${p.serviceName} on ${format(when, 'MMM d')} — confirmed`}>
+    <EmailShell
+      preview={`${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d')} — confirmed`}
+    >
       <H1>You're on the books.</H1>
       <P>
         Hey {p.clientFirstName}, your appointment with {p.businessName} is locked in. The deposit
@@ -36,7 +42,7 @@ export function BookingConfirmedClientEmail(p: ConfirmedClientProps) {
       <Divider />
 
       <DetailRow label="Service" value={p.serviceName} />
-      <DetailRow label="When" value={format(when, "EEE, MMM d 'at' h:mm a")} />
+      <DetailRow label="When" value={whenLabel} />
       <DetailRow label="Braider" value={p.businessName} />
       <DetailRow label="Deposit paid" value={formatMoney(p.depositCents)} />
       <DetailRow

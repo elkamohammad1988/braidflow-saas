@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   DetailRow,
   Divider,
@@ -9,6 +8,7 @@ import {
   Signoff
 } from '../components';
 import { formatMoney } from '@/lib/utils';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 export type ReceivedBraiderProps = {
   braiderFirstName: string;
@@ -16,6 +16,7 @@ export type ReceivedBraiderProps = {
   clientPhone: string | null;
   serviceName: string;
   scheduledAt: string;
+  timeZone: string;
   priceCents: number;
   depositCents: number;
   dashboardUrl: string;
@@ -25,12 +26,17 @@ export const receivedBraiderSubject = (p: ReceivedBraiderProps) =>
   `${p.clientName.split(' ')[0]} just booked ${p.serviceName}`;
 
 export function BookingReceivedBraiderEmail(p: ReceivedBraiderProps) {
-  const when = new Date(p.scheduledAt);
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+    p.scheduledAt,
+    p.timeZone
+  )}`;
   return (
-    <EmailShell preview={`New booking — ${format(when, 'EEE, MMM d, h:mm a')}`}>
+    <EmailShell
+      preview={`New booking — ${formatInZone(p.scheduledAt, p.timeZone, 'EEE, MMM d, h:mm a')}`}
+    >
       <H1>New booking.</H1>
       <P>
-        Hi {p.braiderFirstName}, {p.clientName} just booked you for {format(when, "EEE, MMM d 'at' h:mm a")}. Their deposit is in.
+        Hi {p.braiderFirstName}, {p.clientName} just booked you for {whenLabel}. Their deposit is in.
       </P>
 
       <Divider />
@@ -38,7 +44,7 @@ export function BookingReceivedBraiderEmail(p: ReceivedBraiderProps) {
       <DetailRow label="Client" value={p.clientName} />
       {p.clientPhone && <DetailRow label="Phone" value={p.clientPhone} />}
       <DetailRow label="Service" value={p.serviceName} />
-      <DetailRow label="When" value={format(when, "EEE, MMM d 'at' h:mm a")} />
+      <DetailRow label="When" value={whenLabel} />
       <DetailRow label="Total" value={formatMoney(p.priceCents)} />
       <DetailRow label="Deposit collected" value={formatMoney(p.depositCents)} />
       <DetailRow

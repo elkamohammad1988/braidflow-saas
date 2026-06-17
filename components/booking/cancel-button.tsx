@@ -10,9 +10,11 @@ type Props = {
   bookingId: string;
   label?: string;
   className?: string;
+  // Guest capability token; passed through to authorize a guest's cancellation.
+  token?: string;
 };
 
-export function CancelBookingButton({ bookingId, label = 'Cancel', className }: Props) {
+export function CancelBookingButton({ bookingId, label = 'Cancel', className, token }: Props) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -21,7 +23,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className }: 
   function run() {
     setError(null);
     startTransition(async () => {
-      const result = await cancelBookingAction(bookingId);
+      const result = await cancelBookingAction(bookingId, token);
       if (result && 'error' in result) {
         setError(result.error ?? 'Something went wrong.');
         setConfirming(false);

@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   DetailRow,
   Divider,
@@ -8,6 +7,7 @@ import {
   P,
   Signoff
 } from '../components';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 export type ReminderBraiderProps = {
   braiderFirstName: string;
@@ -15,6 +15,7 @@ export type ReminderBraiderProps = {
   clientPhone: string | null;
   serviceName: string;
   scheduledAt: string;
+  timeZone: string;
   dashboardUrl: string;
   proximity?: '24h' | '2h';
 };
@@ -25,10 +26,14 @@ export const reminderBraiderSubject = (p: ReminderBraiderProps) =>
     : `Tomorrow: ${p.clientName.split(' ')[0]} for ${p.serviceName}`;
 
 export function ReminderBraiderEmail(p: ReminderBraiderProps) {
-  const when = new Date(p.scheduledAt);
   const isSoon = p.proximity === '2h';
+  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a');
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+    p.scheduledAt,
+    p.timeZone
+  )}`;
   return (
-    <EmailShell preview={isSoon ? `${p.clientName} soon at ${format(when, 'h:mm a')}` : `${p.clientName} tomorrow at ${format(when, 'h:mm a')}`}>
+    <EmailShell preview={isSoon ? `${p.clientName} soon at ${time}` : `${p.clientName} tomorrow at ${time}`}>
       <H1>{isSoon ? 'Up next.' : "Tomorrow's lineup."}</H1>
       <P>
         Hi {p.braiderFirstName}, {p.clientName} is{' '}
@@ -40,7 +45,7 @@ export function ReminderBraiderEmail(p: ReminderBraiderProps) {
       <DetailRow label="Client" value={p.clientName} />
       {p.clientPhone && <DetailRow label="Phone" value={p.clientPhone} />}
       <DetailRow label="Service" value={p.serviceName} />
-      <DetailRow label="When" value={format(when, "EEE, MMM d 'at' h:mm a")} />
+      <DetailRow label="When" value={whenLabel} />
 
       <Divider />
 

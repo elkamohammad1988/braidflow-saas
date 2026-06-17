@@ -47,6 +47,10 @@ type BookingContext = {
   braiderName: string;
   braiderEmail: string | null;
   businessName: string;
+  braiderTimezone: string;
+  // Where the client manages this booking: a guest's tokenized capability URL, or
+  // a registered client's bookings list.
+  clientManageUrl: string;
 };
 
 type SendResult = Awaited<ReturnType<typeof sendEmail>>;
@@ -62,39 +66,52 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
   const { data } = await admin
     .from('bookings')
     .select(
-      `id, scheduled_at, price_cents, deposit_cents,
+      `id, scheduled_at, price_cents, deposit_cents, client_id, braider_id,
+       guest_name, guest_email, guest_phone, guest_token,
        services(name),
        client:profiles!bookings_client_id_fkey(full_name, phone),
-       braiders(business_name, profiles!braiders_id_fkey(full_name))`
+       braiders(business_name, timezone, profiles!braiders_id_fkey(full_name))`
     )
     .eq('id', bookingId)
     .maybeSingle();
 
-  if (!data || !data.services || !data.client || !data.braiders) {
+  // Note: `client` is intentionally NOT required — guest bookings have no profile.
+  if (!data || !data.services || !data.braiders) {
     console.error('[notify] booking context unavailable', bookingId);
     return null;
   }
 
-  // Emails live on auth.users — service role can read them via admin auth API.
-  const { data: parties } = await admin
-    .from('bookings')
-    .select('client_id, braider_id')
-    .eq('id', bookingId)
-    .single();
+  // Client identity: a registered client resolves via their profile + auth email
+  // (emails live on auth.users, read via the admin auth API); a guest carries
+  // their contact details on the booking itself, with no auth row to look up.
+  let clientName: string;
+  let clientEmail: string | null;
+  let clientPhone: string | null;
+  if (data.client_id) {
+    const { data: clientAuth } = await admin.auth.admin.getUserById(data.client_id);
+    clientName = data.client?.full_name ?? 'there';
+    clientEmail = clientAuth?.user?.email ?? null;
+    clientPhone = data.client?.phone ?? null;
+  } else {
+    clientName = data.guest_name ?? 'there';
+    clientEmail = data.guest_email ?? null;
+    clientPhone = data.guest_phone ?? null;
+  }
 
-  if (!parties) return null;
-
-  const [{ data: clientAuth }, { data: braiderAuth }] = await Promise.all([
-    admin.auth.admin.getUserById(parties.client_id),
-    admin.auth.admin.getUserById(parties.braider_id)
-  ]);
+  const { data: braiderAuth } = await admin.auth.admin.getUserById(data.braider_id);
+  const braiderEmail = braiderAuth?.user?.email ?? null;
 
   // A missing email no longer suppresses BOTH messages — we send to whoever we
   // can reach and log the gap rather than silently dropping everything.
-  const clientEmail = clientAuth?.user?.email ?? null;
-  const braiderEmail = braiderAuth?.user?.email ?? null;
   if (!clientEmail) console.error('[notify] missing client email for booking', bookingId);
   if (!braiderEmail) console.error('[notify] missing braider email for booking', bookingId);
+
+  // Guests manage via their capability URL (no account); registered clients via
+  // their bookings list.
+  const clientManageUrl =
+    !data.client_id && data.guest_token
+      ? `${siteUrl()}/bookings/${data.id}/confirmation?t=${encodeURIComponent(data.guest_token)}`
+      : `${siteUrl()}/bookings`;
 
   return {
     bookingId: data.id,
@@ -102,12 +119,14 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
     priceCents: data.price_cents,
     depositCents: data.deposit_cents,
     serviceName: data.services.name,
-    clientName: data.client.full_name,
+    clientName,
     clientEmail,
-    clientPhone: data.client.phone,
+    clientPhone,
     braiderName: data.braiders.profiles?.full_name ?? data.braiders.business_name,
     braiderEmail,
-    businessName: data.braiders.business_name
+    businessName: data.braiders.business_name,
+    braiderTimezone: data.braiders.timezone,
+    clientManageUrl
   };
 }
 
@@ -120,9 +139,10 @@ export async function notifyBookingConfirmed(bookingId: string) {
     businessName: ctx.businessName,
     serviceName: ctx.serviceName,
     scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone,
     priceCents: ctx.priceCents,
     depositCents: ctx.depositCents,
-    bookingUrl: `${siteUrl()}/bookings`
+    bookingUrl: ctx.clientManageUrl
   };
 
   const braiderProps = {
@@ -131,6 +151,7 @@ export async function notifyBookingConfirmed(bookingId: string) {
     clientPhone: ctx.clientPhone,
     serviceName: ctx.serviceName,
     scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone,
     priceCents: ctx.priceCents,
     depositCents: ctx.depositCents,
     dashboardUrl: `${siteUrl()}/dashboard/appointments`
@@ -175,8 +196,9 @@ export async function notifyReminder(
     businessName: ctx.businessName,
     serviceName: ctx.serviceName,
     scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone,
     balanceCents: ctx.priceCents - ctx.depositCents,
-    bookingUrl: `${siteUrl()}/bookings`,
+    bookingUrl: ctx.clientManageUrl,
     proximity
   };
 
@@ -186,6 +208,7 @@ export async function notifyReminder(
     clientPhone: ctx.clientPhone,
     serviceName: ctx.serviceName,
     scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone,
     dashboardUrl: `${siteUrl()}/dashboard/appointments`,
     proximity
   };
@@ -230,7 +253,8 @@ export async function notifyReschedule(
     otherPartyName: ctx.businessName,
     serviceName: ctx.serviceName,
     previousScheduledAt: meta.previousScheduledAt,
-    newScheduledAt: ctx.scheduledAt
+    newScheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone
   };
 
   const toBraider: RescheduledProps = {
@@ -239,7 +263,8 @@ export async function notifyReschedule(
     otherPartyName: ctx.clientName,
     serviceName: ctx.serviceName,
     previousScheduledAt: meta.previousScheduledAt,
-    newScheduledAt: ctx.scheduledAt
+    newScheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone
   };
 
   // Send to the party who didn't initiate the change. The initiator already
@@ -291,7 +316,8 @@ export async function notifyCancellation(bookingId: string, cancelledBy: 'client
     cancelledBy,
     otherPartyName: ctx.businessName,
     serviceName: ctx.serviceName,
-    scheduledAt: ctx.scheduledAt
+    scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone
   };
 
   const toBraider: CancelledProps = {
@@ -300,7 +326,8 @@ export async function notifyCancellation(bookingId: string, cancelledBy: 'client
     cancelledBy,
     otherPartyName: ctx.clientName,
     serviceName: ctx.serviceName,
-    scheduledAt: ctx.scheduledAt
+    scheduledAt: ctx.scheduledAt,
+    timeZone: ctx.braiderTimezone
   };
 
   const sends: Promise<SendResult>[] = [];

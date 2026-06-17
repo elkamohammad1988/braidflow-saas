@@ -8,26 +8,31 @@ import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
 import { issueDepositRefund } from './refund';
 import { decideDepositRefund, type RefundDecision } from './cancellation-policy';
+import { authorizeBookingMutation } from './access';
 
-export async function cancelBookingAction(bookingId: string) {
+export async function cancelBookingAction(bookingId: string, token?: string) {
   const supabase = supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'You need to be signed in.' };
 
   const admin = supabaseAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select(
-      'id, client_id, braider_id, status, scheduled_at, payments(id, kind, status, stripe_payment_intent_id)'
+      'id, client_id, braider_id, guest_token, status, scheduled_at, payments(id, kind, status, stripe_payment_intent_id)'
     )
     .eq('id', bookingId)
     .maybeSingle();
 
   if (!booking) return { error: 'Booking not found.' };
 
-  const isClient = booking.client_id === user.id;
-  const isBraider = booking.braider_id === user.id;
-  if (!isClient && !isBraider) return { error: 'Not your booking.' };
+  // Owner (session) or guest (capability token). A guest acts as the client
+  // party for policy purposes (their own cancellation).
+  const actor = await authorizeBookingMutation(booking, user?.id ?? null, token);
+  if ('error' in actor) return { error: actor.error };
+  const isClient = actor.role === 'client' || actor.role === 'guest';
+  // Capture the (narrowed) actor id in a plain const — TS won't carry the
+  // discriminated-union narrowing of `actor` into the nested settle closure below.
+  const actorId = actor.userId;
 
   if (booking.status === 'cancelled' || booking.status === 'completed') {
     return { error: 'That booking can\'t be cancelled.' };
@@ -71,7 +76,7 @@ export async function cancelBookingAction(bookingId: string) {
 
   async function settleChargedDeposit(d: RefundDecision) {
     if (!d.refund) return; // forfeit — braider keeps the deposit per policy
-    const outcome = await issueDepositRefund(admin, bookingId, user!.id);
+    const outcome = await issueDepositRefund(admin, bookingId, actorId);
     if ('error' in outcome) {
       // The booking is already cancelled; surface the refund failure loudly so
       // support can settle it manually rather than silently keeping the money.
@@ -101,7 +106,7 @@ export async function cancelBookingAction(bookingId: string) {
   // -------------------------------------------------------------------------
 
   await recordAuditLog({
-    actorId: user.id,
+    actorId,
     action: 'booking.cancelled',
     entityType: 'booking',
     entityId: bookingId,

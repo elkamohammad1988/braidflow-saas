@@ -3,11 +3,11 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { format } from 'date-fns';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { rescheduleBookingAction } from '@/lib/bookings/reschedule';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 type SerializedDay = {
   date: string;
@@ -21,6 +21,9 @@ type Props = {
   serviceName: string;
   slotsByDay: SerializedDay[];
   returnTo: string;
+  timeZone: string;
+  // Guest capability token; forwarded to authorize a guest's reschedule.
+  token?: string;
 };
 
 export function RescheduleFlow({
@@ -29,8 +32,12 @@ export function RescheduleFlow({
   businessName,
   serviceName,
   slotsByDay,
-  returnTo
+  returnTo,
+  timeZone,
+  token
 }: Props) {
+  const fmt = (d: Date) =>
+    `${formatInZone(d, timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(d, timeZone)}`;
   const router = useRouter();
   const [selectedSlot, setSelectedSlot] = useState<Date | undefined>();
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +55,7 @@ export function RescheduleFlow({
     if (!selectedSlot) return;
     setError(null);
     startTransition(async () => {
-      const result = await rescheduleBookingAction(bookingId, selectedSlot.toISOString());
+      const result = await rescheduleBookingAction(bookingId, selectedSlot.toISOString(), token);
       if ('error' in result) {
         setError(result.error);
         return;
@@ -64,7 +71,7 @@ export function RescheduleFlow({
       <div className="motion-safe:animate-fade-in-up rounded-card border border-ink/5 bg-white p-8 text-center shadow-soft">
         <p className="font-display text-2xl text-ink">Moved.</p>
         <p className="mt-2 text-sm text-ink-muted">
-          Your appointment with {businessName} is now {format(selectedSlot, "EEE, MMM d 'at' h:mm a")}.
+          Your appointment with {businessName} is now {fmt(selectedSlot)}.
         </p>
         <p className="mt-1 text-xs text-ink-muted">Taking you back…</p>
       </div>
@@ -76,9 +83,7 @@ export function RescheduleFlow({
       <div className="space-y-8">
         <div className="rounded-card border border-ink/5 bg-white px-5 py-4 shadow-soft">
           <p className="text-xs uppercase tracking-wider text-ink-muted">Currently scheduled</p>
-          <p className="mt-1 font-medium text-ink">
-            {format(currentTime, "EEE, MMM d 'at' h:mm a")}
-          </p>
+          <p className="mt-1 font-medium text-ink">{fmt(currentTime)}</p>
           <p className="text-sm text-ink-muted">{serviceName}</p>
         </div>
 
@@ -90,6 +95,7 @@ export function RescheduleFlow({
             slotsByDay={hydratedDays}
             selected={selectedSlot}
             onSelect={setSelectedSlot}
+            timeZone={timeZone}
           />
         </section>
       </div>
@@ -98,9 +104,7 @@ export function RescheduleFlow({
         <div className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
           <p className="text-sm text-ink-muted">New appointment</p>
           <p className="mt-1 font-medium text-ink">
-            {selectedSlot
-              ? format(selectedSlot, "EEE, MMM d 'at' h:mm a")
-              : 'Pick a time'}
+            {selectedSlot ? fmt(selectedSlot) : 'Pick a time'}
           </p>
 
           {selectedSlot && (

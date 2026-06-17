@@ -1,9 +1,9 @@
 import Link from 'next/link';
+import { TZDate } from '@date-fns/tz';
 import {
   endOfDay,
   endOfMonth,
   endOfWeek,
-  format,
   startOfDay,
   startOfMonth,
   startOfWeek
@@ -25,7 +25,8 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/utils';
-import { formatAppointment } from '@/lib/format-date';
+import { formatAppointment, formatInZone } from '@/lib/format-date';
+import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 
 function initials(name: string) {
   return name
@@ -40,7 +41,16 @@ export default async function DashboardOverview() {
   const { user, profile } = await requireBraider();
   const supabase = supabaseServer();
 
-  const now = new Date();
+  const { data: braiderRow } = await supabase
+    .from('braiders')
+    .select('timezone')
+    .eq('id', user.id)
+    .maybeSingle();
+  const tz = braiderRow?.timezone ?? DEFAULT_TIMEZONE;
+
+  // Compute "this week"/"this month" boundaries in the braider's zone so the
+  // counts and revenue match their local calendar, not the server's (UTC).
+  const now = TZDate.tz(tz);
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
   const monthStart = startOfMonth(now);
@@ -100,7 +110,7 @@ export default async function DashboardOverview() {
           tone="ink"
           label="Booked this week"
           value={upcomingThisWeek.length.toString()}
-          hint={`${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d')}`}
+          hint={`${formatInZone(weekStart, tz, 'MMM d')} – ${formatInZone(weekEnd, tz, 'MMM d')}`}
         />
         <Stat
           icon={Wallet}
@@ -156,7 +166,7 @@ export default async function DashboardOverview() {
                   <p className="truncate text-sm text-ink-muted">{b.services?.name}</p>
                 </div>
                 <div className="hidden text-right sm:block">
-                  <p className="text-sm text-ink">{formatAppointment(new Date(b.scheduled_at))}</p>
+                  <p className="text-sm text-ink">{formatAppointment(b.scheduled_at, tz)}</p>
                 </div>
                 <Badge tone={b.status === 'confirmed' ? 'success' : 'warning'} dot>
                   {b.status === 'confirmed' ? 'Confirmed' : 'Deposit'}

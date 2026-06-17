@@ -1,12 +1,16 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { format } from 'date-fns';
+import Link from 'next/link';
+import { Check, Lock, ShieldCheck } from 'lucide-react';
 import { ServiceList, type Service } from '@/components/booking/service-list';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { createBookingAction } from '@/lib/bookings/create';
-import { formatMoney } from '@/lib/utils';
+import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
+import { cn, formatMoney } from '@/lib/utils';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
 type SerializedDay = {
   date: string;
@@ -17,20 +21,55 @@ type Props = {
   services: Service[];
   slotsByService: Record<string, SerializedDay[]>;
   braiderSlug: string;
+  businessName: string;
+  timeZone: string;
+  // When false, the booker isn't signed in and we collect guest contact details
+  // inline — no account required to book.
+  isAuthenticated: boolean;
 };
 
-export function BookingFlow({ services, slotsByService, braiderSlug: _slug }: Props) {
+// Mirrors the server-side zod check; just enough to keep the button honest.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function StepHeader({ n, label, done }: { n: number; label: string; done: boolean }) {
+  return (
+    <div className="mb-3 flex items-center gap-2.5">
+      <span
+        className={cn(
+          'flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors',
+          done ? 'bg-moss text-cream' : 'bg-ink/[0.06] text-ink-subtle'
+        )}
+      >
+        {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : n}
+      </span>
+      <h2 className="text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">{label}</h2>
+    </div>
+  );
+}
+
+export function BookingFlow({
+  services,
+  slotsByService,
+  braiderSlug,
+  businessName,
+  timeZone,
+  isAuthenticated
+}: Props) {
   const [serviceId, setServiceId] = useState<string | undefined>(services[0]?.id);
   const [selectedSlot, setSelectedSlot] = useState<Date | undefined>();
   const [notes, setNotes] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const selectedService = services.find((s) => s.id === serviceId);
-
-  // Days are derived directly from the selected service's precomputed
-  // availability — each service has its own duration, so its open slots differ.
   const days = serviceId ? slotsByService[serviceId] ?? [] : [];
+
+  const detailsDone =
+    isAuthenticated || (guestName.trim().length > 0 && EMAIL_RE.test(guestEmail.trim()));
+  const ready = Boolean(serviceId && selectedSlot && detailsDone);
 
   function onSelectService(id: string) {
     setServiceId(id);
@@ -38,13 +77,20 @@ export function BookingFlow({ services, slotsByService, braiderSlug: _slug }: Pr
   }
 
   function submit() {
-    if (!serviceId || !selectedSlot) return;
+    if (!ready || !serviceId || !selectedSlot) return;
     setError(null);
     startTransition(async () => {
       const result = await createBookingAction({
         serviceId,
         scheduledAt: selectedSlot.toISOString(),
-        clientNotes: notes || undefined
+        clientNotes: notes || undefined,
+        guest: isAuthenticated
+          ? undefined
+          : {
+              name: guestName.trim(),
+              email: guestEmail.trim(),
+              phone: guestPhone.trim() || undefined
+            }
       });
       if (result && 'error' in result) setError(result.error);
     });
@@ -55,82 +101,189 @@ export function BookingFlow({ services, slotsByService, braiderSlug: _slug }: Pr
     slots: d.slots.map((s) => ({ start: new Date(s.start), end: new Date(s.end) }))
   }));
 
+  const whenLabel = selectedSlot
+    ? `${formatInZone(selectedSlot, timeZone, 'EEE, MMM d · h:mm a')} ${zoneAbbreviation(
+        selectedSlot,
+        timeZone
+      )}`
+    : null;
+
+  // Step numbering shifts when there's no guest-details step (signed-in clients).
+  const detailsStep = 3;
+
   return (
-    <div className="grid gap-8 md:grid-cols-[1fr_320px]">
-      <div className="space-y-8">
-        <section>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-ink-muted">
-            Service
-          </h2>
-          <ServiceList services={services} selectedId={serviceId} onSelect={onSelectService} />
-        </section>
+    <>
+      <div className="grid gap-8 pb-28 md:grid-cols-[1fr_340px] md:pb-0">
+        <div className="space-y-9">
+          <section>
+            <StepHeader n={1} label="Service" done={Boolean(serviceId)} />
+            <ServiceList services={services} selectedId={serviceId} onSelect={onSelectService} />
+          </section>
 
-        <section>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-ink-muted">
-            Time
-          </h2>
-          <SlotPicker
-            slotsByDay={hydratedDays}
-            selected={selectedSlot}
-            onSelect={setSelectedSlot}
-          />
-        </section>
+          <section>
+            <StepHeader n={2} label="Time" done={Boolean(selectedSlot)} />
+            <SlotPicker
+              slotsByDay={hydratedDays}
+              selected={selectedSlot}
+              onSelect={setSelectedSlot}
+              timeZone={timeZone}
+            />
+          </section>
 
-        <section>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-ink-muted">
-            Anything we should know
-          </h2>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-            maxLength={500}
-            aria-label="Notes for your braider"
-            placeholder="Hair texture, length, preferred parting…"
-            className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
-          />
-        </section>
-      </div>
-
-      <aside className="md:sticky md:top-6 md:self-start">
-        <div className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
-          <p className="text-sm text-ink-muted">Your booking</p>
-          <p className="mt-1 font-medium text-ink">
-            {selectedService?.name ?? 'Pick a service'}
-          </p>
-          <p className="mt-1 text-sm text-ink-muted">
-            {selectedSlot
-              ? format(selectedSlot, "EEE, MMM d · h:mm a")
-              : 'Choose a time'}
-          </p>
-
-          {selectedService && (
-            <dl className="mt-5 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-ink-muted">Service price</dt>
-                <dd>{formatMoney(selectedService.price_cents)}</dd>
+          {!isAuthenticated && (
+            <section>
+              <div className="flex items-center justify-between">
+                <StepHeader n={detailsStep} label="Your details" done={detailsDone} />
+                <Link
+                  href={`/login?next=/braiders/${braiderSlug}/book`}
+                  className="mb-3 text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink"
+                >
+                  Have an account? Log in
+                </Link>
               </div>
-              <div className="flex justify-between font-medium">
-                <dt>Deposit due now</dt>
-                <dd>{formatMoney(selectedService.deposit_cents)}</dd>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Input
+                  label="Your name"
+                  name="guest-name"
+                  autoComplete="name"
+                  placeholder="Aisha Bello"
+                  maxLength={100}
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                />
+                <Input
+                  label="Email"
+                  name="guest-email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  placeholder="you@email.com"
+                  maxLength={254}
+                  hint="Your confirmation lands here"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                />
+                <div className="sm:col-span-2">
+                  <Input
+                    label="Phone (optional)"
+                    name="guest-phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="So your braider can reach you"
+                    maxLength={30}
+                    value={guestPhone}
+                    onChange={(e) => setGuestPhone(e.target.value)}
+                  />
+                </div>
               </div>
-              <p className="pt-1 text-xs text-ink-muted">
-                Balance is paid in person at your appointment.
-              </p>
-            </dl>
+            </section>
           )}
 
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+          <section>
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">
+              Anything we should know{' '}
+              <span className="font-normal normal-case tracking-normal text-ink-subtle">
+                — optional
+              </span>
+            </h2>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              maxLength={500}
+              aria-label="Notes for your braider"
+              placeholder="Hair texture, length, preferred parting…"
+              className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2.5 text-sm placeholder:text-ink-muted/70 focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+            />
+          </section>
 
-          <Button
-            onClick={submit}
-            disabled={!serviceId || !selectedSlot || isPending}
-            className="mt-6 w-full"
-          >
-            {isPending ? 'Reserving…' : 'Continue to deposit'}
+          {/* Trust card — answers the three questions every first-time booker has
+              before paying a deposit. Visible at every breakpoint. */}
+          <ul className="space-y-2.5 rounded-card border border-line bg-paper/70 p-5 text-sm text-ink-muted">
+            <li className="flex items-start gap-2.5">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
+              <span>
+                Free cancellation up to{' '}
+                <span className="text-ink">{CANCELLATION_REFUND_WINDOW_HOURS} hours</span> before —
+                full deposit back.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
+              <span>
+                Your deposit goes straight to{' '}
+                <span className="text-ink">{businessName}</span> — it counts toward your total.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" strokeWidth={2} />
+              <span>Card secured by Stripe. We never see your card details.</span>
+            </li>
+          </ul>
+
+          {error && <p className="text-sm text-red-600 md:hidden">{error}</p>}
+        </div>
+
+        {/* Desktop summary rail */}
+        <aside className="hidden md:block">
+          <div className="sticky top-6 rounded-card border border-line bg-paper p-6 shadow-soft">
+            <p className="text-sm text-ink-muted">Your booking</p>
+            <p className="mt-1 font-medium text-ink">
+              {selectedService?.name ?? 'Pick a service'}
+            </p>
+            <p className="mt-1 text-sm text-ink-muted">{whenLabel ?? 'Choose a time'}</p>
+
+            {selectedService && (
+              <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm">
+                <div className="flex justify-between text-ink-muted">
+                  <dt>Service total</dt>
+                  <dd>{formatMoney(selectedService.price_cents)}</dd>
+                </div>
+                <div className="flex justify-between font-medium text-ink">
+                  <dt>Deposit due now</dt>
+                  <dd className="font-display text-base">
+                    {formatMoney(selectedService.deposit_cents)}
+                  </dd>
+                </div>
+                <div className="flex justify-between text-ink-muted">
+                  <dt>Balance at appointment</dt>
+                  <dd>{formatMoney(selectedService.price_cents - selectedService.deposit_cents)}</dd>
+                </div>
+              </dl>
+            )}
+
+            {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+            <Button onClick={submit} disabled={!ready || isPending} className="mt-6 w-full">
+              {isPending ? 'Reserving…' : 'Continue to deposit'}
+            </Button>
+
+            <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-subtle">
+              <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2} />
+              No charge until you confirm payment
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      {/* Mobile sticky action bar — keeps the deposit + CTA in reach without
+          scrolling past the whole form. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-cream/95 backdrop-blur-md md:hidden">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="min-w-0">
+            <p className="text-xs text-ink-muted">
+              {selectedService ? 'Deposit due now' : 'Pick a service & time'}
+            </p>
+            <p className="font-display text-xl leading-tight text-ink">
+              {selectedService ? formatMoney(selectedService.deposit_cents) : '—'}
+            </p>
+          </div>
+          <Button onClick={submit} disabled={!ready || isPending} size="lg" className="shrink-0">
+            {isPending ? 'Reserving…' : 'Continue'}
           </Button>
         </div>
-      </aside>
-    </div>
+      </div>
+    </>
   );
 }

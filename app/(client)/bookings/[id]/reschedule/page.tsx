@@ -1,23 +1,32 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { TZDate } from '@date-fns/tz';
 import { addDays, startOfDay } from 'date-fns';
 import { requireSession } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
+import { guestTokenMatches } from '@/lib/bookings/guest-token';
+import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { RescheduleFlow } from './reschedule-flow';
 
 const WINDOW_DAYS = 28;
 
-export default async function ReschedulePage({ params }: { params: { id: string } }) {
-  const { user } = await requireSession();
-  const supabase = supabaseServer();
+export default async function ReschedulePage({
+  params,
+  searchParams
+}: {
+  params: { id: string };
+  searchParams: { t?: string };
+}) {
+  const token = searchParams.t;
+  const supabase = supabaseAdmin();
 
   const { data: booking } = await supabase
     .from('bookings')
     .select(
-      `id, client_id, braider_id, status, scheduled_at, duration_minutes,
+      `id, client_id, braider_id, guest_token, status, scheduled_at, duration_minutes,
        services(name, duration_minutes),
-       braiders(business_name, slug,
+       braiders(business_name, slug, timezone,
          availability_rules(day_of_week, start_minute, end_minute),
          availability_overrides(starts_at, ends_at, kind))`
     )
@@ -26,11 +35,26 @@ export default async function ReschedulePage({ params }: { params: { id: string 
 
   if (!booking) notFound();
 
-  const isClient = booking.client_id === user.id;
-  const isBraider = booking.braider_id === user.id;
-  if (!isClient && !isBraider) notFound();
+  // Three possible viewers: a guest (capability token), the signed-in client, or
+  // the signed-in braider. Guests and clients return to their own surfaces.
+  let isGuest = false;
+  let isBraider = false;
+  if (token) {
+    if (!guestTokenMatches(booking.guest_token, token)) notFound();
+    isGuest = true;
+  } else {
+    const { user } = await requireSession();
+    const isClient = booking.client_id === user.id;
+    isBraider = booking.braider_id === user.id;
+    if (!isClient && !isBraider) notFound();
+  }
 
-  const returnTo = isBraider ? '/dashboard/appointments' : '/bookings';
+  const tokenQuery = isGuest && token ? `?t=${encodeURIComponent(token)}` : '';
+  const returnTo = isBraider
+    ? '/dashboard/appointments'
+    : isGuest
+    ? `/bookings/${booking.id}/confirmation${tokenQuery}`
+    : '/bookings';
 
   if (booking.status !== 'pending_payment' && booking.status !== 'confirmed') {
     return (
@@ -49,7 +73,8 @@ export default async function ReschedulePage({ params }: { params: { id: string 
     );
   }
 
-  const today = startOfDay(new Date());
+  const tz = booking.braiders?.timezone ?? DEFAULT_TIMEZONE;
+  const today = startOfDay(TZDate.tz(tz));
   const horizon = addDays(today, WINDOW_DAYS);
 
   const { data: otherBookings } = await supabase
@@ -68,6 +93,7 @@ export default async function ReschedulePage({ params }: { params: { id: string 
       date: day.toISOString(),
       slots: computeSlotsForDay(
         day,
+        tz,
         duration,
         booking.braiders?.availability_rules ?? [],
         booking.braiders?.availability_overrides ?? [],
@@ -107,6 +133,8 @@ export default async function ReschedulePage({ params }: { params: { id: string 
           serviceName={serviceName}
           slotsByDay={slotsByDay}
           returnTo={returnTo}
+          timeZone={tz}
+          token={isGuest ? token : undefined}
         />
       </div>
 
