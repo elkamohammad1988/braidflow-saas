@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidTimeZone } from '@/lib/timezones';
 
 const instagramHandle = z
   .string()
@@ -21,7 +22,11 @@ export const braiderSettingsSchema = z.object({
   bio: z.string().trim().max(800).optional().or(z.literal('')),
   city: z.string().trim().max(80).optional().or(z.literal('')),
   instagramHandle,
-  acceptingBookings: z.boolean()
+  acceptingBookings: z.boolean(),
+  timezone: z
+    .string()
+    .trim()
+    .refine(isValidTimeZone, 'Pick a valid timezone.')
 });
 
 export type BraiderSettingsInput = z.infer<typeof braiderSettingsSchema>;

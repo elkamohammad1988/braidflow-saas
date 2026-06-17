@@ -1,59 +1,85 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { addDays, format, isSameDay, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 import type { Slot } from '@/lib/bookings/availability';
 
 type Props = {
   slotsByDay: { date: Date; slots: Slot[] }[];
   selected?: Date;
   onSelect: (date: Date) => void;
+  // The braider's IANA zone. Slots are absolute instants; all day/time labels and
+  // the active-day comparison are resolved in this zone so a client in another
+  // timezone sees the braider's actual local hours.
+  timeZone: string;
 };
 
-export function SlotPicker({ slotsByDay, selected, onSelect }: Props) {
-  const [activeDay, setActiveDay] = useState(slotsByDay[0]?.date ?? startOfDay(new Date()));
+export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) {
+  const dayKey = (d: Date) => formatInZone(d, timeZone, 'yyyy-MM-dd');
 
-  const activeSlots = useMemo(
-    () => slotsByDay.find((d) => isSameDay(d.date, activeDay))?.slots ?? [],
-    [slotsByDay, activeDay]
+  const [activeKey, setActiveKey] = useState(
+    slotsByDay[0] ? dayKey(slotsByDay[0].date) : ''
   );
+
+  const activeDay = useMemo(
+    () => slotsByDay.find((d) => dayKey(d.date) === activeKey),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [slotsByDay, activeKey, timeZone]
+  );
+  const activeSlots = activeDay?.slots ?? [];
 
   return (
     <div>
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1.5">
         {slotsByDay.map(({ date, slots }) => {
-          const active = isSameDay(date, activeDay);
+          const key = dayKey(date);
+          const active = key === activeKey;
           const empty = slots.length === 0;
           return (
             <button
               key={date.toISOString()}
               type="button"
-              onClick={() => setActiveDay(date)}
+              onClick={() => setActiveKey(key)}
               disabled={empty}
+              aria-pressed={active}
               className={cn(
-                'flex w-16 shrink-0 flex-col items-center rounded-xl border px-3 py-2 text-sm transition-colors',
-                active ? 'border-ink bg-ink text-cream' : 'border-ink/10 bg-white hover:border-ink/25',
-                empty && 'cursor-not-allowed opacity-40'
+                'flex w-[3.75rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 transition-all',
+                active
+                  ? 'border-ink bg-ink text-cream shadow-soft'
+                  : 'border-ink/10 bg-white text-ink hover:border-ink/25',
+                empty && 'cursor-not-allowed opacity-35 hover:border-ink/10'
               )}
             >
-              <span className="text-xs uppercase tracking-wider">{format(date, 'EEE')}</span>
-              <span className="font-display text-lg leading-none">{format(date, 'd')}</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider opacity-80">
+                {formatInZone(date, timeZone, 'EEE')}
+              </span>
+              <span className="font-display text-lg leading-none">
+                {formatInZone(date, timeZone, 'd')}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {activeSlots.length === 0 ? (
-        <p
-          key={activeDay.toISOString()}
-          className="motion-safe:animate-fade-in rounded-card border border-dashed border-ink/10 bg-white/40 px-4 py-8 text-center text-sm text-ink-muted"
-        >
-          No openings on this day. Pick another date.
+      {activeDay && (
+        <p className="mb-3 text-sm text-ink">
+          <span className="font-medium">{formatInZone(activeDay.date, timeZone, 'EEEE, MMMM d')}</span>
+          <span className="text-ink-subtle"> · {zoneAbbreviation(activeDay.date, timeZone)}</span>
         </p>
+      )}
+
+      {activeSlots.length === 0 ? (
+        <div
+          key={activeKey}
+          className="motion-safe:animate-fade-in rounded-card border border-dashed border-ink/15 bg-white/40 px-4 py-10 text-center"
+        >
+          <p className="text-sm font-medium text-ink">No openings this day</p>
+          <p className="mt-1 text-sm text-ink-muted">Try one of the other dates above.</p>
+        </div>
       ) : (
         <div
-          key={activeDay.toISOString()}
+          key={activeKey}
           className="motion-safe:animate-fade-in grid grid-cols-3 gap-2 sm:grid-cols-4"
         >
           {activeSlots.map((slot) => {
@@ -63,14 +89,15 @@ export function SlotPicker({ slotsByDay, selected, onSelect }: Props) {
                 key={slot.start.toISOString()}
                 type="button"
                 onClick={() => onSelect(slot.start)}
+                aria-pressed={Boolean(isSelected)}
                 className={cn(
-                  'rounded-lg border px-3 py-2 text-sm transition-colors',
+                  'rounded-lg border py-2.5 text-center text-sm font-medium tabular-nums transition-all',
                   isSelected
-                    ? 'border-ink bg-ink text-cream'
-                    : 'border-ink/10 bg-white hover:border-ink/25'
+                    ? 'border-ink bg-ink text-cream shadow-soft'
+                    : 'border-ink/10 bg-white text-ink hover:border-ink/30 hover:bg-cream'
                 )}
               >
-                {format(slot.start, 'h:mm a')}
+                {formatInZone(slot.start, timeZone, 'h:mm a')}
               </button>
             );
           })}
@@ -78,8 +105,4 @@ export function SlotPicker({ slotsByDay, selected, onSelect }: Props) {
       )}
     </div>
   );
-}
-
-export function buildWeek(from: Date, days: number) {
-  return Array.from({ length: days }, (_, i) => addDays(startOfDay(from), i));
 }

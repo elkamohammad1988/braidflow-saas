@@ -21,6 +21,16 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
   const ensured = await ensureBraiderRecord(user.id, parsed.data.businessName);
   if ('error' in ensured) return { error: ensured.error };
 
+  // A braider can't accept bookings until Stripe can take charges — otherwise a
+  // client could "book" with no way to pay the deposit. Clamp server-side so the
+  // disabled UI toggle can't be bypassed by a crafted request.
+  const { data: connect } = await supabase
+    .from('braiders')
+    .select('charges_enabled')
+    .eq('id', user.id)
+    .maybeSingle();
+  const acceptingBookings = parsed.data.acceptingBookings && (connect?.charges_enabled ?? false);
+
   const normaliseHandle = (raw: string | undefined) => {
     const trimmed = raw?.replace(/^@/, '').trim();
     return trimmed ? trimmed : null;
@@ -42,7 +52,8 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
       bio: parsed.data.bio?.trim() ? parsed.data.bio.trim() : null,
       city: parsed.data.city?.trim() ? parsed.data.city.trim() : null,
       instagram_handle: normaliseHandle(parsed.data.instagramHandle),
-      accepting_bookings: parsed.data.acceptingBookings
+      accepting_bookings: acceptingBookings,
+      timezone: parsed.data.timezone
     })
     .eq('id', user.id)
     .select('id');
@@ -75,7 +86,7 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
     action: 'settings.updated',
     entityType: 'braider',
     entityId: user.id,
-    metadata: { accepting_bookings: parsed.data.acceptingBookings }
+    metadata: { accepting_bookings: acceptingBookings }
   });
 
   return { ok: true as const };

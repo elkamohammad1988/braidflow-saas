@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardBody } from '@/components/ui/card';
 import { CopyButton } from '@/components/ui/copy-button';
+import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { SettingsForm } from './settings-form';
 
 export default async function SettingsPage() {
@@ -12,7 +13,9 @@ export default async function SettingsPage() {
   const [braiderRes, profileRes] = await Promise.all([
     supabase
       .from('braiders')
-      .select('slug, business_name, bio, city, instagram_handle, accepting_bookings')
+      .select(
+        'slug, business_name, bio, city, instagram_handle, accepting_bookings, timezone, charges_enabled'
+      )
       .eq('id', user.id)
       .maybeSingle(),
     supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle()
@@ -49,7 +52,9 @@ export default async function SettingsPage() {
             bio: braider?.bio ?? '',
             city: braider?.city ?? '',
             instagramHandle: braider?.instagram_handle ?? '',
-            acceptingBookings: braider?.accepting_bookings ?? true
+            acceptingBookings: braider?.accepting_bookings ?? true,
+            timezone: braider?.timezone ?? DEFAULT_TIMEZONE,
+            chargesEnabled: braider?.charges_enabled ?? false
           }}
         />
       </div>

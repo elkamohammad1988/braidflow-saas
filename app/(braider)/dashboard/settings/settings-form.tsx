@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { updateBraiderSettingsAction } from '@/lib/braider/actions';
+import { COMMON_TIMEZONES } from '@/lib/timezones';
+import { cn } from '@/lib/utils';
 
 type Initial = {
   fullName: string;
@@ -15,6 +17,10 @@ type Initial = {
   city: string;
   instagramHandle: string;
   acceptingBookings: boolean;
+  timezone: string;
+  // Whether Stripe can take charges for this braider. When false, accepting
+  // bookings is impossible (no way to collect a deposit), so the toggle is locked.
+  chargesEnabled: boolean;
 };
 
 export function SettingsForm({ initial }: { initial: Initial }) {
@@ -26,6 +32,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
   const [city, setCity] = useState(initial.city);
   const [instagramHandle, setInstagramHandle] = useState(initial.instagramHandle);
   const [acceptingBookings, setAcceptingBookings] = useState(initial.acceptingBookings);
+  const [timezone, setTimezone] = useState(initial.timezone);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -41,7 +48,8 @@ export function SettingsForm({ initial }: { initial: Initial }) {
         bio,
         city,
         instagramHandle: instagramHandle.replace(/^@/, ''),
-        acceptingBookings
+        acceptingBookings,
+        timezone
       });
       if ('error' in result) {
         setError(result.error ?? 'Something went wrong.');
@@ -102,20 +110,56 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           />
         </div>
 
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-ink/10 bg-white px-4 py-3">
-          <input
-            type="checkbox"
-            checked={acceptingBookings}
-            onChange={(e) => setAcceptingBookings(e.target.checked)}
-            className="h-4 w-4 accent-ink"
-          />
-          <span className="text-sm">
-            <span className="font-medium text-ink">Accepting new bookings</span>
-            <span className="ml-2 text-ink-muted">
-              Uncheck to pause your page without taking it down.
-            </span>
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-ink">Timezone</span>
+          <select
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+          >
+            {COMMON_TIMEZONES.map((tz) => (
+              <option key={tz.value} value={tz.value}>
+                {tz.label}
+              </option>
+            ))}
+            {!COMMON_TIMEZONES.some((tz) => tz.value === timezone) && (
+              <option value={timezone}>{timezone}</option>
+            )}
+          </select>
+          <span className="mt-1.5 block text-xs text-ink-muted">
+            Your weekly hours and every appointment time are shown in this zone. Set it to where
+            you actually braid.
           </span>
         </label>
+
+        <div>
+          <label
+            className={cn(
+              'flex items-center gap-3 rounded-lg border border-ink/10 bg-white px-4 py-3',
+              initial.chargesEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+            )}
+          >
+            <input
+              type="checkbox"
+              checked={acceptingBookings && initial.chargesEnabled}
+              onChange={(e) => setAcceptingBookings(e.target.checked)}
+              disabled={!initial.chargesEnabled}
+              className="h-4 w-4 accent-ink"
+            />
+            <span className="text-sm">
+              <span className="font-medium text-ink">Accepting new bookings</span>
+              <span className="ml-2 text-ink-muted">
+                Uncheck to pause your page without taking it down.
+              </span>
+            </span>
+          </label>
+          {!initial.chargesEnabled && (
+            <p className="mt-1.5 text-xs text-clay">
+              Connect Stripe (banner at the top of your dashboard) before you can accept bookings —
+              clients can’t pay a deposit until your account is set up.
+            </p>
+          )}
+        </div>
       </Section>
 
       <Section title="Account" description="Only you see this.">

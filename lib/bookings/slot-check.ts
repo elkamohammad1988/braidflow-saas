@@ -12,6 +12,7 @@ import {
 // server can reject anything a tampered or stale client submits.
 export function isSlotBookable(
   requestedStart: Date,
+  timeZone: string,
   serviceDurationMinutes: number,
   rules: AvailabilityRule[],
   overrides: AvailabilityOverride[],
@@ -19,6 +20,7 @@ export function isSlotBookable(
 ): boolean {
   const slots = computeSlotsForDay(
     requestedStart,
+    timeZone,
     serviceDurationMinutes,
     rules,
     overrides,
