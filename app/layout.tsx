@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
+import { JsonLd } from '@/components/shared/json-ld';
 import './globals.css';
 
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -62,7 +63,31 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
-      <body>{children}</body>
+      <body>
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'Organization',
+                '@id': `${siteUrl}/#organization`,
+                name: 'BraidFlow',
+                url: siteUrl,
+                description:
+                  'The booking platform built for braiders — take deposits, manage your schedule, and stop chasing down DMs.'
+              },
+              {
+                '@type': 'WebSite',
+                '@id': `${siteUrl}/#website`,
+                url: siteUrl,
+                name: 'BraidFlow',
+                publisher: { '@id': `${siteUrl}/#organization` }
+              }
+            ]
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

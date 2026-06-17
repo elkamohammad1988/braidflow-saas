@@ -2,9 +2,11 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ArrowUpRight, Star } from 'lucide-react';
 import { supabaseServer } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { BraiderReviews } from '@/components/braider/reviews';
+import { JsonLd } from '@/components/shared/json-ld';
 import { formatDuration, formatMoney } from '@/lib/utils';
 
 export const revalidate = 60;
@@ -58,8 +60,62 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   // Bookable only when accepting AND Stripe can take charges for them.
   const open = braider.accepting_bookings && braider.charges_enabled;
 
+  const { data: ratingRows } = await supabase
+    .from('reviews')
+    .select('rating')
+    .eq('braider_id', braider.id);
+  const ratings = ratingRows ?? [];
+  const reviewCount = ratings.length;
+  const avgRating = reviewCount
+    ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : 0;
+
+  const prices = services.map((s) => s.price_cents);
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://braidflow.app';
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'HairSalon',
+        name: braider.business_name,
+        url: `${base}/braiders/${braider.slug}`,
+        ...(braider.hero_image_url ? { image: braider.hero_image_url } : {}),
+        ...(braider.bio ? { description: braider.bio } : {}),
+        ...(braider.city
+          ? { address: { '@type': 'PostalAddress', addressLocality: braider.city } }
+          : {}),
+        ...(prices.length
+          ? { priceRange: `${formatMoney(Math.min(...prices))}–${formatMoney(Math.max(...prices))}` }
+          : {}),
+        ...(reviewCount
+          ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: avgRating.toFixed(1),
+                reviewCount
+              }
+            }
+          : {})
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: base },
+          { '@type': 'ListItem', position: 2, name: 'Find a braider', item: `${base}/braiders` },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: braider.business_name,
+            item: `${base}/braiders/${braider.slug}`
+          }
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
+      <JsonLd data={jsonLd} />
       <div className="grid gap-10 md:grid-cols-[1fr_320px]">
         <div>
           {braider.hero_image_url && (
@@ -76,11 +132,25 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           )}
 
           <h1 className="font-display text-4xl text-ink">{braider.business_name}</h1>
-          <div className="mt-2 flex items-center gap-3 text-sm text-ink-muted">
-            {braider.city && <span>{braider.city}</span>}
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+            {reviewCount > 0 && (
+              <a href="#reviews" className="flex items-center gap-1 text-ink hover:text-clay">
+                <Star className="h-4 w-4 fill-clay text-clay" />
+                <span className="font-medium">{avgRating.toFixed(1)}</span>
+                <span className="text-ink-muted">
+                  · {reviewCount} review{reviewCount === 1 ? '' : 's'}
+                </span>
+              </a>
+            )}
+            {braider.city && (
+              <>
+                {reviewCount > 0 && <span aria-hidden>·</span>}
+                <span>{braider.city}</span>
+              </>
+            )}
             {braider.instagram_handle && (
               <>
-                <span aria-hidden>·</span>
+                {(reviewCount > 0 || braider.city) && <span aria-hidden>·</span>}
                 <a
                   href={`https://instagram.com/${braider.instagram_handle}`}
                   target="_blank"
@@ -119,7 +189,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
             </ul>
           </section>
 
-          <BraiderReviews braiderId={braider.id} />
+          <BraiderReviews braiderId={braider.id} avg={avgRating} count={reviewCount} />
         </div>
 
         <aside className="md:sticky md:top-6 md:self-start">
@@ -134,9 +204,22 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                   <Button className="w-full">See available times</Button>
                 </Link>
               ) : (
-                <p className="rounded-lg border border-ink/10 bg-cream px-4 py-3 text-center text-sm text-ink-muted">
-                  Books are closed right now.
-                </p>
+                <div className="rounded-lg border border-ink/10 bg-cream px-4 py-4 text-center">
+                  <p className="text-sm text-ink-muted">
+                    {braider.business_name} isn&rsquo;t taking online bookings right now.
+                  </p>
+                  {braider.instagram_handle && (
+                    <a
+                      href={`https://instagram.com/${braider.instagram_handle}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
+                    >
+                      Reach out on Instagram
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           </div>
