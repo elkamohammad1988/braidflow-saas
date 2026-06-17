@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { usePathname } from 'next/navigation';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -11,8 +12,13 @@ import { startStripeOnboarding } from '@/lib/braider/connect';
 // `onboardingComplete` = the braider finished Stripe's form but charges aren't
 // live yet (under review) → distinct copy from "not started".
 export function ConnectBanner({ onboardingComplete }: { onboardingComplete: boolean }) {
+  const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  // The dashboard overview already carries the full activation checklist, which
+  // owns the Stripe step there — don't stack a second prompt on top of it.
+  if (pathname === '/dashboard') return null;
 
   function begin() {
     setError(null);

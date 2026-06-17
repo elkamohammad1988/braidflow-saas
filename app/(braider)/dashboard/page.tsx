@@ -15,6 +15,8 @@ import {
   Hourglass,
   Users,
   CalendarPlus,
+  CheckCircle2,
+  Info,
   type LucideIcon
 } from 'lucide-react';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -24,6 +26,7 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
+import { ActivationChecklist } from '@/components/braider/activation-checklist';
 import { formatMoney } from '@/lib/utils';
 import { formatAppointment, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
@@ -37,13 +40,17 @@ function initials(name: string) {
     .join('');
 }
 
-export default async function DashboardOverview() {
+export default async function DashboardOverview({
+  searchParams
+}: {
+  searchParams: { connect?: string };
+}) {
   const { user, profile } = await requireBraider();
   const supabase = supabaseServer();
 
   const { data: braiderRow } = await supabase
     .from('braiders')
-    .select('timezone')
+    .select('timezone, charges_enabled, stripe_onboarding_complete')
     .eq('id', user.id)
     .maybeSingle();
   const tz = braiderRow?.timezone ?? DEFAULT_TIMEZONE;
@@ -60,7 +67,9 @@ export default async function DashboardOverview() {
     upcomingRes,
     monthRevenueRes,
     pendingRes,
-    distinctClientsRes
+    distinctClientsRes,
+    serviceCountRes,
+    hoursCountRes
   ] = await Promise.all([
     supabase
       .from('bookings')
@@ -84,7 +93,16 @@ export default async function DashboardOverview() {
       .select('id', { count: 'exact', head: true })
       .eq('braider_id', user.id)
       .eq('status', 'pending_payment'),
-    supabase.from('bookings').select('client_id').eq('braider_id', user.id)
+    supabase.from('bookings').select('client_id').eq('braider_id', user.id),
+    supabase
+      .from('services')
+      .select('id', { count: 'exact', head: true })
+      .eq('braider_id', user.id)
+      .eq('is_active', true),
+    supabase
+      .from('availability_rules')
+      .select('id', { count: 'exact', head: true })
+      .eq('braider_id', user.id)
   ]);
 
   const firstError =
@@ -96,6 +114,15 @@ export default async function DashboardOverview() {
   const pendingCount = pendingRes.count ?? 0;
   const totalClients = new Set((distinctClientsRes.data ?? []).map((b) => b.client_id)).size;
 
+  // First-run activation: a braider can't take bookings until they have a
+  // service, set hours, and Stripe can accept charges. Show a guided checklist
+  // until all three are done.
+  const hasService = (serviceCountRes.count ?? 0) > 0;
+  const hasHours = (hoursCountRes.count ?? 0) > 0;
+  const chargesEnabled = braiderRow?.charges_enabled ?? false;
+  const onboardingComplete = braiderRow?.stripe_onboarding_complete ?? false;
+  const activated = hasService && hasHours && chargesEnabled;
+
   return (
     <div>
       <PageHeader
@@ -103,6 +130,36 @@ export default async function DashboardOverview() {
         title={`Hi, ${profile.full_name.split(' ')[0]}`}
         description="Here's how the week is shaping up."
       />
+
+      {searchParams.connect === 'done' && (
+        <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-moss/30 bg-moss/5 p-4">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-moss" />
+          <p className="text-sm text-ink">
+            <span className="font-medium">Stripe connected.</span> You can take bookings now —
+            deposits pay out straight to your account.
+          </p>
+        </div>
+      )}
+      {searchParams.connect === 'pending' && (
+        <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-clay/30 bg-clay/5 p-4">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-clay" />
+          <p className="text-sm text-ink">
+            <span className="font-medium">Almost there.</span> Stripe is reviewing your account —
+            deposits start as soon as it&rsquo;s approved, usually within minutes.
+          </p>
+        </div>
+      )}
+
+      {!activated && (
+        <div className="mt-6">
+          <ActivationChecklist
+            hasService={hasService}
+            hasHours={hasHours}
+            chargesEnabled={chargesEnabled}
+            onboardingComplete={onboardingComplete}
+          />
+        </div>
+      )}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
