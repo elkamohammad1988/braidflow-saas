@@ -8,5 +8,9 @@
       "path": "/api/cron/expire-bookings",
       "schedule": "*/15 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/cron/reminders/route.ts": { "maxDuration": 60 },
+    "app/api/cron/expire-bookings/route.ts": { "maxDuration": 60 }
+  }
 }

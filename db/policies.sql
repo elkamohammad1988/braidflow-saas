@@ -41,9 +41,12 @@ create policy "availability_rules: owner write"
   using (braider_id = auth.uid())
   with check (braider_id = auth.uid());
 
-create policy "availability_overrides: public read"
+-- Owner-only: overrides carry a free-text `note` (private time-off reasons). The
+-- booking page reads override windows server-side with the service role, so the
+-- public never needs direct read access. See migration 0011.
+create policy "availability_overrides: owner read"
   on availability_overrides for select
-  using (true);
+  using (braider_id = auth.uid());
 
 create policy "availability_overrides: owner write"
   on availability_overrides for all

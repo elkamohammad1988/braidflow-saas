@@ -7,6 +7,14 @@ import { assertRuntimeEnv } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Cap wall-clock so a large backlog can't run past the platform's function limit
+// and get killed mid-send (which would leave reminders claimed-but-unsent).
+export const maxDuration = 60;
+
+// Max reminders processed per window per run. Each window is ~2h wide and the
+// cron is hourly, so any overflow is picked up on the next tick. Tune up once a
+// queue replaces the inline send.
+const REMINDER_BATCH = 100;
 
 type WindowKind = '24h' | '2h';
 
@@ -50,15 +58,38 @@ export async function GET(req: Request) {
     const startIso = addHours(now, w.startHours).toISOString();
     const endIso = addHours(now, w.endHours).toISOString();
 
-    // Atomic claim — the partial-index'd update guarantees a row is only ever
-    // picked up by one cron run, so we can't double-send even on concurrent hits.
-    const { data, error } = await admin
+    // Bound the batch so one run stays within maxDuration even with a backlog.
+    // PostgREST can't LIMIT an UPDATE, so pre-select the ids to claim.
+    const { data: due, error: dueError } = await admin
       .from('bookings')
-      .update(reminderUpdate(w.column, nowIso))
+      .select('id')
       .eq('status', 'confirmed')
       .is(w.column, null)
       .gte('scheduled_at', startIso)
       .lt('scheduled_at', endIso)
+      .limit(REMINDER_BATCH);
+
+    if (dueError) {
+      console.error(`[cron/reminders] ${w.name} lookup failed`, dueError);
+      results.push({ window: w.name, claimed: 0, failed: 0 });
+      continue;
+    }
+
+    const candidateIds = (due ?? []).map((b) => b.id);
+    if (candidateIds.length === 0) {
+      results.push({ window: w.name, claimed: 0, failed: 0 });
+      continue;
+    }
+
+    // Atomic claim, restricted to this batch. The .is(column, null) guard still
+    // guarantees each row is claimed by exactly one run, so concurrent crons
+    // can't double-send even if they pre-selected overlapping ids.
+    const { data, error } = await admin
+      .from('bookings')
+      .update(reminderUpdate(w.column, nowIso))
+      .in('id', candidateIds)
+      .eq('status', 'confirmed')
+      .is(w.column, null)
       .select('id');
 
     if (error) {

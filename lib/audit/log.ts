@@ -11,7 +11,9 @@ export type AuditAction =
   | 'booking.refunded'
   | 'booking.expired'
   | 'payment.disputed'
-  | 'settings.updated';
+  | 'settings.updated'
+  | 'connect.account_created'
+  | 'connect.onboarded';
 
 type AuditEntry = {
   actorId: string | null;

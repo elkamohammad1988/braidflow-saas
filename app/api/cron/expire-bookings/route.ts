@@ -8,8 +8,12 @@ import { assertRuntimeEnv } from '@/lib/env';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Each stale hold costs one synchronous Stripe call, so cap wall-clock and the
+// batch size. The cron runs every 15 min, so any backlog drains over a few runs.
+export const maxDuration = 60;
 
 const DEFAULT_TTL_MINUTES = 30;
+const EXPIRE_BATCH = 100;
 
 // How long an unpaid hold may sit before it's released. Configurable so the
 // window can be tuned without a redeploy.
@@ -39,7 +43,9 @@ export async function GET(req: Request) {
       'id, braider_id, scheduled_at, payments(id, kind, status, stripe_payment_intent_id)'
     )
     .eq('status', 'pending_payment')
-    .lt('created_at', cutoff);
+    .lt('created_at', cutoff)
+    .order('created_at', { ascending: true })
+    .limit(EXPIRE_BATCH);
 
   if (error) {
     console.error('[cron/expire-bookings] lookup failed', error);
