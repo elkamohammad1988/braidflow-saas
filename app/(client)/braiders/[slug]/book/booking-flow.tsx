@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createBookingAction } from '@/lib/bookings/create';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
+import { fieldSurface } from '@/components/ui/field';
 import { cn, formatMoney } from '@/lib/utils';
 import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
@@ -194,7 +195,7 @@ export function BookingFlow({
               maxLength={500}
               aria-label="Notes for your braider"
               placeholder="Hair texture, length, preferred parting…"
-              className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2.5 text-sm placeholder:text-ink-muted/70 focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+              className={cn(fieldSurface, 'min-h-[84px] w-full resize-y px-3.5 py-2.5 leading-relaxed')}
             />
           </section>
 
@@ -222,7 +223,11 @@ export function BookingFlow({
             </li>
           </ul>
 
-          {error && <p className="text-sm text-red-600 md:hidden">{error}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-red-600 md:hidden">
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Desktop summary rail */}
@@ -235,7 +240,7 @@ export function BookingFlow({
             <p className="mt-1 text-sm text-ink-muted">{whenLabel ?? 'Choose a time'}</p>
 
             {selectedService && (
-              <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm">
+              <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm tabular-nums">
                 <div className="flex justify-between text-ink-muted">
                   <dt>Service total</dt>
                   <dd>{formatMoney(selectedService.price_cents)}</dd>
@@ -253,7 +258,11 @@ export function BookingFlow({
               </dl>
             )}
 
-            {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+            {error && (
+              <p role="alert" className="mt-4 text-sm text-red-600">
+                {error}
+              </p>
+            )}
 
             <Button onClick={submit} disabled={!ready || isPending} className="mt-6 w-full">
               {isPending ? 'Reserving…' : 'Continue to deposit'}

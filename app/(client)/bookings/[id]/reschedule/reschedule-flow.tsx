@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Check } from 'lucide-react';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -43,6 +44,10 @@ export function RescheduleFlow({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [pending, startTransition] = useTransition();
+  const redirectTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Clear the post-success redirect timer if the user navigates away first.
+  useEffect(() => () => clearTimeout(redirectTimer.current), []);
 
   const currentTime = new Date(currentScheduledAt);
 
@@ -62,13 +67,16 @@ export function RescheduleFlow({
       }
       setSuccess(true);
       // Give the success state a beat before bouncing back.
-      setTimeout(() => router.push(returnTo), 1200);
+      redirectTimer.current = setTimeout(() => router.push(returnTo), 1200);
     });
   }
 
   if (success && selectedSlot) {
     return (
-      <div className="motion-safe:animate-fade-in-up rounded-card border border-ink/5 bg-white p-8 text-center shadow-soft">
+      <div className="motion-safe:animate-fade-in-up rounded-card border border-line bg-paper p-8 text-center shadow-soft">
+        <span className="motion-safe:animate-pop-in mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
+          <Check className="h-6 w-6" strokeWidth={2.2} />
+        </span>
         <p className="font-display text-2xl text-ink">Moved.</p>
         <p className="mt-2 text-sm text-ink-muted">
           Your appointment with {businessName} is now {fmt(selectedSlot)}.
@@ -81,7 +89,7 @@ export function RescheduleFlow({
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_320px]">
       <div className="space-y-8">
-        <div className="rounded-card border border-ink/5 bg-white px-5 py-4 shadow-soft">
+        <div className="rounded-card border border-line bg-paper px-5 py-4 shadow-soft">
           <p className="text-xs uppercase tracking-wider text-ink-muted">Currently scheduled</p>
           <p className="mt-1 font-medium text-ink">{fmt(currentTime)}</p>
           <p className="text-sm text-ink-muted">{serviceName}</p>
@@ -101,7 +109,7 @@ export function RescheduleFlow({
       </div>
 
       <aside className="md:sticky md:top-6 md:self-start">
-        <div className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
+        <div className="rounded-card border border-line bg-paper p-6 shadow-soft">
           <p className="text-sm text-ink-muted">New appointment</p>
           <p className="mt-1 font-medium text-ink">
             {selectedSlot ? fmt(selectedSlot) : 'Pick a time'}

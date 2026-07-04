@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { stripe } from '@/lib/stripe/client';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { db, dbAdmin } from '@/lib/db/server';
 import { notifyCancellation } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
@@ -11,10 +11,10 @@ import { decideDepositRefund, type RefundDecision } from './cancellation-policy'
 import { authorizeBookingMutation } from './access';
 
 export async function cancelBookingAction(bookingId: string, token?: string) {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select(
@@ -66,7 +66,7 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
   //   - UNPAID hold → cancel its PaymentIntent so a late payment can't land
   //     against a now-cancelled booking. If Stripe rejects the cancel the client
   //     just paid — re-apply the policy to that now-charged deposit.
-  const deposit = (booking.payments ?? []).find((p) => p.kind === 'deposit');
+  const deposit = (booking.payments ?? []).find((p: any) => p.kind === 'deposit');
   const cancelledBy = isClient ? 'client' : 'braider';
   const decision = decideDepositRefund({
     cancelledBy,

@@ -1,5 +1,6 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
+import { fieldInvalid, fieldSurface, describedById } from './field';
 
 type Props = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
@@ -12,28 +13,31 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
   ref
 ) {
   const inputId = id ?? rest.name;
+  const descId = describedById(inputId, Boolean(hint || error));
   return (
-    <label htmlFor={inputId} className="block">
+    <div className="block">
       {label && (
-        <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
+        <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-ink">
+          {label}
+        </label>
       )}
       <input
         ref={ref}
         id={inputId}
-        className={cn(
-          'h-11 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm text-ink',
-          'placeholder:text-ink-muted/70',
-          'focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10',
-          error && 'border-red-500/50 focus:border-red-500/60 focus:ring-red-500/10',
-          className
-        )}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={descId}
+        className={cn(fieldSurface, 'h-11 w-full px-3.5', error && fieldInvalid, className)}
         {...rest}
       />
       {(hint || error) && (
-        <span className={cn('mt-1 block text-xs', error ? 'text-red-600' : 'text-ink-muted')}>
+        <span
+          id={descId}
+          role={error ? 'alert' : undefined}
+          className={cn('mt-1.5 block text-xs', error ? 'text-red-600' : 'text-ink-muted')}
+        >
           {error ?? hint}
         </span>
       )}
-    </label>
+    </div>
   );
 });

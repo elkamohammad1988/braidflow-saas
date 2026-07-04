@@ -19,7 +19,7 @@ import {
   Info,
   type LucideIcon
 } from 'lucide-react';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { requireBraider } from '@/lib/auth/session';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardBody } from '@/components/ui/card';
@@ -27,18 +27,9 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { ActivationChecklist } from '@/components/braider/activation-checklist';
-import { formatMoney } from '@/lib/utils';
+import { formatMoney, initials } from '@/lib/utils';
 import { formatAppointment, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('');
-}
 
 export default async function DashboardOverview({
   searchParams
@@ -46,9 +37,9 @@ export default async function DashboardOverview({
   searchParams: { connect?: string };
 }) {
   const { user, profile } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: braiderRow } = await supabase
+  const { data: braiderRow } = await database
     .from('braiders')
     .select('timezone, charges_enabled, stripe_onboarding_complete')
     .eq('id', user.id)
@@ -71,7 +62,7 @@ export default async function DashboardOverview({
     serviceCountRes,
     hoursCountRes
   ] = await Promise.all([
-    supabase
+    database
       .from('bookings')
       .select(
         'id, scheduled_at, status, price_cents, services(name), profiles!bookings_client_id_fkey(full_name)'
@@ -81,25 +72,25 @@ export default async function DashboardOverview({
       .lte('scheduled_at', endOfDay(weekEnd).toISOString())
       .in('status', ['pending_payment', 'confirmed'])
       .order('scheduled_at'),
-    supabase
+    database
       .from('bookings')
       .select('price_cents')
       .eq('braider_id', user.id)
       .gte('scheduled_at', monthStart.toISOString())
       .lte('scheduled_at', monthEnd.toISOString())
       .in('status', ['confirmed', 'completed']),
-    supabase
+    database
       .from('bookings')
       .select('id', { count: 'exact', head: true })
       .eq('braider_id', user.id)
       .eq('status', 'pending_payment'),
-    supabase.from('bookings').select('client_id').eq('braider_id', user.id),
-    supabase
+    database.from('bookings').select('client_id').eq('braider_id', user.id),
+    database
       .from('services')
       .select('id', { count: 'exact', head: true })
       .eq('braider_id', user.id)
       .eq('is_active', true),
-    supabase
+    database
       .from('availability_rules')
       .select('id', { count: 'exact', head: true })
       .eq('braider_id', user.id)
@@ -213,7 +204,7 @@ export default async function DashboardOverview({
               <Link
                 key={b.id}
                 href="/dashboard/appointments"
-                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-cream/50"
+                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-cream/50 focus-visible:[outline-offset:-2px]"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
                   {initials(b.profiles?.full_name ?? '') || '—'}
@@ -251,9 +242,9 @@ export default async function DashboardOverview({
 }
 
 const statTones: Record<'ink' | 'moss' | 'clay', string> = {
-  ink: 'bg-ink/[0.06] text-ink',
-  moss: 'bg-moss/10 text-moss',
-  clay: 'bg-clay/15 text-clay'
+  ink: 'bg-ink/[0.06] text-ink ring-1 ring-ink/[0.06]',
+  moss: 'bg-moss/10 text-moss ring-1 ring-moss/15',
+  clay: 'bg-clay/15 text-clay ring-1 ring-clay/20'
 };
 
 function Stat({
@@ -270,18 +261,24 @@ function Stat({
   hint?: string;
 }) {
   return (
-    <Card interactive>
-      <CardBody>
+    <Card interactive className="group relative overflow-hidden">
+      {/* gold corner glow on hover — the marketing tell, carried into the app */}
+      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <CardBody className="relative">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-muted">{label}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
+            {label}
+          </p>
           <span
-            className={`flex h-8 w-8 items-center justify-center rounded-lg ${statTones[tone]}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-xl ${statTones[tone]}`}
           >
-            <Icon className="h-4 w-4" strokeWidth={1.9} />
+            <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
           </span>
         </div>
-        <p className="mt-3 font-display text-3xl tracking-tight text-ink">{value}</p>
-        {hint && <p className="mt-1 text-xs text-ink-muted">{hint}</p>}
+        <p className="mt-3 font-display text-[2rem] font-medium leading-none tracking-tight tabular-nums text-ink">
+          {value}
+        </p>
+        {hint && <p className="mt-1.5 text-xs text-ink-muted">{hint}</p>}
       </CardBody>
     </Card>
   );

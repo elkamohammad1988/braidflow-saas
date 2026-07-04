@@ -71,7 +71,11 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <Input name="email" type="email" label="Email" autoComplete="email" required />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-red-600">
+          {error}
+        </p>
+      )}
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? 'Sending link…' : 'Send reset link'}
       </Button>

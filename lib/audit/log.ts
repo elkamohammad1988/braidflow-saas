@@ -1,5 +1,5 @@
 import 'server-only';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import type { Json } from '@/types/db';
 
 export type AuditAction =
@@ -28,7 +28,7 @@ type AuditEntry = {
 // break the business action it's recording.
 export async function recordAuditLog(entry: AuditEntry): Promise<void> {
   try {
-    const admin = supabaseAdmin();
+    const admin = dbAdmin();
     const { error } = await admin.from('audit_logs').insert({
       actor_id: entry.actorId,
       action: entry.action,

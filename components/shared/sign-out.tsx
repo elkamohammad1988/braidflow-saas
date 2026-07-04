@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabaseBrowser } from '@/lib/supabase/client';
+import { logoutAction } from '@/lib/auth/actions';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ export function SignOutLink({ className }: { className?: string }) {
 
   function signOut() {
     startTransition(async () => {
-      await supabaseBrowser().auth.signOut();
+      await logoutAction();
       router.push('/');
       router.refresh();
     });

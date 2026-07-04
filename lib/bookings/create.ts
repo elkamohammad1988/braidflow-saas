@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { db, dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
 import { rateLimit, clientIpKey } from '@/lib/rate-limit';
@@ -16,8 +16,8 @@ export async function createBookingAction(input: CreateBookingInput) {
   const parsed = createBookingSchema.safeParse(input);
   if (!parsed.success) return { error: 'Invalid booking details.' };
 
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
 
   // A guest (not signed in) books with the contact details from the form. An
   // authenticated client books against their account and any guest fields are
@@ -40,7 +40,7 @@ export async function createBookingAction(input: CreateBookingInput) {
     return { error: 'You\'re booking very quickly. Please wait a moment and try again.' };
   }
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
 
   const { data: service, error: serviceError } = await admin
     .from('services')

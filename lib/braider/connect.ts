@@ -1,6 +1,6 @@
 'use server';
 
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { requireBraider } from '@/lib/auth/session';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
@@ -29,7 +29,7 @@ export async function startStripeOnboarding(): Promise<{ url: string } | { error
   const ensured = await ensureBraiderRecord(user.id, profile.full_name);
   if ('error' in ensured) return { error: ensured.error };
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: braider } = await admin
     .from('braiders')
     .select('stripe_account_id')
@@ -76,7 +76,7 @@ export async function refreshConnectStatus(): Promise<
   { ok: true; chargesEnabled: boolean } | { error: string }
 > {
   const { user } = await requireBraider();
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: braider } = await admin
     .from('braiders')
     .select('stripe_account_id')

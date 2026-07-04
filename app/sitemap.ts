@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { dbAdmin } from '@/lib/db/server';
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://braidflow.app').replace(/\/$/, '');
 
@@ -9,20 +9,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${siteUrl}/pricing`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${siteUrl}/braiders`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${siteUrl}/signup`, lastModified: now, changeFrequency: 'yearly', priority: 0.5 },
-    { url: `${siteUrl}/login`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 }
+    { url: `${siteUrl}/braiders`, lastModified: now, changeFrequency: 'daily', priority: 0.8 }
   ];
 
-  // Public braider profiles — only emit if Supabase is reachable. Using an
-  // anonymous client here so it works at build time without service-role keys.
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return staticRoutes;
-
   try {
-    const supabase = createClient(url, anon);
-    const { data } = await supabase
+    const { data } = await dbAdmin()
       .from('braiders')
       .select('slug')
       .eq('accepting_bookings', true)

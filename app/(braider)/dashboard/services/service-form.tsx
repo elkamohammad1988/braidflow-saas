@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea, fieldSurface } from '@/components/ui/field';
+import { ChevronDown } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { createServiceAction, updateServiceAction } from '@/lib/services/actions';
 import { cn } from '@/lib/utils';
@@ -83,18 +85,15 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         required
       />
 
-      <label className="block">
-        <span className="mb-1.5 block text-sm font-medium text-ink">Description</span>
-        <textarea
-          value={description ?? ''}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          maxLength={500}
-          placeholder="What's included, length, what to expect."
-          className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
-        />
-        <span className="mt-1 block text-xs text-ink-muted">Optional. Shown on your booking page.</span>
-      </label>
+      <Textarea
+        label="Description"
+        value={description ?? ''}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={3}
+        maxLength={500}
+        placeholder="What's included, length, what to expect."
+        hint="Optional. Shown on your booking page."
+      />
 
       <fieldset>
         <legend className="mb-1.5 block text-sm font-medium text-ink">Duration</legend>
@@ -107,20 +106,29 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
               max={24}
               value={hours}
               onChange={(e) => setHours(Math.max(0, Number(e.target.value)))}
-              className="mt-1 h-11 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+              className={cn(fieldSurface, 'mt-1 h-11 w-full px-3.5')}
             />
           </label>
           <label className="block">
             <span className="block text-xs text-ink-muted">Minutes</span>
-            <select
-              value={minutes}
-              onChange={(e) => setMinutes(Number(e.target.value))}
-              className="mt-1 h-11 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
-            >
-              {[0, 15, 30, 45].map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
+            <div className="relative mt-1">
+              <select
+                value={minutes}
+                onChange={(e) => setMinutes(Number(e.target.value))}
+                className={cn(fieldSurface, 'h-11 w-full cursor-pointer appearance-none px-3.5 pr-10')}
+              >
+                {[0, 15, 30, 45].map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden
+                strokeWidth={2}
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+              />
+            </div>
           </label>
         </div>
       </fieldset>
@@ -136,12 +144,12 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         />
       </div>
 
-      <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-ink/10 bg-white px-4 py-3">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-line-strong bg-paper px-4 py-3 transition-colors hover:border-clay/30">
         <input
           type="checkbox"
           checked={isActive}
           onChange={(e) => setIsActive(e.target.checked)}
-          className="h-4 w-4 accent-ink"
+          className="h-4 w-4 accent-clay"
         />
         <span className="text-sm">
           <span className="font-medium text-ink">Show on my booking page</span>
@@ -150,7 +158,10 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
       </label>
 
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </p>
       )}
@@ -205,7 +216,7 @@ function DollarInput({
           onChange={(e) => onChange(e.target.value)}
           required={required}
           placeholder="0.00"
-          className="h-11 w-full rounded-lg border border-ink/10 bg-white pl-7 pr-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+          className={cn(fieldSurface, 'h-11 w-full pl-7 pr-3.5')}
         />
       </div>
       {hint && <span className="mt-1 block text-xs text-ink-muted">{hint}</span>}

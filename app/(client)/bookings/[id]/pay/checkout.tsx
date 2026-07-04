@@ -15,32 +15,47 @@ import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// Tuned to the atelier palette so Stripe's fields feel like part of the page,
+// not a cold white iframe dropped into warm paper.
 const appearance: Appearance = {
   theme: 'stripe',
   variables: {
-    colorPrimary: '#1a1410',
-    colorText: '#1a1410',
-    colorBackground: '#ffffff',
+    colorPrimary: '#c78a3a',
+    colorText: '#231810',
+    colorTextSecondary: '#6d5c4e',
+    colorBackground: '#fdfaf4',
     colorDanger: '#dc2626',
     fontFamily: 'Inter, system-ui, sans-serif',
     fontSizeBase: '15px',
-    borderRadius: '10px',
+    borderRadius: '12px',
     spacingUnit: '4px'
   },
   rules: {
     '.Input': {
-      border: '1px solid rgba(26,20,16,0.1)',
-      boxShadow: 'none',
-      padding: '10px 12px'
+      border: '1px solid rgba(35,24,16,0.15)',
+      boxShadow: 'inset 0 1px 2px rgba(35,24,16,0.04)',
+      padding: '11px 14px'
     },
     '.Input:focus': {
-      border: '1px solid rgba(26,20,16,0.3)',
-      boxShadow: '0 0 0 3px rgba(26,20,16,0.08)'
+      border: '1px solid rgba(199,138,58,0.55)',
+      boxShadow: '0 0 0 4px rgba(224,163,63,0.15)'
     },
     '.Label': {
       fontWeight: '500',
       fontSize: '13px',
+      color: '#6d5c4e',
       marginBottom: '6px'
+    },
+    '.Tab': {
+      border: '1px solid rgba(35,24,16,0.15)',
+      boxShadow: 'none'
+    },
+    '.Tab:hover': {
+      borderColor: 'rgba(199,138,58,0.5)'
+    },
+    '.Tab--selected': {
+      borderColor: '#c78a3a',
+      boxShadow: '0 0 0 1px #c78a3a'
     }
   }
 };
@@ -104,7 +119,7 @@ function CheckoutForm({
 
   return (
     <form onSubmit={onSubmit}>
-      <div className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
+      <div className="rounded-card border border-line bg-paper p-6 shadow-soft">
         {!ready && (
           <div className="flex items-center justify-center py-8 text-ink-muted">
             <Spinner />
@@ -120,7 +135,10 @@ function CheckoutForm({
       </div>
 
       {error && (
-        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </p>
       )}

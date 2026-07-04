@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Check } from 'lucide-react';
+import { SuccessCheck } from '@/components/motion/success-check';
 import { formatAppointment } from '@/lib/format-date';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { resolveBookingViewer } from '@/lib/bookings/access';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,7 @@ export default async function ConfirmationPage({
   const isGuest = viewer.kind === 'guest';
   const tokenQuery = isGuest && token ? `?t=${encodeURIComponent(token)}` : '';
 
-  const { data: booking } = await supabaseAdmin()
+  const { data: booking } = await dbAdmin()
     .from('bookings')
     .select(
       'id, client_id, scheduled_at, status, price_cents, deposit_cents, services(name), braiders(business_name, slug, timezone)'
@@ -49,43 +49,53 @@ export default async function ConfirmationPage({
       {isConfirmed && (
         <>
           <div className="flex justify-center">
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-moss/10 text-moss ring-1 ring-inset ring-moss/20 motion-safe:animate-fade-in-up">
-              <Check className="h-8 w-8" strokeWidth={2.5} />
-            </span>
+            <SuccessCheck />
           </div>
-          <h1 className="mt-5 font-display text-3xl text-ink">You're on the books.</h1>
-          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+          <p className="label mx-auto mt-6 w-fit text-moss">Booking confirmed</p>
+          <h1 className="mt-3 font-display text-[2.5rem] font-medium leading-[1.03] tracking-[-0.03em] text-ink">
+            You&rsquo;re on the books.
+          </h1>
+          <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-ink-muted">
             {isGuest ? 'Your confirmation is on its way by email. ' : ''}We&rsquo;ll remind you
             before your appointment.
           </p>
 
-          <dl className="mx-auto mt-8 w-full max-w-sm space-y-1 rounded-card border border-line bg-paper px-6 py-5 text-left text-sm shadow-soft">
-            <div className="flex justify-between">
-              <dt className="text-ink-muted">Braider</dt>
-              <dd className="text-ink">{booking.braiders?.business_name}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-ink-muted">Service</dt>
-              <dd className="text-ink">{booking.services?.name}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-ink-muted">When</dt>
-              <dd className="text-ink">
-                {formatAppointment(
-                  booking.scheduled_at,
-                  booking.braiders?.timezone ?? DEFAULT_TIMEZONE
-                )}
-              </dd>
-            </div>
-            <div className="flex justify-between pt-2">
-              <dt className="text-ink-muted">Deposit paid</dt>
-              <dd className="text-ink">{formatMoney(booking.deposit_cents)}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-ink-muted">Balance at appointment</dt>
-              <dd className="text-ink">
-                {formatMoney(booking.price_cents - booking.deposit_cents)}
-              </dd>
+          {/* Receipt — a gold-topped ticket for the moment they paid. */}
+          <dl className="mx-auto mt-9 w-full max-w-sm overflow-hidden rounded-xl2 border border-line bg-paper text-left text-sm tabular-nums shadow-lifted">
+            <div className="h-1 bg-gradient-to-r from-gold-bright via-gold to-clay" aria-hidden />
+            <div className="divide-y divide-line px-6">
+              <div className="flex items-center justify-between gap-4 py-3.5">
+                <dt className="text-ink-muted">Braider</dt>
+                <dd className="font-medium text-ink">{booking.braiders?.business_name}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 py-3.5">
+                <dt className="text-ink-muted">Service</dt>
+                <dd className="text-right font-medium text-ink">{booking.services?.name}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 py-3.5">
+                <dt className="text-ink-muted">When</dt>
+                <dd className="text-right font-medium text-ink">
+                  {formatAppointment(
+                    booking.scheduled_at,
+                    booking.braiders?.timezone ?? DEFAULT_TIMEZONE
+                  )}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 py-3.5">
+                <dt className="flex items-center gap-1.5 text-ink-muted">
+                  <span className="h-1.5 w-1.5 rounded-full bg-moss-bright" />
+                  Deposit paid
+                </dt>
+                <dd className="font-display text-base font-medium text-ink">
+                  {formatMoney(booking.deposit_cents)}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 py-3.5">
+                <dt className="text-ink-muted">Balance at appointment</dt>
+                <dd className="text-ink">
+                  {formatMoney(booking.price_cents - booking.deposit_cents)}
+                </dd>
+              </div>
             </div>
           </dl>
 

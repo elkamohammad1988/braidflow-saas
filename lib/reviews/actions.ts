@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { submitReviewSchema, type SubmitReviewInput } from './validation';
 
 type Result = { ok: true } | { error: string };
@@ -12,14 +12,14 @@ export async function submitReviewAction(input: SubmitReviewInput): Promise<Resu
     return { error: parsed.error.issues[0]?.message ?? 'Invalid review.' };
   }
 
-  // Use the caller's RLS-scoped client. The reviews_client_insert policy is the
-  // real gate (own booking, status = completed, one per booking) — these checks
-  // just turn policy rejections into friendly copy.
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Authorization is enforced here in code: the review must be for the caller's
+  // own booking, the appointment must be completed, and each booking can be
+  // reviewed only once (a duplicate booking_id is rejected with a 23505).
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) return { error: 'You need to be signed in to leave a review.' };
 
-  const { data: booking } = await supabase
+  const { data: booking } = await database
     .from('bookings')
     .select('id, client_id, braider_id, status')
     .eq('id', parsed.data.bookingId)
@@ -34,7 +34,7 @@ export async function submitReviewAction(input: SubmitReviewInput): Promise<Resu
   // braider_id and client_id are taken from the booking, never from the client,
   // so a review can't be misattributed.
   const body = parsed.data.body?.trim() ? parsed.data.body.trim() : null;
-  const { error } = await supabase.from('reviews').insert({
+  const { error } = await database.from('reviews').insert({
     booking_id: booking.id,
     braider_id: booking.braider_id,
     client_id: user.id,
@@ -50,7 +50,7 @@ export async function submitReviewAction(input: SubmitReviewInput): Promise<Resu
     return { error: 'Could not save your review. Try again.' };
   }
 
-  const { data: braider } = await supabase
+  const { data: braider } = await database
     .from('braiders')
     .select('slug')
     .eq('id', booking.braider_id)

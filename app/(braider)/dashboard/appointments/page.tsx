@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { isPast } from 'date-fns';
+import { CalendarPlus } from 'lucide-react';
 import { requireBraider } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Badge } from '@/components/ui/badge';
@@ -94,16 +95,16 @@ function bookingActions(
 
 export default async function AppointmentsPage() {
   const { user } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: braiderRow } = await supabase
+  const { data: braiderRow } = await database
     .from('braiders')
     .select('timezone')
     .eq('id', user.id)
     .maybeSingle();
   const tz = braiderRow?.timezone ?? DEFAULT_TIMEZONE;
 
-  const { data: appointments, error } = await supabase
+  const { data: appointments, error } = await database
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
@@ -124,13 +125,14 @@ export default async function AppointmentsPage() {
       <div className="mt-8">
         {!appointments || appointments.length === 0 ? (
           <EmptyState
+            icon={CalendarPlus}
             title="No appointments yet"
-            description="When clients book, they'll show up here."
+            description="When clients book your page, every appointment — past and upcoming — lands here."
           />
         ) : (
           <>
             {/* Desktop: table */}
-            <div className="hidden overflow-hidden rounded-card border border-ink/5 bg-white shadow-soft md:block">
+            <div className="hidden overflow-hidden rounded-card border border-line bg-paper shadow-soft md:block">
               <table className="w-full text-sm">
                 <thead className="bg-ink/[0.03] text-left text-xs uppercase tracking-wider text-ink-muted">
                   <tr>
@@ -142,7 +144,7 @@ export default async function AppointmentsPage() {
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-ink/5">
+                <tbody className="divide-y divide-line">
                   {appointments.map((a) => {
                     const status = a.status as Status;
                     const upcoming = !isPast(new Date(a.scheduled_at));
@@ -154,7 +156,7 @@ export default async function AppointmentsPage() {
                           <p className="font-medium text-ink">
                             {relativeDayLabel(a.scheduled_at, tz)}
                           </p>
-                          <p className="text-xs text-ink-muted">
+                          <p className="text-xs tabular-nums text-ink-muted">
                             {formatInZone(a.scheduled_at, tz, 'h:mm a')}
                           </p>
                         </td>
@@ -166,7 +168,7 @@ export default async function AppointmentsPage() {
                         </td>
                         <td className="px-5 py-3 text-ink-muted">{a.services?.name}</td>
                         <td className="px-5 py-3">{statusBadges(status, deposit)}</td>
-                        <td className="px-5 py-3 text-right text-ink">
+                        <td className="px-5 py-3 text-right tabular-nums text-ink">
                           {formatMoney(a.price_cents)}
                         </td>
                         <td className="px-5 py-3 text-right">
@@ -190,18 +192,20 @@ export default async function AppointmentsPage() {
                 return (
                   <li
                     key={a.id}
-                    className="rounded-card border border-ink/5 bg-white p-4 shadow-soft"
+                    className="rounded-card border border-line bg-paper p-4 shadow-soft"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-medium text-ink">
                           {relativeDayLabel(a.scheduled_at, tz)}
                         </p>
-                        <p className="text-xs text-ink-muted">
+                        <p className="text-xs tabular-nums text-ink-muted">
                           {formatInZone(a.scheduled_at, tz, 'h:mm a')}
                         </p>
                       </div>
-                      <p className="shrink-0 font-medium text-ink">{formatMoney(a.price_cents)}</p>
+                      <p className="shrink-0 font-medium tabular-nums text-ink">
+                        {formatMoney(a.price_cents)}
+                      </p>
                     </div>
 
                     <div className="mt-3 text-sm">
@@ -215,7 +219,7 @@ export default async function AppointmentsPage() {
                     <div className="mt-3">{statusBadges(status, deposit)}</div>
 
                     {actions && (
-                      <div className="mt-4 border-t border-ink/5 pt-3">{actions}</div>
+                      <div className="mt-4 border-t border-line pt-3">{actions}</div>
                     )}
                   </li>
                 );

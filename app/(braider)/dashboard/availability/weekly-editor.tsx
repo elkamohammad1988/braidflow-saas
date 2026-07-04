@@ -2,12 +2,14 @@
 
 import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
+import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import {
   addAvailabilityRuleAction,
   removeAvailabilityRuleAction
 } from '@/lib/availability/actions';
 import { DAY_LABELS, minutesToTime, timeStringToMinutes } from '@/lib/availability/format';
+import { cn } from '@/lib/utils';
 
 export type Rule = {
   id: string;
@@ -24,7 +26,7 @@ export function WeeklyEditor({ rules }: { rules: Rule[] }) {
   });
 
   return (
-    <div className="divide-y divide-ink/5">
+    <div className="divide-y divide-line">
       {DAY_LABELS.map((label, day) => (
         <DayRow key={day} day={day} label={label} rules={(byDay.get(day) ?? []).sort((a, b) => a.start_minute - b.start_minute)} />
       ))}
@@ -70,7 +72,7 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
 function RuleChip({ rule }: { rule: Rule }) {
   const [pending, startTransition] = useTransition();
   return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-ink/5 px-3 py-1 text-xs text-ink">
+    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-ink/[0.04] px-3 py-1 text-xs text-ink">
       {minutesToTime(rule.start_minute)} – {minutesToTime(rule.end_minute)}
       <button
         type="button"
@@ -118,7 +120,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
           type="time"
           value={start}
           onChange={(e) => setStart(e.target.value)}
-          className="mt-1 block h-10 rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+          className={cn(fieldSurface, 'mt-1 block h-10 px-3.5')}
         />
       </label>
       <label className="text-xs text-ink-muted">
@@ -127,7 +129,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
           type="time"
           value={end}
           onChange={(e) => setEnd(e.target.value)}
-          className="mt-1 block h-10 rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+          className={cn(fieldSurface, 'mt-1 block h-10 px-3.5')}
         />
       </label>
       <Button size="sm" onClick={save} disabled={pending}>
@@ -141,7 +143,11 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
       >
         Cancel
       </button>
-      {error && <p className="basis-full text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="basis-full text-sm text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

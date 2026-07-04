@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import {
   availabilityRuleSchema,
   overrideSchema,
@@ -10,10 +10,10 @@ import {
 } from './validation';
 
 async function requireBraiderId() {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  return { supabase, userId: user.id };
+  return { database, userId: user.id };
 }
 
 export async function addAvailabilityRuleAction(input: AvailabilityRuleInput) {
@@ -22,8 +22,8 @@ export async function addAvailabilityRuleAction(input: AvailabilityRuleInput) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid range' };
   }
 
-  const { supabase, userId } = await requireBraiderId();
-  const { error } = await supabase.from('availability_rules').insert({
+  const { database, userId } = await requireBraiderId();
+  const { error } = await database.from('availability_rules').insert({
     braider_id: userId,
     day_of_week: parsed.data.dayOfWeek,
     start_minute: parsed.data.startMinute,
@@ -36,8 +36,8 @@ export async function addAvailabilityRuleAction(input: AvailabilityRuleInput) {
 }
 
 export async function removeAvailabilityRuleAction(id: string) {
-  const { supabase, userId } = await requireBraiderId();
-  await supabase.from('availability_rules').delete().eq('id', id).eq('braider_id', userId);
+  const { database, userId } = await requireBraiderId();
+  await database.from('availability_rules').delete().eq('id', id).eq('braider_id', userId);
   revalidatePath('/dashboard/availability');
 }
 
@@ -47,8 +47,8 @@ export async function addOverrideAction(input: OverrideInput) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid time off' };
   }
 
-  const { supabase, userId } = await requireBraiderId();
-  const { error } = await supabase.from('availability_overrides').insert({
+  const { database, userId } = await requireBraiderId();
+  const { error } = await database.from('availability_overrides').insert({
     braider_id: userId,
     starts_at: parsed.data.startsAt,
     ends_at: parsed.data.endsAt,
@@ -62,8 +62,8 @@ export async function addOverrideAction(input: OverrideInput) {
 }
 
 export async function removeOverrideAction(id: string) {
-  const { supabase, userId } = await requireBraiderId();
-  await supabase
+  const { database, userId } = await requireBraiderId();
+  await database
     .from('availability_overrides')
     .delete()
     .eq('id', id)

@@ -44,13 +44,13 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
               key={l.href}
               href={l.href}
               className={cn(
-                'inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-colors',
+                'inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-all duration-200 ease-spring',
                 active
-                  ? 'bg-ink text-cream'
+                  ? 'bg-gradient-to-br from-onyx-soft to-night text-cream ring-1 ring-gold/20'
                   : 'text-ink-muted hover:bg-ink/[0.05] hover:text-ink'
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className={cn('h-4 w-4', active && 'text-gold')} />
               {l.label}
             </Link>
           );
@@ -70,14 +70,20 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
               <Link
                 href={l.href}
                 className={cn(
-                  'group flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-colors',
+                  'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 ease-spring',
                   active
-                    ? 'bg-ink text-cream shadow-sm'
+                    ? 'bg-gradient-to-br from-onyx-soft to-night text-cream shadow-[0_8px_22px_-10px_rgba(35,24,16,0.55)] ring-1 ring-gold/15'
                     : 'text-ink-muted hover:bg-ink/[0.05] hover:text-ink'
                 )}
               >
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-gold-bright to-gold"
+                  />
+                )}
                 <Icon
-                  className={cn('h-[18px] w-[18px]', active ? 'text-cream' : 'text-ink-subtle group-hover:text-ink')}
+                  className={cn('h-[18px] w-[18px]', active ? 'text-gold' : 'text-ink-subtle group-hover:text-ink')}
                   strokeWidth={active ? 2 : 1.75}
                 />
                 {l.label}

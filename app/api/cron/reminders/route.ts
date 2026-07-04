@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { addHours } from 'date-fns';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { notifyReminder } from '@/lib/email/notifications';
 import { isAuthorizedCron } from '@/lib/cron/auth';
 import { assertRuntimeEnv } from '@/lib/env';
@@ -33,7 +33,7 @@ const WINDOWS: Window[] = [
 ];
 
 // Build a typed single-column update for the window's reminder timestamp. A
-// computed property key would widen to a string index signature that Supabase's
+// computed property key would widen to a string index signature that the
 // generated Update type rejects, so branch on the literal column instead.
 function reminderUpdate(column: Window['column'], value: string | null) {
   return column === 'reminder_sent_at'
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
   const now = new Date();
   const nowIso = now.toISOString();
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const results: RunResult[] = [];
 
   for (const w of WINDOWS) {

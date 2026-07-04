@@ -5,7 +5,8 @@ import { LegalShell, LegalSection } from '@/components/shared/legal';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'The terms that govern your use of BraidFlow as a client booking appointments or a braider accepting them.'
+    'The terms that govern your use of BraidFlow as a client booking appointments or a braider accepting them.',
+  alternates: { canonical: '/terms' }
 };
 
 const LAST_UPDATED = 'June 13, 2026';

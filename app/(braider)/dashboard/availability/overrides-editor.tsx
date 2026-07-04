@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { addOverrideAction, removeOverrideAction } from '@/lib/availability/actions';
+import { formatInZone } from '@/lib/format-date';
+import { cn } from '@/lib/utils';
 
 export type Override = {
   id: string;
@@ -13,7 +15,13 @@ export type Override = {
   note: string | null;
 };
 
-export function OverridesEditor({ overrides }: { overrides: Override[] }) {
+export function OverridesEditor({
+  overrides,
+  timeZone
+}: {
+  overrides: Override[];
+  timeZone: string;
+}) {
   const [adding, setAdding] = useState(false);
 
   return (
@@ -34,32 +42,41 @@ export function OverridesEditor({ overrides }: { overrides: Override[] }) {
 
       <ul className="mt-4 space-y-2">
         {overrides.length === 0 && !adding && (
-          <li className="rounded-card border border-dashed border-ink/10 bg-white/40 px-4 py-6 text-center text-sm text-ink-muted">
+          <li className="rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-6 text-center text-sm text-ink-muted">
             Nothing blocked off right now.
           </li>
         )}
         {overrides.map((o) => (
-          <OverrideRow key={o.id} override={o} />
+          <OverrideRow key={o.id} override={o} timeZone={timeZone} />
         ))}
       </ul>
     </div>
   );
 }
 
-function OverrideRow({ override }: { override: Override }) {
+function OverrideRow({ override, timeZone }: { override: Override; timeZone: string }) {
   const [pending, startTransition] = useTransition();
-  const start = new Date(override.starts_at);
-  const end = new Date(override.ends_at);
-  const sameDay = start.toDateString() === end.toDateString();
+  // Format in the braider's zone so server and client render identical text
+  // (raw date-fns `format` uses the runtime zone → hydration mismatch).
+  const sameDay =
+    formatInZone(override.starts_at, timeZone, 'yyyy-MM-dd') ===
+    formatInZone(override.ends_at, timeZone, 'yyyy-MM-dd');
+  const label = sameDay
+    ? `${formatInZone(override.starts_at, timeZone, 'EEE, MMM d')} · ${formatInZone(
+        override.starts_at,
+        timeZone,
+        'h:mm a'
+      )} – ${formatInZone(override.ends_at, timeZone, 'h:mm a')}`
+    : `${formatInZone(override.starts_at, timeZone, 'MMM d, h:mm a')} – ${formatInZone(
+        override.ends_at,
+        timeZone,
+        'MMM d, h:mm a'
+      )}`;
 
   return (
-    <li className="flex items-center justify-between gap-4 rounded-card border border-ink/5 bg-white px-5 py-3">
+    <li className="flex items-center justify-between gap-4 rounded-card border border-line bg-paper px-5 py-3 shadow-card">
       <div>
-        <p className="text-sm font-medium text-ink">
-          {sameDay
-            ? `${format(start, 'EEE, MMM d')} · ${format(start, 'h:mm a')} – ${format(end, 'h:mm a')}`
-            : `${format(start, 'MMM d, h:mm a')} – ${format(end, 'MMM d, h:mm a')}`}
-        </p>
+        <p className="text-sm font-medium text-ink">{label}</p>
         {override.note && <p className="mt-0.5 text-xs text-ink-muted">{override.note}</p>}
       </div>
       <button
@@ -105,7 +122,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <div className="rounded-card border border-ink/10 bg-white p-5">
+    <div className="rounded-card border border-line bg-paper p-5 shadow-card">
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="text-xs text-ink-muted">
           Date
@@ -114,7 +131,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
             value={date}
             min={today}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block h-10 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+            className={cn(fieldSurface, 'mt-1 block h-10 w-full px-3.5')}
           />
         </label>
         <label className="text-xs text-ink-muted">
@@ -123,7 +140,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="mt-1 block h-10 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+            className={cn(fieldSurface, 'mt-1 block h-10 w-full px-3.5')}
           />
         </label>
         <label className="text-xs text-ink-muted">
@@ -132,7 +149,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="mt-1 block h-10 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+            className={cn(fieldSurface, 'mt-1 block h-10 w-full px-3.5')}
           />
         </label>
       </div>
@@ -145,11 +162,15 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
           onChange={(e) => setNote(e.target.value)}
           maxLength={120}
           placeholder="Birthday, family event, traveling…"
-          className="mt-1 block h-10 w-full rounded-lg border border-ink/10 bg-white px-3 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
+          className={cn(fieldSurface, 'mt-1 block h-10 w-full px-3.5')}
         />
       </label>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       <div className="mt-4 flex gap-3">
         <Button size="sm" onClick={save} disabled={pending}>

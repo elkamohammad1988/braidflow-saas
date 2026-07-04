@@ -3,14 +3,14 @@
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { stripe } from '@/lib/stripe/client';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { db, dbAdmin } from '@/lib/db/server';
 import { notifyDepositRefunded } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
 
 type Result = { ok: true } | { error: string };
 
-type Admin = ReturnType<typeof supabaseAdmin>;
+type Admin = ReturnType<typeof dbAdmin>;
 
 export type DepositRefundOutcome =
   | { status: 'succeeded' | 'pending'; amountCents: number }
@@ -117,11 +117,11 @@ export async function issueDepositRefund(
 }
 
 export async function refundDepositAction(bookingId: string): Promise<Result> {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) return { error: 'You need to be signed in.' };
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select('id, braider_id, status, deposit_cents')

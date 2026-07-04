@@ -1,5 +1,5 @@
 import { stripe } from './client';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { guestTokenMatches } from '@/lib/bookings/guest-token';
 
 // Who is asking for the deposit secret: the authenticated owner, or a guest
@@ -21,7 +21,7 @@ function authorize(
  * client who owns it (by session) or the guest who holds its token.
  */
 export async function getDepositClientSecret(bookingId: string, access: DepositAccess) {
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
 
   const { data: booking } = await admin
     .from('bookings')

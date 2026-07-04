@@ -1,124 +1,84 @@
 # Production Deployment Checklist
 
-End-to-end checklist for taking BraidFlow from this repo to a live production
-deployment on Vercel. Work top to bottom — later steps depend on earlier ones.
-Check each box as you go.
+End-to-end checklist for taking BraidFlow from this repo to a live deployment on
+Vercel. The app is **self-contained** — local session auth plus an in-memory data
+layer — so it deploys and runs with **zero configuration**. Everything else on
+this page is optional and only needed to turn on a specific integration.
 
-> Target stack: **Vercel** (hosting + cron) · **Supabase** (Postgres, Auth, RLS)
-> · **Stripe** (deposits + webhooks) · **Resend** (email) · **Sentry** (optional
-> error monitoring).
+> Target stack: **Vercel** (hosting + cron). Optional: **Stripe** (deposits +
+> webhooks) · **Resend** (email) · **Sentry** (error monitoring).
 
 ---
 
 ## 0. Accounts & prerequisites
 
 - [ ] A **Vercel** account with this repo pushed to GitHub.
-- [ ] A **Supabase** project (production — separate from any dev project).
-- [ ] A **Stripe** account with a business profile completed enough to activate
-      live mode.
-- [ ] A **Resend** account and a domain you can add DNS records to.
+- [ ] (Optional) A **Stripe** account, if you want to take real deposits.
+- [ ] (Optional) A **Resend** account + a domain you can add DNS records to, for email.
 - [ ] (Optional) A **Sentry** account for error monitoring.
-- [ ] A **custom domain** for the app (e.g. `app.braidflow.app`).
+- [ ] (Optional) A **custom domain** for the app (e.g. `app.braidflow.app`).
 
 ---
 
-## 1. Environment variables
+## 1. Deploy on Vercel
 
-Set these in **Vercel → Project → Settings → Environment Variables** for the
-**Production** environment (and Preview, if you use preview deploys). Anything
-prefixed `NEXT_PUBLIC_` is exposed to the browser — never put a secret there.
+- [ ] Import the GitHub repo (framework auto-detected as Next.js).
+- [ ] Trigger the first deploy. **No environment variables are required** — the
+      build succeeds and every screen works against the seeded in-memory data.
+- [ ] (Optional) Add a **custom domain** (Settings → Domains) and set
+      `NEXT_PUBLIC_SITE_URL` to match it (used for absolute links in emails,
+      sitemap, and OpenGraph).
+- [ ] **Cron**: `vercel.json` defines the hourly reminder cron and the 15-minute
+      booking-expiry cron. Vercel attaches `Authorization: Bearer $CRON_SECRET`
+      to those calls, which the routes verify (`lib/cron/auth.ts`). Set
+      `CRON_SECRET` if you want the crons authenticated, then check
+      Vercel → Crons after deploy to confirm they registered.
 
-| Variable | Required | Source / notes |
+> **How the data layer works.** The app seeds a realistic in-memory dataset on
+> first request and serves everything from it (`lib/db`). It persists while a
+> server instance is warm and resets to the deterministic seed on a cold start —
+> ideal for a demo. To run this as a real multi-user product, implement a durable
+> store (Postgres, etc.) behind the same `db()` / `dbAdmin()` interface in
+> `lib/db/server.ts`; no call sites change.
+
+---
+
+## 2. Environment variables (all optional)
+
+Set these in **Vercel → Project → Settings → Environment Variables** only if you
+want the matching feature. Anything prefixed `NEXT_PUBLIC_` is exposed to the
+browser — never put a secret there.
+
+| Variable | For | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase → Settings → API. Bare project URL, no path. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase → Settings → API (anon/publishable key). |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase → Settings → API (service role / secret). **Server-only secret.** |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | ✅ | Stripe → Developers → API keys (**live** `pk_live_…`). |
-| `STRIPE_SECRET_KEY` | ✅ | Stripe (**live** `sk_live_…`). Secret. |
-| `STRIPE_WEBHOOK_SECRET` | ✅ | From the webhook endpoint you create in step 3 (`whsec_…`). |
-| `RESEND_API_KEY` | ✅ (for email) | Resend → API Keys. If empty, emails are skipped (logged only). |
-| `EMAIL_FROM` | ✅ (for email) | A verified sender on your Resend domain, e.g. `BraidFlow <hello@yourdomain.com>`. |
-| `CRON_SECRET` | ✅ | Long random string. Vercel sends it as a Bearer token to cron routes. |
-| `PENDING_BOOKING_TTL_MINUTES` | ➖ | Minutes an unpaid booking is held before the expiry cron releases it. Default 30. |
-| `NEXT_PUBLIC_SITE_URL` | ✅ | Your **production** URL, e.g. `https://app.braidflow.app`. Must match Supabase Site URL. |
-| `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | ➖ | Sentry DSN. Omit to leave monitoring inert. |
-| `SENTRY_TRACES_SAMPLE_RATE` | ➖ | 0–1, default 0.1. |
-| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | ➖ | Only to upload source maps at build time. |
+| `AUTH_SECRET` | Auth | Signs the session cookie (HMAC). A stable default is used if unset; set a long random string in production so cookies forged with the well-known default are rejected. `openssl rand -hex 32`. |
+| `NEXT_PUBLIC_SITE_URL` | Links | Production URL, e.g. `https://app.braidflow.app` (no trailing slash). Used for absolute links only. |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Payments | Stripe → Developers → API keys (`pk_live_…`). |
+| `STRIPE_SECRET_KEY` | Payments | Stripe (`sk_live_…`). Secret. |
+| `STRIPE_WEBHOOK_SECRET` | Payments | From the webhook endpoint in step 3 (`whsec_…`). |
+| `RESEND_API_KEY` | Email | Resend → API Keys. If empty, emails are skipped (logged only). |
+| `EMAIL_FROM` | Email | A verified sender on your Resend domain, e.g. `BraidFlow <hello@yourdomain.com>`. |
+| `CRON_SECRET` | Cron | Long random string; Vercel sends it as a Bearer token to cron routes. |
+| `PENDING_BOOKING_TTL_MINUTES` | Cron | Minutes an unpaid booking is held before the expiry cron releases it. Default 30. |
+| `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | Monitoring | Sentry DSN. Omit to leave monitoring inert. |
+| `SENTRY_TRACES_SAMPLE_RATE` | Monitoring | 0–1, default 0.1. |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Monitoring | Only to upload source maps at build time. |
 
-- [ ] Every required var above is set for Production.
 - [ ] No secret is sitting in a `NEXT_PUBLIC_` variable.
-- [ ] `NEXT_PUBLIC_SITE_URL` exactly matches the production domain (no trailing slash).
-- [ ] Generate `CRON_SECRET` with something like `openssl rand -hex 32`.
+- [ ] `AUTH_SECRET` is set to a strong random value for production.
 
 ---
 
-## 2. Supabase
+## 3. Stripe (optional — real deposits)
 
-### 2a. Schema & migrations
+Skip this entire section to run the app without payments. With no Stripe keys,
+the booking flow surfaces up to the pay step but can't collect a live deposit.
 
-Run against the production database (SQL Editor or `psql`), **in order**:
-
-- [ ] `db/schema.sql` (baseline tables + GiST exclusion constraint)
-- [ ] `db/policies.sql` (Row-Level Security policies)
-- [ ] `db/migrations/0001_reminders.sql`
-- [ ] `db/migrations/0002_refunds.sql`
-- [ ] `db/migrations/0003_final_reminders.sql`
-- [ ] `db/migrations/0004_reviews.sql`
-- [ ] `db/migrations/0005_braider_onboarding.sql` — creates the `braiders` row on
-      braider signup. Skip it and braider accounts have no public booking page.
-- [ ] `db/migrations/0006_audit_logs.sql` — the `audit_logs` table the actions/crons write to.
-- [ ] `db/migrations/0007_profiles_role_lock.sql` — **must run.** Locks
-      `profiles.role` so a user can't self-promote to braider (privilege-escalation hole otherwise).
-- [ ] `db/migrations/0008_webhook_events_and_client_reads.sql` — Stripe webhook
-      idempotency table + RLS letting a braider read their own clients' details.
-- [ ] `db/migrations/0009_braider_timezone.sql` — adds `braiders.timezone`
-      (NOT NULL). Slot generation reads it; skip it and availability breaks.
-- [ ] `db/migrations/0010_stripe_connect.sql` — Stripe Connect columns on
-      `braiders` (`stripe_account_id`, `charges_enabled`, `payouts_enabled`,
-      `stripe_onboarding_complete`, `onboarding_completed_at`). **Required for
-      bookings**: until a braider's account has `charges_enabled`, the booking
-      flow is gated off (server + UI).
-- [ ] `db/migrations/0011_security_fixes.sql` — **must run.** Locks down the
-      `availability_overrides` public-read leak and the `reviews` UPDATE policy.
-- [ ] (Optional) `db/seed.sql` for demo data — **do not** run on real production.
-      Note: seeded braiders have no Stripe account, so they can't take bookings
-      until they complete Connect onboarding (Stripe test mode auto-fills it).
-
-> Sanity check: in Supabase → Authentication → Policies, confirm **RLS is
-> enabled on every table**. The trust boundary lives in the database.
-
-### 2b. Auth configuration (Authentication → URL Configuration)
-
-- [ ] **Site URL** = `NEXT_PUBLIC_SITE_URL` (your production domain).
-- [ ] **Redirect URLs** include `https://<your-domain>/auth/callback` for every
-      environment (production, and each preview domain you use). This is where
-      email confirmation **and password-reset** links land.
-- [ ] Decide on **Confirm email** (Authentication → Providers → Email). Enabled =
-      users verify before first sign-in (recommended for production).
-
-### 2c. Email delivery (critical for production)
-
-Supabase's built-in email is heavily rate-limited and meant for testing only.
-
-- [ ] Configure **custom SMTP** (Authentication → Emails → SMTP Settings) — e.g.
-      via Resend SMTP — so confirmation and password-reset emails actually send
-      at volume.
-- [ ] Review the **Confirmation** and **Reset Password** email templates. The
-      default templates link through `{{ .ConfirmationURL }}`, which honors the
-      `redirectTo` the app passes (`/auth/callback?next=/reset-password`). If you
-      customize them, keep that redirect intact.
-- [ ] Send yourself a test password reset and confirm the link lands on
-      `/reset-password` and lets you set a new password.
-
----
-
-## 3. Stripe
-
-- [ ] Activate **live mode** and use `pk_live_…` / `sk_live_…` keys (step 1).
+- [ ] Activate **live mode** and use `pk_live_…` / `sk_live_…` keys (step 2).
 - [ ] Create a webhook endpoint (Developers → Webhooks → Add endpoint):
       `https://<your-domain>/api/stripe/webhook`.
-- [ ] Subscribe it to exactly these events (the handler in
-      `app/api/stripe/webhook/route.ts` processes them):
+- [ ] Subscribe it to exactly these events (handled in
+      `app/api/stripe/webhook/route.ts`):
   - [ ] `payment_intent.succeeded`
   - [ ] `payment_intent.payment_failed`
   - [ ] `payment_intent.canceled`
@@ -126,116 +86,78 @@ Supabase's built-in email is heavily rate-limited and meant for testing only.
   - [ ] `refund.updated`
   - [ ] `refund.failed`
   - [ ] `charge.dispute.created`
-  - [ ] `account.updated` — keeps each braider's Connect capability flags
-        (`charges_enabled` etc.) in sync. Without it, a braider who finishes
-        onboarding may stay gated until they hit the manual refresh.
+  - [ ] `account.updated` — keeps each braider's Connect capability flags in sync.
 - [ ] Copy the endpoint's **Signing secret** → `STRIPE_WEBHOOK_SECRET`.
-- [ ] Confirm your Stripe account can actually accept charges and pay out
-      (business details, bank account).
 
 > The webhook is the source of truth: it promotes bookings to `confirmed` and
-> sends confirmation email. Handlers are idempotent (deduped on event id), so
-> Stripe's at-least-once retries are safe.
+> sends confirmation email. Handlers are idempotent (deduped on event id).
 
 ### 3a. Stripe Connect (braiders receive deposits)
 
-Deposits are **destination charges** routed to each braider's own connected
-account — the braider is the merchant of record and keeps 100% (no platform fee
-in beta). The platform account stays the integrator, so the webhook above is
-unchanged.
+Deposits are **destination charges** routed to each braider's connected account —
+the braider is the merchant of record and keeps 100% (no platform fee in beta).
 
-- [ ] Enable **Connect** (Stripe → Connect → Get started) and use **Express**
-      accounts.
-- [ ] Confirm the platform account's **Connect settings** allow creating Express
-      accounts and that `card_payments` + `transfers` capabilities are available.
-- [ ] No new env vars are needed — onboarding uses `STRIPE_SECRET_KEY` and the
-      return/refresh URLs are derived from `NEXT_PUBLIC_SITE_URL`
-      (`/dashboard/connect/return`, `/dashboard/connect/refresh`).
-- [ ] After deploy: from a braider dashboard, click **Connect Stripe**, complete
-      the hosted onboarding, and confirm the booking flow unlocks once the
-      account reaches `charges_enabled`.
+- [ ] Enable **Connect → Express** on the platform account.
+- [ ] Confirm `card_payments` + `transfers` capabilities are available.
+- [ ] No new env vars are needed — onboarding uses `STRIPE_SECRET_KEY`; the
+      return/refresh URLs derive from `NEXT_PUBLIC_SITE_URL`.
 
 ---
 
-## 4. Resend (transactional email)
+## 4. Resend (optional — transactional email)
+
+Skip to run without email; the app logs would-be sends and continues.
 
 - [ ] Add and **verify your sending domain** in Resend (SPF/DKIM DNS records).
 - [ ] Set `EMAIL_FROM` to an address on that verified domain.
 - [ ] Set `RESEND_API_KEY`.
-- [ ] Send a test booking and confirm the confirmation email arrives and isn't
-      flagged as spam.
+- [ ] Send a test booking and confirm the confirmation email arrives.
 
 ---
 
-## 5. Sentry (optional but recommended)
+## 5. Sentry (optional — error monitoring)
 
 - [ ] Create a Sentry project (platform: Next.js) and copy its DSN.
-- [ ] Set `NEXT_PUBLIC_SENTRY_DSN` (and `SENTRY_DSN` if you want a separate
-      server DSN).
+- [ ] Set `NEXT_PUBLIC_SENTRY_DSN` (and `SENTRY_DSN` for a separate server DSN).
 - [ ] (Optional) Set `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` so
-      `next build` uploads source maps for readable stack traces.
-- [ ] After deploy, trigger a test error and confirm it appears in Sentry.
+      `next build` uploads source maps.
 
-> With no DSN configured, Sentry is fully inert — the app builds and runs exactly
-> as without it. See `sentry.*.config.ts` and `lib/monitoring.ts`.
-
----
-
-## 6. Deploy on Vercel
-
-- [ ] Import the GitHub repo (framework auto-detected as Next.js).
-- [ ] Confirm all environment variables from step 1 are set for Production.
-- [ ] Trigger the first deploy and confirm the build succeeds
-      (`next build` passes locally too — see step 8).
-- [ ] Add your **custom domain** (Settings → Domains) and update
-      `NEXT_PUBLIC_SITE_URL` + Supabase Site URL if the domain changed.
-- [ ] **Cron**: `vercel.json` already defines the hourly reminder cron and the
-      15-minute booking-expiry cron. Vercel automatically attaches
-      `Authorization: Bearer $CRON_SECRET` to those calls, which the routes
-      verify (`lib/cron/auth.ts`). Confirm `CRON_SECRET` is set, then check
-      Vercel → Crons after deploy to see them registered.
+> With no DSN configured, Sentry is fully inert. See `sentry.*.config.ts` and
+> `lib/monitoring.ts`.
 
 ---
 
-## 7. Security & ops review
+## 6. Security & ops review
 
-- [ ] **RLS** enabled on every table (re-verify on the production DB).
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` is only ever used server-side (it is — via
-      `supabaseAdmin()`); never shipped to the browser.
-- [ ] **Security headers** are applied (`next.config.mjs`): HSTS, `nosniff`,
-      `X-Frame-Options`, Referrer-Policy, Permissions-Policy. Note HSTS uses
-      `preload` — only keep it if you intend to stay HTTPS-only permanently.
+- [ ] **`AUTH_SECRET`** set to a strong random value (see step 2).
+- [ ] **Security headers** applied (`next.config.mjs`): HSTS, `nosniff`,
+      `X-Frame-Options`, Referrer-Policy, Permissions-Policy. HSTS uses `preload`
+      — only keep it if you intend to stay HTTPS-only permanently.
 - [ ] **Rate limiting** (`lib/rate-limit.ts`) is **in-memory and per-instance**.
-      On serverless this means the effective limit is roughly `limit ×
-      instances` and resets on cold start. It's a basic abuse/burst guard, not a
-      hard global limit. For strict global limits (e.g. brute-force protection at
-      scale), swap the `Map` for **Upstash Redis** or a Postgres table behind the
-      same `rateLimit()` signature — no call sites change. Applied today to the
-      password-reset request (IP + email keyed) and booking creation (user keyed).
-- [ ] **Legal pages** (`/privacy`, `/terms`) — the shipped copy is a solid
-      starting point, but have it reviewed by counsel and fill in your real
-      company/jurisdiction details before relying on it.
+      On serverless the effective limit is roughly `limit × instances` and resets
+      on cold start — a basic abuse/burst guard, not a hard global limit. For
+      strict global limits, swap the `Map` for Upstash Redis (or similar) behind
+      the same `rateLimit()` signature — no call sites change.
+- [ ] **Legal pages** (`/privacy`, `/terms`) — the shipped copy is a starting
+      point; have counsel review and fill in your real company details.
 - [ ] Rotate any secret that was ever pasted into chat, a ticket, or a screenshot.
 - [ ] `npm audit` — review and patch high/critical advisories where feasible.
 
 ---
 
-## 8. Pre-launch verification
+## 7. Pre-launch verification
 
 - [ ] `npm run typecheck` — clean.
 - [ ] `npm run lint` — clean.
 - [ ] `npm run build` — succeeds.
-- [ ] Run the **[Manual QA Checklist](./QA_CHECKLIST.md)** against the production
-      (or a production-like) deploy, using Stripe **test** mode first, then a
-      single real live transaction as a final smoke test.
-- [ ] Verify cron jobs by checking that a confirmed booking ~24h out receives a
+- [ ] Run the **[Manual QA Checklist](./QA_CHECKLIST.md)**. If Stripe is enabled,
+      test in Stripe **test** mode first, then one real live transaction.
+- [ ] If crons are enabled, verify a confirmed booking ~24h out receives a
       reminder, and an unpaid booking is expired after `PENDING_BOOKING_TTL_MINUTES`.
 
 ---
 
-## 9. Rollback
+## 8. Rollback
 
 - [ ] Know how to **redeploy the previous build** in Vercel (Deployments →
       previous → Promote) if a release misbehaves.
-- [ ] Database migrations are forward-only and additive; keep a recent Supabase
-      backup before running new migrations so you can restore if needed.

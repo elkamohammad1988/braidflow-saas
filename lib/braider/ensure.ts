@@ -1,5 +1,5 @@
 import 'server-only';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 
 // Mirror of the SQL public.slugify() function so the app can mint slugs without
 // a round-trip. Keep the two in sync.
@@ -22,7 +22,7 @@ export async function ensureBraiderRecord(
   userId: string,
   fallbackName: string
 ): Promise<EnsureResult> {
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
 
   const { data: existing, error: lookupError } = await admin
     .from('braiders')

@@ -43,7 +43,7 @@ export function ActivationChecklist({
         </div>
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-ink/10">
           <div
-            className="h-full rounded-full bg-clay transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-gold-bright to-clay shadow-[0_0_10px_rgba(224,163,63,0.5)] transition-all duration-700 ease-spring"
             style={{ width: `${(done / 3) * 100}%` }}
           />
         </div>

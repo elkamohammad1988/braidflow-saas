@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { CalendarHeart } from 'lucide-react';
 import { requireSession } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,9 @@ const STATUS_TONE = {
 
 export default async function MyBookings() {
   const { user } = await requireSession();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: bookings, error: bookingsError } = await supabase
+  const { data: bookings, error: bookingsError } = await database
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
@@ -40,7 +41,7 @@ export default async function MyBookings() {
 
   // Which completed bookings has this client already reviewed? Drives the
   // "Leave a review" prompt below.
-  const { data: myReviews, error: reviewsError } = await supabase
+  const { data: myReviews, error: reviewsError } = await database
     .from('reviews')
     .select('booking_id')
     .eq('client_id', user.id);
@@ -62,6 +63,7 @@ export default async function MyBookings() {
       <div className="mt-8 space-y-3">
         {(!bookings || bookings.length === 0) && (
           <EmptyState
+            icon={CalendarHeart}
             title="No bookings yet"
             description="Find a braider near you and lock in your first appointment."
             action={
@@ -81,7 +83,7 @@ export default async function MyBookings() {
           return (
             <div
               key={b.id}
-              className="flex items-start justify-between gap-4 rounded-card border border-ink/5 bg-white p-5 shadow-soft"
+              className="flex items-start justify-between gap-4 rounded-card border border-line bg-paper p-5 shadow-soft transition-colors duration-300 hover:border-clay/25"
             >
               <div>
                 <p className="font-medium text-ink">{b.services?.name}</p>
@@ -115,7 +117,7 @@ export default async function MyBookings() {
                     </Badge>
                   </div>
                 )}
-                <p className="mt-2 text-sm text-ink-muted">{formatMoney(b.price_cents)}</p>
+                <p className="mt-2 text-sm tabular-nums text-ink-muted">{formatMoney(b.price_cents)}</p>
                 {b.status === 'pending_payment' && (
                   <Link
                     href={`/bookings/${b.id}/pay`}

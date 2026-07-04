@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase/server';
+import { SearchX, Sparkles } from 'lucide-react';
+import { db } from '@/lib/db/server';
 import { BraiderCard } from '@/components/braider/braider-card';
 import { BraiderSearch } from '@/components/braider/braider-search';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
+import { Reveal } from '@/components/motion/reveal';
 
 export const metadata: Metadata = {
   title: 'Find a braider',
@@ -20,14 +22,14 @@ export default async function BraidersIndex({
 }: {
   searchParams: { q?: string; sort?: string };
 }) {
-  const supabase = supabaseServer();
+  const database = db();
   const q = (searchParams.q ?? '').trim();
   const sort: Sort =
     searchParams.sort === 'price' || searchParams.sort === 'newest'
       ? searchParams.sort
       : 'rating';
 
-  let query = supabase
+  let query = database
     .from('braiders')
     .select(
       'id, slug, business_name, city, hero_image_url, created_at, services(price_cents, is_active)'
@@ -49,7 +51,7 @@ export default async function BraidersIndex({
   // memory — avoids an N+1 of a reviews query per card.
   const ratings = new Map<string, { sum: number; count: number }>();
   if (rows.length > 0) {
-    const { data: reviewRows } = await supabase
+    const { data: reviewRows } = await database
       .from('reviews')
       .select('braider_id, rating')
       .in(
@@ -66,8 +68,8 @@ export default async function BraidersIndex({
 
   const enriched = rows.map((b) => {
     const activePrices = (b.services ?? [])
-      .filter((s) => s.is_active)
-      .map((s) => s.price_cents);
+      .filter((s: any) => s.is_active)
+      .map((s: any) => s.price_cents);
     const agg = ratings.get(b.id);
     return {
       slug: b.slug,
@@ -106,16 +108,17 @@ export default async function BraidersIndex({
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <PageHeader
+        eyebrow="The directory"
         title="Find a braider"
         description="Real stylists, real availability. Search your city, compare, and book in a minute."
       />
 
-      <div className="mt-6">
+      <div className="mt-7">
         <BraiderSearch defaultQuery={q} defaultSort={sort} />
       </div>
 
       {enriched.length > 0 && (
-        <p className="mt-5 text-sm text-ink-muted">
+        <p className="mt-6 font-mono text-xs uppercase tracking-[0.14em] text-ink-subtle">
           {enriched.length} {enriched.length === 1 ? 'braider' : 'braiders'}
           {hasQuery ? ` for “${q}”` : ' available'}
         </p>
@@ -125,6 +128,7 @@ export default async function BraidersIndex({
         {enriched.length === 0 ? (
           hasQuery ? (
             <EmptyState
+              icon={SearchX}
               title={`No braiders match “${q}”`}
               description="Try a different name or city, or clear the search to see everyone."
               action={
@@ -138,14 +142,17 @@ export default async function BraidersIndex({
             />
           ) : (
             <EmptyState
+              icon={Sparkles}
               title="No braiders here yet"
               description="We're onboarding the first stylists now. Check back soon."
             />
           )
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {enriched.map((b) => (
-              <BraiderCard key={b.slug} {...b} />
+            {enriched.map((b, i) => (
+              <Reveal key={b.slug} delay={Math.min(i, 8) * 70}>
+                <BraiderCard {...b} />
+              </Reveal>
             ))}
           </div>
         )}

@@ -27,22 +27,22 @@ export default function GlobalError({
           alignItems: 'center',
           justifyContent: 'center',
           fontFamily: 'system-ui, sans-serif',
-          background: '#faf6f1',
-          color: '#1c1917',
+          background: '#f5eee3',
+          color: '#231810',
           textAlign: 'center',
           padding: '0 1.5rem',
           margin: 0
         }}
       >
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Something went wrong</h1>
-        <p style={{ marginTop: '0.5rem', color: '#57534e', maxWidth: '28rem' }}>
+        <p style={{ marginTop: '0.5rem', color: '#6d5c4e', maxWidth: '28rem' }}>
           We&apos;ve been notified. Please refresh the page or try again in a moment.
         </p>
         <a
           href="/"
           style={{
             marginTop: '1.5rem',
-            color: '#1c1917',
+            color: '#231810',
             textDecoration: 'underline',
             fontWeight: 500
           }}

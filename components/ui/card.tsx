@@ -9,7 +9,7 @@ export function Card({ className, interactive, ...rest }: CardProps) {
       className={cn(
         'rounded-card border border-line bg-paper shadow-card',
         interactive &&
-          'transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/15 hover:shadow-lifted',
+          'transition-all duration-300 ease-spring hover:-translate-y-1 hover:border-clay/30 hover:shadow-lifted active:translate-y-0 active:shadow-card active:duration-100',
         className
       )}
       {...rest}

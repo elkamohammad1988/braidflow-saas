@@ -30,10 +30,10 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
               onClick={() => onSelect(s.id)}
               aria-pressed={active}
               className={cn(
-                'group w-full rounded-card border bg-white px-5 py-4 text-left transition-all',
+                'group w-full rounded-card border px-5 py-4 text-left transition-all duration-300 ease-spring active:scale-[0.99]',
                 active
-                  ? 'border-ink ring-1 ring-ink shadow-soft'
-                  : 'border-ink/10 hover:border-ink/30 hover:shadow-soft'
+                  ? 'border-clay/40 bg-gold/[0.05] shadow-card ring-1 ring-gold/20'
+                  : 'border-line bg-paper hover:-translate-y-0.5 hover:border-clay/30 hover:shadow-card'
               )}
             >
               <div className="flex items-start justify-between gap-4">
@@ -42,7 +42,9 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                     <span
                       className={cn(
                         'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
-                        active ? 'border-ink bg-ink text-cream' : 'border-ink/25'
+                        active
+                          ? 'border-transparent bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                          : 'border-line-strong group-hover:border-clay/50'
                       )}
                     >
                       {active && <Check className="h-3 w-3" strokeWidth={3} />}
@@ -58,7 +60,7 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                     {formatDuration(s.duration_minutes)} · deposit {formatMoney(s.deposit_cents)}
                   </p>
                 </div>
-                <p className="shrink-0 font-display text-lg text-ink">
+                <p className="shrink-0 font-display text-lg tabular-nums text-ink">
                   {formatMoney(s.price_cents)}
                 </p>
               </div>

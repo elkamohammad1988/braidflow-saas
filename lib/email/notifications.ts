@@ -1,5 +1,5 @@
 import 'server-only';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { sendEmail } from './send';
 import {
   BookingConfirmedClientEmail,
@@ -62,7 +62,7 @@ function sendOk(r: SendResult): boolean {
 }
 
 async function loadBookingContext(bookingId: string): Promise<BookingContext | null> {
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data } = await admin
     .from('bookings')
     .select(

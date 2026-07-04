@@ -44,11 +44,11 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
               disabled={empty}
               aria-pressed={active}
               className={cn(
-                'flex w-[3.75rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 transition-all',
+                'flex w-[3.75rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 transition-all duration-200 ease-spring active:scale-[0.96]',
                 active
-                  ? 'border-ink bg-ink text-cream shadow-soft'
-                  : 'border-ink/10 bg-white text-ink hover:border-ink/25',
-                empty && 'cursor-not-allowed opacity-35 hover:border-ink/10'
+                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-cream shadow-soft ring-1 ring-gold/25'
+                  : 'border-line bg-paper text-ink hover:-translate-y-px hover:border-clay/30 hover:shadow-card',
+                empty && 'cursor-not-allowed opacity-35 hover:translate-y-0 hover:border-line hover:shadow-none active:scale-100'
               )}
             >
               <span className="text-[11px] font-medium uppercase tracking-wider opacity-80">
@@ -72,7 +72,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
       {activeSlots.length === 0 ? (
         <div
           key={activeKey}
-          className="motion-safe:animate-fade-in rounded-card border border-dashed border-ink/15 bg-white/40 px-4 py-10 text-center"
+          className="motion-safe:animate-fade-in rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
         >
           <p className="text-sm font-medium text-ink">No openings this day</p>
           <p className="mt-1 text-sm text-ink-muted">Try one of the other dates above.</p>
@@ -91,10 +91,10 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
                 onClick={() => onSelect(slot.start)}
                 aria-pressed={Boolean(isSelected)}
                 className={cn(
-                  'rounded-lg border py-2.5 text-center text-sm font-medium tabular-nums transition-all',
+                  'rounded-lg border py-2.5 text-center text-sm font-medium tabular-nums transition-all duration-200 ease-spring active:scale-[0.96]',
                   isSelected
-                    ? 'border-ink bg-ink text-cream shadow-soft'
-                    : 'border-ink/10 bg-white text-ink hover:border-ink/30 hover:bg-cream'
+                    ? 'border-transparent bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                    : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.05] hover:shadow-card'
                 )}
               >
                 {formatInZone(slot.start, timeZone, 'h:mm a')}

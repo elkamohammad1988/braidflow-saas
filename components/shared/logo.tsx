@@ -33,19 +33,28 @@ export function LogoMark({ className }: { className?: string }) {
 export function Logo({
   className,
   markClassName,
-  wordmark = true
+  wordmark = true,
+  tone = 'ink'
 }: {
   className?: string;
   markClassName?: string;
   wordmark?: boolean;
+  tone?: 'ink' | 'cream';
 }) {
   return (
-    <span className={cn('inline-flex items-center gap-2', className)}>
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-ink text-cream">
-        <LogoMark className={cn('h-[18px] w-[18px]', markClassName)} />
+    <span className={cn('inline-flex items-center gap-2.5', className)}>
+      <span className="relative flex h-9 w-9 items-center justify-center rounded-[11px] bg-gradient-to-br from-onyx-soft to-night text-gold shadow-[0_2px_10px_-3px_rgba(35,24,16,0.5),inset_0_1px_0_rgba(242,196,100,0.18)] ring-1 ring-gold/25">
+        <LogoMark className={cn('h-[19px] w-[19px]', markClassName)} />
       </span>
       {wordmark && (
-        <span className="font-display text-xl tracking-tight text-ink">BraidFlow</span>
+        <span
+          className={cn(
+            'font-display text-[1.35rem] font-medium tracking-[-0.03em]',
+            tone === 'cream' ? 'text-cream' : 'text-ink'
+          )}
+        >
+          Braid<span className="text-clay">flow</span>
+        </span>
       )}
     </span>
   );

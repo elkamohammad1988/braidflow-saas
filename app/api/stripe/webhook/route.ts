@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { notifyBookingConfirmed } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureMessage } from '@/lib/monitoring';
@@ -21,9 +21,8 @@ function refundStatus(status: Stripe.Refund['status']) {
 
 export async function POST(req: Request) {
   // This route is excluded from middleware, so the runtime-env check never ran
-  // for it. Assert here so a missing service-role key fails clearly instead of
-  // crashing opaquely inside supabaseAdmin() — which would silently stop paid
-  // bookings from ever being confirmed.
+  // for it. Assert here so any required config is validated up front rather than
+  // failing opaquely mid-handler.
   assertRuntimeEnv();
 
   const signature = req.headers.get('stripe-signature');
@@ -41,7 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
 
   // Idempotency: record the event id first. Stripe delivers at-least-once and
   // can replay; a duplicate insert conflicts (23505) and we skip re-processing.

@@ -39,7 +39,7 @@ export function ConfirmationPoller({
   // their payment is safe, so tell them and give a way forward.
   if (timedOut) {
     return (
-      <div className="mt-8 text-sm text-ink-muted">
+      <div role="status" className="mt-8 text-sm text-ink-muted">
         <p className="mx-auto max-w-xs">
           This is taking longer than usual. Your payment is safe — we&apos;ll email your
           confirmation as soon as it clears.
@@ -55,7 +55,10 @@ export function ConfirmationPoller({
   }
 
   return (
-    <div className="mt-8 inline-flex items-center justify-center text-sm text-ink-muted">
+    <div
+      role="status"
+      className="mt-8 inline-flex items-center justify-center text-sm text-ink-muted"
+    >
       <Spinner className="mr-2" />
       Waiting on confirmation
     </div>

@@ -6,7 +6,7 @@ type Tone = 'neutral' | 'success' | 'warning' | 'danger';
 const tones: Record<Tone, string> = {
   neutral: 'bg-ink/[0.06] text-ink ring-1 ring-inset ring-ink/[0.06]',
   success: 'bg-moss/10 text-moss ring-1 ring-inset ring-moss/15',
-  warning: 'bg-clay/15 text-clay ring-1 ring-inset ring-clay/20',
+  warning: 'bg-clay/15 text-clay-text ring-1 ring-inset ring-clay/25',
   danger: 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/15'
 };
 

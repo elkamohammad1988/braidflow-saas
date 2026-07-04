@@ -10,18 +10,20 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants: Record<Variant, string> = {
+  // Gold, lit from within — the signature action.
   primary:
-    'bg-ink text-cream shadow-sm hover:bg-ink/90 active:translate-y-px disabled:bg-ink/40 disabled:shadow-none',
+    'bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold hover:-translate-y-[1px] hover:brightness-[1.04] active:translate-y-0 active:brightness-95 disabled:from-clay-soft disabled:to-clay-soft disabled:text-ink-subtle disabled:shadow-none disabled:hover:translate-y-0',
   secondary:
-    'bg-paper text-ink border border-line shadow-card hover:border-ink/25 hover:bg-cream active:translate-y-px',
+    'bg-paper text-ink border border-line-strong shadow-card hover:-translate-y-[1px] hover:border-ink/25 hover:shadow-lifted active:translate-y-0',
   ghost: 'text-ink hover:bg-ink/[0.06]',
-  danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 active:translate-y-px'
+  danger:
+    'bg-gradient-to-b from-red-500 to-red-600 text-white shadow-sm hover:-translate-y-[1px] hover:brightness-105 active:translate-y-0'
 };
 
 const sizes: Record<Size, string> = {
-  sm: 'h-9 gap-1.5 px-3.5 text-sm [&_svg]:h-4 [&_svg]:w-4',
+  sm: 'h-9 gap-1.5 px-4 text-sm [&_svg]:h-4 [&_svg]:w-4',
   md: 'h-11 gap-2 px-5 text-sm [&_svg]:h-4 [&_svg]:w-4',
-  lg: 'h-12 gap-2 px-6 text-base [&_svg]:h-[18px] [&_svg]:w-[18px]'
+  lg: 'h-[52px] gap-2.5 px-7 text-[15px] [&_svg]:h-[18px] [&_svg]:w-[18px]'
 };
 
 export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
@@ -32,9 +34,11 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center rounded-full font-medium transition-all duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-2 focus-visible:ring-offset-cream',
-        'disabled:cursor-not-allowed [&_svg]:shrink-0',
+        'group/btn inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 ease-spring',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-cream',
+        'disabled:cursor-not-allowed [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-200',
+        // The arrow used in CTAs nudges forward on hover.
+        'hover:[&_svg:last-child]:translate-x-0.5',
         variants[variant],
         sizes[size],
         className

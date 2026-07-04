@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { subMinutes } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { isAuthorizedCron } from '@/lib/cron/auth';
 import { assertRuntimeEnv } from '@/lib/env';
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const ttl = ttlMinutes();
   const cutoff = subMinutes(new Date(), ttl).toISOString();
 
@@ -55,7 +55,7 @@ export async function GET(req: Request) {
   let expired = 0;
 
   for (const b of candidates ?? []) {
-    const deposit = (b.payments ?? []).find((p) => p.kind === 'deposit');
+    const deposit = (b.payments ?? []).find((p: any) => p.kind === 'deposit');
 
     // A succeeded deposit means the booking is (or is about to be) confirmed by
     // the webhook — never release it.

@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SignupForm } from './signup-form';
+
+export const metadata: Metadata = {
+  title: 'Create your account',
+  robots: { index: false, follow: false }
+};
 
 type SearchParams = { role?: string };
 

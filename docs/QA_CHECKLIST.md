@@ -23,35 +23,34 @@ Legend: ✅ = expected result.
 
 ## 1. Account & auth
 
+> This build uses local demo authentication: sign-in accepts **any** email and
+> password and maps you onto a seeded persona. There is no email verification.
+
 ### Signup
-- [ ] Sign up as a **client** (name, email, password ≥ 8 chars). ✅ With email
-      confirmation on, you see "Check your inbox"; the confirmation link lands on
-      `/auth/callback` and then `/braiders`.
-- [ ] Sign up as a **braider**. ✅ After confirming, you land on `/dashboard` and
-      a public booking page exists for the account.
-- [ ] Try signing up with an **already-registered email**. ✅ You're told the
-      account exists / to sign in — no duplicate confirmation email is implied.
+- [ ] Sign up as a **client** (name, email, password ≥ 8 chars). ✅ You're signed
+      in immediately and land on `/braiders`.
+- [ ] Sign up as a **braider**. ✅ You land on `/dashboard` with a populated,
+      seeded studio and a public booking page.
+- [ ] Submit with a password under 8 characters. ✅ Inline validation error,
+      nothing submitted.
 - [ ] The signup form shows the **Terms / Privacy** agreement line, and both
       links open the right pages.
 
 ### Login
-- [ ] Sign in with correct credentials. ✅ Redirected to your role's home.
-- [ ] Sign in with a wrong password. ✅ A clear error, no redirect.
+- [ ] Sign in with any email + password. ✅ Redirected to your role's home
+      (`amara@braidflow.app` → braider dashboard; anything else → the client side).
+- [ ] Submit with an empty email or password. ✅ A clear error, no redirect.
 - [ ] Visit a gated URL while logged out (e.g. `/dashboard`, `/bookings`). ✅
       Redirected to `/login?next=…` and back to the target after signing in.
+- [ ] **Sign out**. ✅ The session cookie is cleared and gated routes redirect to
+      `/login` again.
 
-### Password reset (new)
+### Password reset
 - [ ] On `/login`, click **Forgot password?**. ✅ Lands on `/forgot-password`.
-- [ ] Submit your account email. ✅ Generic "if an account exists…" confirmation
-      (same message whether or not the email exists — no enumeration).
-- [ ] Open the reset email and click the link. ✅ Lands on `/reset-password` with
-      the form ready (recovery session established).
-- [ ] Set a new password (with a matching confirmation). ✅ Saved, and you're
-      signed in and routed to your role's home.
-- [ ] Sign out and sign back in with the **new** password. ✅ Works.
-- [ ] Open `/reset-password` **directly** (no link). ✅ Shows "invalid or expired"
-      with a link to request a new one.
-- [ ] Use a reset link **twice**. ✅ The second use shows the expired/invalid state.
+- [ ] Submit an email. ✅ Generic "if an account exists…" confirmation (no
+      enumeration; this build sends no email).
+- [ ] On `/reset-password`, enter a new password and a matching confirmation. ✅
+      Accepted and returned to `/login`.
 - [ ] Mismatched password + confirmation. ✅ Inline "passwords don't match" error,
       nothing saved.
 
@@ -74,8 +73,8 @@ Legend: ✅ = expected result.
 
 ### Concurrency / slot safety
 - [ ] In two sessions, try to book the **same slot** at the same time. ✅ Only one
-      succeeds; the other sees "someone just grabbed that slot" (DB exclusion
-      constraint, not a race).
+      succeeds; the other sees "someone just grabbed that slot" (server-side slot
+      re-validation, not a race).
 
 ---
 
@@ -109,7 +108,7 @@ Legend: ✅ = expected result.
 
 ---
 
-## 5. Authorization & data isolation (RLS)
+## 5. Authorization & data isolation
 
 - [ ] As a **client**, try to open `/dashboard`. ✅ Redirected away (not a braider).
 - [ ] As client A, try to view client B's booking by guessing a URL/id. ✅ Denied /
@@ -127,7 +126,6 @@ Legend: ✅ = expected result.
 - [ ] Reminder emails (24h and 2h) — trigger the reminder cron and confirm a
       confirmed, upcoming booking gets one (and only one) of each.
 - [ ] Cancellation, reschedule, and refund notification emails arrive with correct content.
-- [ ] Password-reset email arrives and the link works (covered in §1).
 
 ---
 
@@ -140,7 +138,7 @@ Legend: ✅ = expected result.
       throttled with a "booking very quickly" message; a normal user never hits it.
 
 > Note: limits are in-memory per server instance — on serverless the effective
-> limit scales with instance count. This is expected; see DEPLOYMENT.md §7.
+> limit scales with instance count. This is expected; see DEPLOYMENT.md §6.
 
 ---
 

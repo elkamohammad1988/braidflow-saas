@@ -1,10 +1,11 @@
 import { format } from 'date-fns';
+import { Users } from 'lucide-react';
 import { requireBraider } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Card, CardBody } from '@/components/ui/card';
-import { formatMoney } from '@/lib/utils';
+import { formatMoney, initials } from '@/lib/utils';
 
 type ClientRow = {
   id: string;
@@ -17,9 +18,9 @@ type ClientRow = {
 
 export default async function ClientsPage() {
   const { user } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: bookings, error } = await supabase
+  const { data: bookings, error } = await database
     .from('bookings')
     .select(
       'price_cents, scheduled_at, status, client_id, guest_name, guest_email, guest_phone, profiles!bookings_client_id_fkey(id, full_name, phone)'
@@ -74,24 +75,31 @@ export default async function ClientsPage() {
       <div className="mt-8 space-y-3">
         {clients.length === 0 ? (
           <EmptyState
+            icon={Users}
             title="No clients yet"
-            description="As soon as someone books, they'll show up here."
+            description="As soon as someone books, they'll show up here — with their history and notes in one place."
           />
         ) : (
           clients.map((c) => (
-            <Card key={c.id}>
-              <CardBody className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-ink">{c.name}</p>
-                  {c.phone && <p className="text-sm text-ink-muted">{c.phone}</p>}
+            <Card key={c.id} className="transition-colors duration-300 hover:border-clay/25">
+              <CardBody className="flex items-center gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
+                  {initials(c.name) || '—'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-ink">{c.name}</p>
+                  {c.phone && (
+                    <p className="truncate text-sm tabular-nums text-ink-muted">{c.phone}</p>
+                  )}
                 </div>
-                <div className="text-right text-sm text-ink-muted">
-                  <p>
+                <div className="shrink-0 text-right text-sm text-ink-muted">
+                  <p className="tabular-nums">
                     {c.visits} {c.visits === 1 ? 'visit' : 'visits'} ·{' '}
-                    {formatMoney(c.lifetimeCents)} lifetime
+                    <span className="font-medium text-ink">{formatMoney(c.lifetimeCents)}</span>{' '}
+                    lifetime
                   </p>
                   {c.lastVisit && (
-                    <p className="mt-0.5 text-xs">
+                    <p className="mt-0.5 text-xs tabular-nums">
                       last seen {format(c.lastVisit, 'MMM d, yyyy')}
                     </p>
                   )}

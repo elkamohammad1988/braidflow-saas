@@ -1,9 +1,9 @@
 import 'server-only';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { retrieveAccountStatus, type ConnectAccountStatus } from '@/lib/stripe/connect';
 
-type Admin = ReturnType<typeof supabaseAdmin>;
+type Admin = ReturnType<typeof dbAdmin>;
 
 // Persisting Connect capability flags is shared between the webhook
 // (account.updated) and the on-demand actions (return route / manual refresh),
@@ -60,6 +60,6 @@ export async function syncConnectStatus(
   accountId: string
 ): Promise<ConnectAccountStatus> {
   const status = await retrieveAccountStatus(accountId);
-  await applyConnectStatus(supabaseAdmin(), accountId, status);
+  await applyConnectStatus(dbAdmin(), accountId, status);
   return status;
 }

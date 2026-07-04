@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { TZDate } from '@date-fns/tz';
 import { addDays, startOfDay } from 'date-fns';
 import { requireSession } from '@/lib/auth/session';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
 import { guestTokenMatches } from '@/lib/bookings/guest-token';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
@@ -19,9 +19,9 @@ export default async function ReschedulePage({
   searchParams: { t?: string };
 }) {
   const token = searchParams.t;
-  const supabase = supabaseAdmin();
+  const database = dbAdmin();
 
-  const { data: booking } = await supabase
+  const { data: booking } = await database
     .from('bookings')
     .select(
       `id, client_id, braider_id, guest_token, status, scheduled_at, duration_minutes,
@@ -77,7 +77,7 @@ export default async function ReschedulePage({
   const today = startOfDay(TZDate.tz(tz));
   const horizon = addDays(today, WINDOW_DAYS);
 
-  const { data: otherBookings } = await supabase
+  const { data: otherBookings } = await database
     .from('bookings')
     .select('id, scheduled_at, duration_minutes')
     .eq('braider_id', booking.braider_id)
@@ -138,7 +138,7 @@ export default async function ReschedulePage({
         />
       </div>
 
-      <div className="mt-10 rounded-card border border-ink/5 bg-white/60 px-5 py-4 text-sm text-ink-muted">
+      <div className="mt-10 rounded-card border border-line bg-paper/60 px-5 py-4 text-sm text-ink-muted">
         Can&apos;t find a time that works?{' '}
         <Link
           href={`/braiders/${booking.braiders?.slug ?? ''}`}

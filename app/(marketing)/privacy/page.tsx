@@ -5,7 +5,8 @@ import { LegalShell, LegalSection } from '@/components/shared/legal';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'How BraidFlow collects, uses, and protects your information when you book or accept appointments.'
+    'How BraidFlow collects, uses, and protects your information when you book or accept appointments.',
+  alternates: { canonical: '/privacy' }
 };
 
 const LAST_UPDATED = 'June 13, 2026';
@@ -70,10 +71,9 @@ export default function PrivacyPage() {
             vice-versa, so the appointment can happen.
           </li>
           <li>
-            <strong className="text-ink">Service providers.</strong> We rely on Supabase
-            (database, authentication, and hosting), Stripe (payments), Resend (transactional
-            email), and Vercel (application hosting). They process data on our behalf under their
-            own terms and security commitments.
+            <strong className="text-ink">Service providers.</strong> We rely on Stripe
+            (payments), Resend (transactional email), and Vercel (application hosting). They
+            process data on our behalf under their own terms and security commitments.
           </li>
           <li>
             <strong className="text-ink">Legal and safety.</strong> We may disclose information if
@@ -112,11 +112,11 @@ export default function PrivacyPage() {
 
       <LegalSection title="Security">
         <p>
-          Data is encrypted in transit. Access to data is restricted at the database level with
-          row-level security so that, for example, clients see only their own bookings and braiders
-          see only their own business data. Privileged operations run server-side with least
-          privilege. No system is perfectly secure, but we work to protect your information using
-          industry-standard safeguards.
+          Data is encrypted in transit. Access is enforced by server-side authorization checks so
+          that, for example, clients see only their own bookings and braiders see only their own
+          business data. Privileged operations run server-side with least privilege. No system is
+          perfectly secure, but we work to protect your information using industry-standard
+          safeguards.
         </p>
       </LegalSection>
 

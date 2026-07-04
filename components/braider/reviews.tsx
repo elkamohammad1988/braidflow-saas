@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
-import { supabaseServer } from '@/lib/supabase/server';
+import { Star } from 'lucide-react';
+import { db } from '@/lib/db/server';
+import { cn } from '@/lib/utils';
 
 const MAX_VISIBLE = 6;
 
@@ -17,10 +19,10 @@ export async function BraiderReviews({
 }) {
   if (count === 0) return null;
 
-  const supabase = supabaseServer();
+  const database = db();
   const avgDisplay = avg.toFixed(1);
 
-  const { data: reviews } = await supabase
+  const { data: reviews } = await database
     .from('reviews')
     .select('id, rating, body, created_at, client:profiles!reviews_client_id_fkey(full_name)')
     .eq('braider_id', braiderId)
@@ -43,7 +45,7 @@ export async function BraiderReviews({
         {all.map((r) => (
           <figure
             key={r.id}
-            className="rounded-card border border-ink/5 bg-white p-5 shadow-soft"
+            className="rounded-card border border-line bg-paper p-5 shadow-soft"
           >
             <Stars rating={r.rating} />
             {r.body && (
@@ -62,14 +64,14 @@ export async function BraiderReviews({
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div
-      aria-label={`Rated ${rating} out of 5`}
-      className="flex gap-0.5 text-clay"
-    >
+    <div aria-label={`Rated ${rating} out of 5`} className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} aria-hidden className={i < rating ? 'opacity-100' : 'opacity-25'}>
-          ★
-        </span>
+        <Star
+          key={i}
+          aria-hidden
+          strokeWidth={1.5}
+          className={cn('h-4 w-4', i < rating ? 'fill-gold text-gold' : 'fill-transparent text-ink/25')}
+        />
       ))}
     </div>
   );

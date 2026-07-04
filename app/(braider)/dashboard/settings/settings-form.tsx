@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, Textarea } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { updateBraiderSettingsAction } from '@/lib/braider/actions';
 import { COMMON_TIMEZONES } from '@/lib/timezones';
@@ -80,17 +81,14 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           required
         />
 
-        <label className="block">
-          <span className="mb-1.5 block text-sm font-medium text-ink">Bio</span>
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            rows={4}
-            maxLength={800}
-            placeholder="Style specialties, years of experience, what makes you, you."
-            className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
-          />
-        </label>
+        <Textarea
+          label="Bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          rows={4}
+          maxLength={800}
+          placeholder="Style specialties, years of experience, what makes you, you."
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
@@ -110,33 +108,27 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           />
         </div>
 
-        <label className="block">
-          <span className="mb-1.5 block text-sm font-medium text-ink">Timezone</span>
-          <select
-            value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
-            className="w-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-sm focus:border-ink/30 focus:outline-none focus:ring-2 focus:ring-ink/10"
-          >
-            {COMMON_TIMEZONES.map((tz) => (
-              <option key={tz.value} value={tz.value}>
-                {tz.label}
-              </option>
-            ))}
-            {!COMMON_TIMEZONES.some((tz) => tz.value === timezone) && (
-              <option value={timezone}>{timezone}</option>
-            )}
-          </select>
-          <span className="mt-1.5 block text-xs text-ink-muted">
-            Your weekly hours and every appointment time are shown in this zone. Set it to where
-            you actually braid.
-          </span>
-        </label>
+        <Select
+          label="Timezone"
+          value={timezone}
+          onChange={(e) => setTimezone(e.target.value)}
+          hint="Your weekly hours and every appointment time are shown in this zone. Set it to where you actually braid."
+        >
+          {COMMON_TIMEZONES.map((tz) => (
+            <option key={tz.value} value={tz.value}>
+              {tz.label}
+            </option>
+          ))}
+          {!COMMON_TIMEZONES.some((tz) => tz.value === timezone) && (
+            <option value={timezone}>{timezone}</option>
+          )}
+        </Select>
 
         <div>
           <label
             className={cn(
-              'flex items-center gap-3 rounded-lg border border-ink/10 bg-white px-4 py-3',
-              initial.chargesEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+              'flex items-center gap-3 rounded-xl border border-line-strong bg-paper px-4 py-3 transition-colors',
+              initial.chargesEnabled ? 'cursor-pointer hover:border-clay/30' : 'cursor-not-allowed opacity-60'
             )}
           >
             <input
@@ -144,7 +136,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
               checked={acceptingBookings && initial.chargesEnabled}
               onChange={(e) => setAcceptingBookings(e.target.checked)}
               disabled={!initial.chargesEnabled}
-              className="h-4 w-4 accent-ink"
+              className="h-4 w-4 accent-clay"
             />
             <span className="text-sm">
               <span className="font-medium text-ink">Accepting new bookings</span>
@@ -154,7 +146,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
             </span>
           </label>
           {!initial.chargesEnabled && (
-            <p className="mt-1.5 text-xs text-clay">
+            <p className="mt-1.5 text-xs text-clay-text">
               Connect Stripe (banner at the top of your dashboard) before you can accept bookings —
               clients can’t pay a deposit until your account is set up.
             </p>
@@ -181,7 +173,10 @@ export function SettingsForm({ initial }: { initial: Initial }) {
       </Section>
 
       {error && (
-        <p className="motion-safe:animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="motion-safe:animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </p>
       )}
@@ -198,7 +193,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           )}
         </Button>
         {saved && !pending && (
-          <span className="motion-safe:animate-fade-in text-sm text-ink-muted">
+          <span role="status" className="motion-safe:animate-fade-in text-sm text-ink-muted">
             Saved.
           </span>
         )}
@@ -217,7 +212,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
+    <section className="rounded-card border border-line bg-paper p-6 shadow-soft">
       <div className="mb-5">
         <h2 className="font-display text-xl text-ink">{title}</h2>
         {description && <p className="mt-1 text-sm text-ink-muted">{description}</p>}

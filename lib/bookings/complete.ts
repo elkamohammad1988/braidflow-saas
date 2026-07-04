@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { db, dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 
 type Result = { ok: true } | { error: string };
@@ -14,11 +14,11 @@ async function finalizeBooking(
   bookingId: string,
   to: 'completed' | 'no_show'
 ): Promise<Result> {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) return { error: 'You need to be signed in.' };
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select('id, braider_id, status, scheduled_at')

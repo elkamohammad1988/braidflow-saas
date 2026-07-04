@@ -1,15 +1,15 @@
 import { notFound } from 'next/navigation';
 import { requireBraider } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardBody } from '@/components/ui/card';
 import { ServiceForm } from '../service-form';
 
 export default async function EditServicePage({ params }: { params: { id: string } }) {
   const { user } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: service } = await supabase
+  const { data: service } = await database
     .from('services')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, is_active')
     .eq('id', params.id)

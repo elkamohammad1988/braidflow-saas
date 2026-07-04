@@ -2,14 +2,14 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { serviceSchema, type ServiceInput } from './validation';
 
 async function requireBraiderId() {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  return { supabase, userId: user.id };
+  return { database, userId: user.id };
 }
 
 export async function createServiceAction(input: ServiceInput) {
@@ -18,8 +18,8 @@ export async function createServiceAction(input: ServiceInput) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
 
-  const { supabase, userId } = await requireBraiderId();
-  const { error } = await supabase.from('services').insert({
+  const { database, userId } = await requireBraiderId();
+  const { error } = await database.from('services').insert({
     braider_id: userId,
     name: parsed.data.name,
     description: parsed.data.description || null,
@@ -41,8 +41,8 @@ export async function updateServiceAction(id: string, input: ServiceInput) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
 
-  const { supabase, userId } = await requireBraiderId();
-  const { error } = await supabase
+  const { database, userId } = await requireBraiderId();
+  const { error } = await database
     .from('services')
     .update({
       name: parsed.data.name,
@@ -62,8 +62,8 @@ export async function updateServiceAction(id: string, input: ServiceInput) {
 }
 
 export async function archiveServiceAction(id: string) {
-  const { supabase, userId } = await requireBraiderId();
-  await supabase
+  const { database, userId } = await requireBraiderId();
+  await database
     .from('services')
     .update({ is_active: false })
     .eq('id', id)

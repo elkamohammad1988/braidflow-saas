@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { ensureBraiderRecord } from './ensure';
 import { braiderSettingsSchema, type BraiderSettingsInput } from './validation';
@@ -12,8 +12,8 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
 
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
   if (!user) return { error: 'You need to be signed in.' };
 
   // Without a braiders row the UPDATE below matches nothing and reports success
@@ -24,7 +24,7 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
   // A braider can't accept bookings until Stripe can take charges — otherwise a
   // client could "book" with no way to pay the deposit. Clamp server-side so the
   // disabled UI toggle can't be bypassed by a crafted request.
-  const { data: connect } = await supabase
+  const { data: connect } = await database
     .from('braiders')
     .select('charges_enabled')
     .eq('id', user.id)
@@ -36,7 +36,7 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
     return trimmed ? trimmed : null;
   };
 
-  const profileUpdate = supabase
+  const profileUpdate = database
     .from('profiles')
     .update({
       full_name: parsed.data.fullName,
@@ -45,7 +45,7 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
     .eq('id', user.id)
     .select('id');
 
-  const braiderUpdate = supabase
+  const braiderUpdate = database
     .from('braiders')
     .update({
       business_name: parsed.data.businessName,
@@ -74,7 +74,7 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
   // The public-facing pages cache braider data — bust those too.
   revalidatePath('/braiders');
 
-  const { data: braider } = await supabase
+  const { data: braider } = await database
     .from('braiders')
     .select('slug')
     .eq('id', user.id)

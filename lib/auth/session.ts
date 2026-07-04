@@ -1,16 +1,19 @@
 import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
+import { readSessionToken } from './session-token';
+import { SESSION_COOKIE } from './personas';
 
+// The session is derived entirely from the signed cookie — no database lookup —
+// so it survives serverless cold starts and never makes a network call. The
+// shape is `{ user, profile }`, matching what server components and actions read.
 export async function getSession() {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id, role, full_name')
-    .eq('id', user.id)
-    .single();
-  return profile ? { user, profile } : null;
+  const token = cookies().get(SESSION_COOKIE)?.value;
+  const payload = await readSessionToken(token);
+  if (!payload) return null;
+  return {
+    user: { id: payload.sub, email: payload.email },
+    profile: { id: payload.sub, role: payload.role, full_name: payload.name }
+  };
 }
 
 export async function requireSession() {

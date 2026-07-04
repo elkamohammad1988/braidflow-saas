@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import { Scissors } from 'lucide-react';
 import { requireBraider } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Card, CardBody } from '@/components/ui/card';
@@ -10,9 +11,9 @@ import { formatDuration, formatMoney } from '@/lib/utils';
 
 export default async function ServicesPage() {
   const { user } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
-  const { data: services, error } = await supabase
+  const { data: services, error } = await database
     .from('services')
     .select('id, name, description, duration_minutes, price_cents, deposit_cents, is_active')
     .eq('braider_id', user.id)
@@ -35,6 +36,7 @@ export default async function ServicesPage() {
       <div className="mt-8 space-y-3">
         {(!services || services.length === 0) ? (
           <EmptyState
+            icon={Scissors}
             title="No services yet"
             description="Add the styles you offer with prices and how long they take."
             action={
@@ -45,7 +47,7 @@ export default async function ServicesPage() {
           />
         ) : (
           services.map((s) => (
-            <Card key={s.id}>
+            <Card key={s.id} className="transition-colors duration-300 hover:border-clay/25">
               <CardBody className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
@@ -60,7 +62,7 @@ export default async function ServicesPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-display text-lg text-ink">{formatMoney(s.price_cents)}</p>
+                  <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents)}</p>
                   <Link
                     href={`/dashboard/services/${s.id}`}
                     className="mt-2 inline-block text-sm text-ink-muted hover:text-ink"

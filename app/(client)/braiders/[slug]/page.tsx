@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { Button } from '@/components/ui/button';
 import { BraiderReviews } from '@/components/braider/reviews';
 import { JsonLd } from '@/components/shared/json-ld';
@@ -16,8 +16,8 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const supabase = supabaseServer();
-  const { data: braider } = await supabase
+  const database = db();
+  const { data: braider } = await database
     .from('braiders')
     .select('business_name, bio, city, hero_image_url')
     .eq('slug', params.slug)
@@ -44,8 +44,8 @@ export async function generateMetadata({
 }
 
 export default async function BraiderProfile({ params }: { params: { slug: string } }) {
-  const supabase = supabaseServer();
-  const { data: braider, error } = await supabase
+  const database = db();
+  const { data: braider, error } = await database
     .from('braiders')
     .select(
       'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, charges_enabled, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
@@ -56,11 +56,11 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   if (error) throw error;
   if (!braider) notFound();
 
-  const services = (braider.services ?? []).filter((s) => s.is_active);
+  const services = (braider.services ?? []).filter((s: any) => s.is_active);
   // Bookable only when accepting AND Stripe can take charges for them.
   const open = braider.accepting_bookings && braider.charges_enabled;
 
-  const { data: ratingRows } = await supabase
+  const { data: ratingRows } = await database
     .from('reviews')
     .select('rating')
     .eq('braider_id', braider.id);
@@ -70,7 +70,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
     ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
     : 0;
 
-  const prices = services.map((s) => s.price_cents);
+  const prices = services.map((s: any) => s.price_cents);
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://braidflow.app';
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -116,26 +116,52 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       <JsonLd data={jsonLd} />
-      <div className="grid gap-10 md:grid-cols-[1fr_320px]">
+      <div className="grid gap-10 md:grid-cols-[1fr_340px]">
         <div>
-          {braider.hero_image_url && (
-            <div className="relative mb-6 aspect-[16/10] overflow-hidden rounded-card bg-ink/5">
-              <Image
-                src={braider.hero_image_url}
-                alt={braider.business_name}
-                fill
-                sizes="(min-width: 768px) 60vw, 100vw"
-                priority
-                className="object-cover"
-              />
-            </div>
-          )}
+          <div className="relative mb-7 aspect-[16/10] overflow-hidden rounded-xl2 shadow-lifted ring-1 ring-line">
+            {braider.hero_image_url ? (
+              <>
+                <Image
+                  src={braider.hero_image_url}
+                  alt={braider.business_name}
+                  fill
+                  sizes="(min-width: 768px) 60vw, 100vw"
+                  priority
+                  className="object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/30 via-transparent to-transparent" />
+              </>
+            ) : (
+              <div className="relative flex h-full items-center justify-center overflow-hidden bg-gradient-to-br from-clay/25 via-cream-deep to-plum/15">
+                <svg
+                  className="absolute inset-0 h-full w-full text-clay/25"
+                  viewBox="0 0 160 100"
+                  preserveAspectRatio="xMidYMid slice"
+                  aria-hidden
+                >
+                  <g fill="none" stroke="currentColor" strokeWidth="0.6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <path
+                        key={i}
+                        d={`M-10 ${14 + i * 15} C 40 ${2 + i * 15}, 60 ${28 + i * 15}, 100 ${14 + i * 15} S 170 ${2 + i * 15}, 190 ${16 + i * 15}`}
+                      />
+                    ))}
+                  </g>
+                </svg>
+                <span className="relative font-display text-7xl font-medium text-clay/60">
+                  {braider.business_name[0]}
+                </span>
+              </div>
+            )}
+          </div>
 
-          <h1 className="font-display text-4xl text-ink">{braider.business_name}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+          <h1 className="font-display text-[2.5rem] font-medium leading-[1.03] tracking-[-0.03em] text-ink md:text-[3rem]">
+            {braider.business_name}
+          </h1>
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[13px] text-ink-muted">
             {reviewCount > 0 && (
-              <a href="#reviews" className="flex items-center gap-1 text-ink hover:text-clay">
-                <Star className="h-4 w-4 fill-clay text-clay" />
+              <a href="#reviews" className="flex items-center gap-1 text-ink transition-colors hover:text-clay">
+                <Star className="h-4 w-4 fill-gold text-gold" />
                 <span className="font-medium">{avgRating.toFixed(1)}</span>
                 <span className="text-ink-muted">
                   · {reviewCount} review{reviewCount === 1 ? '' : 's'}
@@ -154,7 +180,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                 <a
                   href={`https://instagram.com/${braider.instagram_handle}`}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="hover:text-ink"
                 >
                   @{braider.instagram_handle}
@@ -164,24 +190,30 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           </div>
 
           {braider.bio && (
-            <p className="mt-6 max-w-prose text-ink-muted">{braider.bio}</p>
+            <p className="mt-6 max-w-prose text-[17px] leading-relaxed text-ink-muted">{braider.bio}</p>
           )}
 
-          <section className="mt-10">
-            <h2 className="font-display text-2xl text-ink">Services</h2>
-            <ul className="mt-4 divide-y divide-ink/5 border-y border-ink/5">
-              {services.map((s) => (
-                <li key={s.id} className="flex items-start justify-between gap-4 py-4">
+          <section className="mt-12">
+            <h2 className="label mb-4 flex items-center gap-2 text-clay-text">
+              <span className="h-1 w-1 rounded-full bg-clay" />
+              Services
+            </h2>
+            <ul className="divide-y divide-line border-y border-line">
+              {services.map((s: any) => (
+                <li
+                  key={s.id}
+                  className="group flex items-start justify-between gap-4 py-5 transition-colors"
+                >
                   <div>
-                    <p className="font-medium text-ink">{s.name}</p>
+                    <p className="font-display text-lg font-medium text-ink">{s.name}</p>
                     {s.description && (
-                      <p className="mt-1 text-sm text-ink-muted">{s.description}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-ink-muted">{s.description}</p>
                     )}
-                    <p className="mt-1 text-xs text-ink-muted">
+                    <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
                       {formatDuration(s.duration_minutes)} · deposit {formatMoney(s.deposit_cents)}
                     </p>
                   </div>
-                  <p className="shrink-0 font-display text-lg text-ink">
+                  <p className="shrink-0 font-display text-xl font-medium text-ink">
                     {formatMoney(s.price_cents)}
                   </p>
                 </li>
@@ -192,19 +224,22 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           <BraiderReviews braiderId={braider.id} avg={avgRating} count={reviewCount} />
         </div>
 
-        <aside className="md:sticky md:top-6 md:self-start">
-          <div className="rounded-card border border-ink/5 bg-white p-6 shadow-soft">
-            <p className="font-display text-xl text-ink">Book an appointment</p>
-            <p className="mt-1 text-sm text-ink-muted">
+        <aside className="md:sticky md:top-24 md:self-start">
+          <div className="relative overflow-hidden rounded-xl2 border border-line bg-paper p-6 shadow-lifted">
+            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_70%)]" />
+            <p className="relative font-display text-xl font-medium text-ink">Book an appointment</p>
+            <p className="relative mt-1.5 text-sm leading-relaxed text-ink-muted">
               Pick a service and a time that works. Deposit holds your slot.
             </p>
-            <div className="mt-5">
+            <div className="relative mt-5">
               {open ? (
                 <Link href={`/braiders/${braider.slug}/book`}>
-                  <Button className="w-full">See available times</Button>
+                  <Button size="lg" className="w-full">
+                    See available times
+                  </Button>
                 </Link>
               ) : (
-                <div className="rounded-lg border border-ink/10 bg-cream px-4 py-4 text-center">
+                <div className="rounded-xl border border-line bg-cream-deep/40 px-4 py-4 text-center">
                   <p className="text-sm text-ink-muted">
                     {braider.business_name} isn&rsquo;t taking online bookings right now.
                   </p>
@@ -212,7 +247,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                     <a
                       href={`https://instagram.com/${braider.instagram_handle}`}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
                     >
                       Reach out on Instagram

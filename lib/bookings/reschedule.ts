@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { db, dbAdmin } from '@/lib/db/server';
 import { notifyReschedule } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { isSlotBookable } from './slot-check';
@@ -17,8 +17,8 @@ export async function rescheduleBookingAction(
   newScheduledAt: string,
   token?: string
 ): Promise<Result> {
-  const supabase = supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const database = db();
+  const { data: { user } } = await database.auth.getUser();
 
   const newTime = new Date(newScheduledAt);
   if (Number.isNaN(newTime.getTime())) return { error: 'Invalid time.' };
@@ -28,7 +28,7 @@ export async function rescheduleBookingAction(
     return { error: 'Pick a time in the future.' };
   }
 
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select('id, client_id, braider_id, guest_token, status, scheduled_at, duration_minutes')
@@ -54,8 +54,8 @@ export async function rescheduleBookingAction(
 
   // Re-validate the requested slot against the braider's live availability. The
   // request is fully untrusted — exactly as in createBookingAction — so we
-  // re-derive bookable slots from scratch. The DB exclusion constraint only
-  // prevents double-booking; this is what keeps a booking from being moved
+  // re-derive bookable slots from scratch. Slot re-derivation excludes existing
+  // bookings (preventing double-booking) and keeps a booking from being moved
   // outside working hours, onto a blocked day, or off the slot grid.
   const { data: braider } = await admin
     .from('braiders')

@@ -32,10 +32,9 @@ has paid.
   and refund
 
 **Platform**
-- Row-Level Security on every table; clients see only their own bookings and
-  braiders only their own data
-- A Postgres GiST exclusion constraint makes double-booking impossible at the
-  database level, even under concurrent writes
+- Authorization on every mutation (server actions + Edge middleware); guests act
+  on a booking through a signed capability token, never a shared login
+- Server-side slot re-validation on every booking request guards double-booking
 - Idempotent Stripe webhook as the source of truth for payment state
 - Zod validation on every server action, audit logging, and Sentry monitoring
 - TypeScript strict mode with `noUncheckedIndexedAccess`
@@ -45,8 +44,8 @@ has paid.
 | Layer | Technology |
 |-------|-----------|
 | Framework | Next.js 14 (App Router, Server Components, Server Actions) |
-| Database & Auth | Supabase (Postgres, Auth, Row-Level Security) |
-| Payments | Stripe (PaymentIntents, Connect Express, Elements, Webhooks) |
+| Data & Auth | In-memory demo store + signed-cookie session auth (no external services) |
+| Payments | Stripe (PaymentIntents, Connect Express, Elements, Webhooks) — optional |
 | Email | Resend + React Email |
 | Monitoring | Sentry (optional) |
 | UI | Tailwind CSS, lucide-react |
@@ -57,55 +56,28 @@ has paid.
 
 ```bash
 npm install
-cp .env.example .env.local
-# fill in Supabase, Stripe, Resend, and CRON_SECRET
+npm run dev
 ```
 
-### Database
+The app runs with **zero configuration**. Copy `.env.example` to `.env.local`
+only to enable optional integrations (Stripe payments, Resend email, cron).
 
-Run the SQL against your Supabase project in order (SQL Editor or `psql`):
+### Demo data & auth
 
-```bash
-psql $SUPABASE_DB_URL -f db/schema.sql
-psql $SUPABASE_DB_URL -f db/policies.sql
-for f in db/migrations/00*.sql; do psql $SUPABASE_DB_URL -f "$f"; done
-# optional demo data (see the seed file header for the two-account setup):
-psql $SUPABASE_DB_URL -f db/seed.sql
-```
+There's nothing to set up. On first request the app seeds a realistic in-memory
+dataset — a braider studio ("Amara Braids") with services, availability,
+bookings, payments and reviews, plus a public directory of other braiders — and
+serves every screen from it. Data lives for the lifetime of the server instance:
+edits persist while it's warm and reset to the known-good seed on a cold start.
 
-The migrations are forward-only and additive — run all of them in order:
+Authentication is fully local. Sign-in accepts **any** email and password and
+issues a signed, httpOnly session cookie; logout clears it. Signing up as a
+**braider** — or signing in with `amara@braidflow.app` — lands you in the
+populated braider dashboard; anyone else gets the client experience. No email
+verification step.
 
-- `0001`–`0003` reminders and the final-reminder window
-- `0004` reviews
-- `0005` creates the `braiders` row on braider signup (without it, braider
-  accounts have no public booking page)
-- `0006` the `audit_logs` table written to by server actions and crons
-- `0007` locks `profiles.role` so a user can't promote themselves to braider —
-  it must run, or self-signup is a privilege-escalation hole
-- `0008` Stripe webhook idempotency table and the policy that lets a braider read
-  their own clients' contact details
-- `0009` per-braider timezone for availability and slot generation
-- `0010` Stripe Connect account fields for direct payouts
-- `0011` security hardening (owner-only availability notes, review-edit guard)
-- `0012` guest bookings (nullable client, guest contact + access token)
-
-Then regenerate types from your live schema:
-
-```bash
-npm run db:types
-```
-
-### Supabase Auth
-
-In Supabase Dashboard → Authentication → URL Configuration:
-
-- **Site URL** must match `NEXT_PUBLIC_SITE_URL` (e.g. `http://localhost:3000`)
-- **Redirect URLs**: add `<site>/auth/callback` for every environment. The email
-  confirmation link redirects there to establish the session.
-
-If *Confirm email* is enabled (the default), signup shows a "check your inbox"
-screen and the user returns through `/auth/callback`. If you disable it, signup
-signs the user straight in. Either way works out of the box.
+To run this as a real multi-user product, implement a durable store behind the
+`db()` / `dbAdmin()` interface in `lib/db/server.ts` — no call sites change.
 
 ### Stripe
 
@@ -139,10 +111,10 @@ CI runs typecheck, lint, and the test suite on every push and pull request
 ## Deploy to Vercel
 
 1. Push to GitHub and import the repo in Vercel (framework auto-detected).
-2. Add every variable from `.env.example`.
-3. Add the production URL to Supabase **Site URL** and as a Stripe webhook
-   endpoint (with `account.updated` enabled).
-4. The hourly reminder cron is configured in `vercel.json`.
+2. No environment variables are required — it deploys and runs as-is. Add any
+   from `.env.example` only to enable optional integrations; set `AUTH_SECRET`
+   to a long random string in production.
+3. The hourly reminder cron is configured in `vercel.json`.
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full production checklist and
 [docs/QA_CHECKLIST.md](docs/QA_CHECKLIST.md) for the manual test pass.
@@ -164,25 +136,21 @@ components/
   booking/       service list, slot picker, cancel/refund buttons
   braider/       braider card, reviews, Connect banner
 lib/
-  supabase/      browser / server / admin clients + middleware
+  db/            in-memory store, seed data, and the query layer (db / dbAdmin)
+  auth/          signed-cookie sessions, demo personas, login/logout actions
   stripe/        server SDK, Connect helpers, client-secret helper
   bookings/      availability, create/cancel/refund/reschedule, guest access, Zod schemas
   braider/       profile and Connect actions
   email/         send + notification orchestration + React Email templates
   timezones.ts   timezone list and helpers
-db/
-  schema.sql     baseline tables + GiST exclusion constraint
-  policies.sql   RLS policies
-  migrations/    additive, forward-only migrations
-  seed.sql       example data
-types/db.ts      Supabase-generated types
+types/db.ts      database row / enum types (shape the in-memory store)
 ```
 
 ## Booking flow
 
 1. The client picks a service and an open slot on `/braiders/[slug]/book`.
-2. `createBookingAction` inserts the booking as `pending_payment`. The database's
-   exclusion constraint guarantees two clients can't claim the same slot.
+2. `createBookingAction` re-validates the slot server-side and inserts the
+   booking as `pending_payment`, so two clients can't hold the same slot.
 3. The server creates a Stripe PaymentIntent for the deposit as a destination
    charge to the braider's connected account, links it to a `payments` row, and
    redirects to the payment page.

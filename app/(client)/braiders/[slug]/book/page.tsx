@@ -3,28 +3,34 @@ import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { TZDate } from '@date-fns/tz';
 import { addDays, startOfDay } from 'date-fns';
-import { supabaseAdmin, supabaseServer } from '@/lib/supabase/server';
+import { dbAdmin, db } from '@/lib/db/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
+import type { Metadata } from 'next';
 import { BookingFlow } from './booking-flow';
 
-// Availability changes constantly and the data is fetched with the service role
-// (no cookies to make this implicitly dynamic), so render on every request.
+// A transactional funnel step, not indexable content.
+export const metadata: Metadata = {
+  title: 'Book an appointment',
+  robots: { index: false, follow: false }
+};
+
+// Availability changes constantly and the query reads private braider data with
+// no request cookies (so it isn't implicitly dynamic) — render on every request.
 export const dynamic = 'force-dynamic';
 
 const WINDOW_DAYS = 21;
 
 export default async function BookPage({ params }: { params: { slug: string } }) {
-  // Use the service role for availability data: it must include this braider's
-  // private block windows and EVERY client's busy slots to compute openings
-  // correctly. RLS would hide both from the viewing client. Only derived free
-  // slots are sent to the browser — never raw bookings or override notes.
-  const admin = supabaseAdmin();
+  // Availability is computed from privileged data — this braider's private block
+  // windows and every client's busy slots. Only the derived free slots are sent
+  // to the browser, never raw bookings or override notes.
+  const admin = dbAdmin();
 
   // Whether to collect guest contact details in the flow. Signed-in clients book
   // against their account; everyone else books as a guest. (No redirect — the
   // whole point is that the page is reachable without an account.)
-  const { data: { user } } = await supabaseServer().auth.getUser();
+  const { data: { user } } = await db().auth.getUser();
   const isAuthenticated = Boolean(user);
 
   const { data: braider } = await admin
@@ -37,7 +43,7 @@ export default async function BookPage({ params }: { params: { slug: string } })
 
   if (!braider) notFound();
 
-  const services = (braider.services ?? []).filter((s) => s.is_active);
+  const services = (braider.services ?? []).filter((s: any) => s.is_active);
 
   // A braider is bookable only when they're accepting bookings AND Stripe can
   // take charges for them. Clients don't need to know which is missing — both

@@ -20,3 +20,13 @@ export function formatDuration(minutes: number) {
   const m = minutes % 60;
   return m === 0 ? `${h} hr` : `${h} hr ${m} min`;
 }
+
+/** Up-to-two-letter monogram from a name, for avatar fallbacks. */
+export function initials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}

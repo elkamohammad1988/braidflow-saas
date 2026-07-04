@@ -1,6 +1,6 @@
 import 'server-only';
 import { notFound, redirect } from 'next/navigation';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { dbAdmin } from '@/lib/db/server';
 import { getSession } from '@/lib/auth/session';
 import { guestTokenMatches } from './guest-token';
 
@@ -27,7 +27,7 @@ export async function resolveBookingViewer(
   bookingId: string,
   token?: string | null
 ): Promise<{ viewer: BookingViewer; clientId: string | null }> {
-  const admin = supabaseAdmin();
+  const admin = dbAdmin();
   const { data: booking } = await admin
     .from('bookings')
     .select('id, client_id, guest_token')

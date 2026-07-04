@@ -16,44 +16,51 @@ export default async function OG() {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '80px',
-          backgroundColor: '#faf6f1',
+          backgroundColor: '#140d08',
+          backgroundImage:
+            'radial-gradient(60% 80% at 12% 0%, rgba(224,163,63,0.30), transparent 60%), radial-gradient(60% 80% at 100% 30%, rgba(106,47,82,0.45), transparent 60%)',
           fontFamily: 'serif'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
           <div
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 12,
-              backgroundColor: '#1a1410',
+              width: 60,
+              height: 60,
+              borderRadius: 14,
+              background: 'linear-gradient(135deg, #271b12, #140d08)',
+              border: '1px solid rgba(224,163,63,0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#faf6f1',
-              fontSize: 32,
+              color: '#e0a33f',
+              fontSize: 34,
               fontWeight: 600
             }}
           >
             B
           </div>
-          <div style={{ fontSize: 32, color: '#1a1410', fontWeight: 500 }}>BraidFlow</div>
+          <div style={{ fontSize: 34, color: '#f5eee3', fontWeight: 500 }}>
+            Braid<span style={{ color: '#e0a33f' }}>flow</span>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
           <div
             style={{
-              fontSize: 88,
-              lineHeight: 1.05,
-              color: '#1a1410',
+              display: 'flex',
+              fontSize: 94,
+              lineHeight: 1.02,
+              color: '#f5eee3',
               fontWeight: 500,
-              letterSpacing: '-0.02em',
-              maxWidth: 980
+              letterSpacing: '-0.03em',
+              maxWidth: 1000
             }}
           >
-            Quit the DMs. Get paid up front.
+            Quit the DMs. Get paid&nbsp;
+            <span style={{ color: '#e0a33f', fontStyle: 'italic' }}>up front.</span>
           </div>
-          <div style={{ fontSize: 30, color: '#6b5d52', maxWidth: 820 }}>
+          <div style={{ fontSize: 30, color: 'rgba(245,238,227,0.65)', maxWidth: 840 }}>
             The booking platform built for braiders. Deposits, scheduling, and reminders — done.
           </div>
         </div>
@@ -63,28 +70,30 @@ export default async function OG() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderTop: '1px solid rgba(26,20,16,0.12)',
-            paddingTop: 24
+            borderTop: '1px solid rgba(245,238,227,0.14)',
+            paddingTop: 26
           }}
         >
-          <div style={{ fontSize: 22, color: '#6b5d52' }}>braidflow.app</div>
+          <div
+            style={{
+              fontSize: 22,
+              color: 'rgba(245,238,227,0.55)',
+              fontFamily: 'monospace',
+              letterSpacing: '0.08em'
+            }}
+          >
+            braidflow.app
+          </div>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 10,
               fontSize: 22,
-              color: '#c98b5e'
+              color: '#e0a33f'
             }}
           >
-            <div
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 99,
-                backgroundColor: '#c98b5e'
-              }}
-            />
+            <div style={{ width: 10, height: 10, borderRadius: 99, backgroundColor: '#e0a33f' }} />
             Start free
           </div>
         </div>

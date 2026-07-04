@@ -10,24 +10,30 @@ export async function Navbar() {
   const isBraider = session?.profile.role === 'braider';
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-cream/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+    <header className="sticky top-0 z-30 border-b border-line bg-cream/70 backdrop-blur-xl backdrop-saturate-150">
+      <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-6">
         <Link href="/" className="transition-opacity hover:opacity-80">
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-1 text-sm font-medium text-ink-muted md:flex">
-          <Link href="/braiders" className="rounded-full px-3 py-2 transition-colors hover:bg-ink/[0.05] hover:text-ink">
-            Find a braider
-          </Link>
-          <Link href="/pricing" className="rounded-full px-3 py-2 transition-colors hover:bg-ink/[0.05] hover:text-ink">
-            Pricing
-          </Link>
-          {!session && (
-            <Link href="/signup?role=braider" className="rounded-full px-3 py-2 transition-colors hover:bg-ink/[0.05] hover:text-ink">
-              For braiders
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 text-sm font-medium text-ink-muted md:flex">
+          {[
+            { href: '/braiders', label: 'Find a braider' },
+            { href: '/pricing', label: 'Pricing' },
+            ...(!session ? [{ href: '/signup?role=braider', label: 'For braiders' }] : [])
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group relative rounded-full px-3.5 py-2 transition-colors hover:text-ink"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 bg-gradient-to-r from-clay to-transparent transition-transform duration-300 ease-spring group-hover:scale-x-100"
+              />
+              {item.label}
             </Link>
-          )}
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -44,7 +50,7 @@ export async function Navbar() {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-ink-muted hover:text-ink md:block"
+                className="hidden text-sm font-medium text-ink-muted transition-colors hover:text-ink md:block"
               >
                 Log in
               </Link>

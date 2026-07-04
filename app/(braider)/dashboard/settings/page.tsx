@@ -1,5 +1,5 @@
 import { requireBraider } from '@/lib/auth/session';
-import { supabaseServer } from '@/lib/supabase/server';
+import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardBody } from '@/components/ui/card';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -8,17 +8,17 @@ import { SettingsForm } from './settings-form';
 
 export default async function SettingsPage() {
   const { user, profile } = await requireBraider();
-  const supabase = supabaseServer();
+  const database = db();
 
   const [braiderRes, profileRes] = await Promise.all([
-    supabase
+    database
       .from('braiders')
       .select(
         'slug, business_name, bio, city, instagram_handle, accepting_bookings, timezone, charges_enabled'
       )
       .eq('id', user.id)
       .maybeSingle(),
-    supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle()
+    database.from('profiles').select('phone').eq('id', user.id).maybeSingle()
   ]);
 
   const braider = braiderRes.data;
