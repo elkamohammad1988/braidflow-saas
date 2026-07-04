@@ -1,181 +1,296 @@
+<div align="center">
+
 # BraidFlow
 
-A two-sided booking platform for braiders and protective-style stylists.
-Clients browse a stylist, pick a service and time, and pay a deposit to confirm.
-Braiders set their hours once, get paid directly through Stripe, and stop
-chasing bookings through Instagram DMs.
+### Quit the DMs. Get paid up front.
 
-It is built for long appointments — 4 to 8 hours — where a no-show costs a whole
-day of work, so the deposit is the default: a slot isn't held until the client
-has paid.
+A booking-and-deposit platform built specifically for hair braiders — a shareable
+booking page that collects a deposit through Stripe, locks the slot, and runs the
+whole week from one dashboard.
+
+[![CI](https://github.com/elkamohammad1988/braidflow-saas/actions/workflows/ci.yml/badge.svg)](https://github.com/elkamohammad1988/braidflow-saas/actions/workflows/ci.yml)
+&nbsp;
+![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-Connect_%2B_Elements-635BFF?logo=stripe&logoColor=white)
+![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white)
+![License](https://img.shields.io/badge/license-Proprietary-1f2937)
+
+**[▶ Live demo](https://braidflow.vercel.app)** · [Case study](marketing/portfolio-case-study.md) · [Screenshots](#screenshots) · [Architecture](#architecture)
+
+<br/>
+
+<img src="marketing/screenshots/01-landing-hero.png" alt="BraidFlow landing page — Quit the DMs. Get paid up front." width="100%" />
+
+</div>
+
+---
+
+## Why BraidFlow
+
+Braiders run a real business out of their DMs. A single client is four to eight hours
+in the chair, so one no-show doesn't cost a slot — it costs a day. And the tools that
+exist (Square, Acuity, Calendly) were built for thirty-minute haircuts, with deposits
+bolted on as an afterthought.
+
+BraidFlow flips that. A braider sets up a booking page in about fifteen minutes.
+Clients pick a style, pick a time, and pay a deposit through Stripe **before** the slot
+is held. The balance is paid in person. No back-and-forth, no ghosting a full day, no
+chasing money after the fact.
+
+|  |  |
+|---|---|
+| **100%** of every deposit stays with the braider | **0%** commission on services |
+| **~15 min** to set up a booking page | **~90 sec** for a client to book |
+
+> **Try it now → [braidflow.vercel.app](https://braidflow.vercel.app)**
+> No signup required. To land inside the braider dashboard, sign in with
+> **`amara@braidflow.app`** and any password. Every screen runs on realistic sample
+> data — a floating *Demo Mode* badge explains it.
+
+---
 
 ## Features
 
-**Clients**
-- Public braider directory with city search, plus SEO-friendly profile pages
-- Service picker with real-time, timezone-aware availability and slot selection
-- Card checkout via Stripe Elements; the slot is confirmed only after the
-  deposit is paid
-- Book as a guest (no account required) or signed in; guest bookings are managed
-  through a secure link sent by email
-- My bookings, reschedule (the deposit carries over), and cancel
-- Leave a review after a completed appointment
+### For the braider
+- **A booking page that pays you first.** Clients pay a deposit through Stripe before a
+  slot is confirmed. No deposit, no hold.
+- **One dashboard for the week.** Overview KPIs — booked this week, revenue this month,
+  deposits still owed, total clients — then a weekly calendar and a full appointments list.
+- **Services with real detail.** Name, description, price, duration, and a *per-service*
+  deposit amount. Clients pick from this list.
+- **Availability that fits a life.** Weekly hours plus one-tap date overrides for
+  vacations and kids' events. All scheduling is **timezone-correct** — counts and revenue
+  land in the braider's own zone, not the server's.
+- **Clients, remembered.** Every person who's booked rolls up with visit count, lifetime
+  value, and last-seen date — registered clients and guests alike.
+- **Stripe Connect payouts.** Deposits pay out straight to the braider's account, and
+  refunds reverse the transfer. A guided activation checklist walks first-timers through
+  service → hours → Stripe.
 
-**Braiders**
-- Dashboard: overview stats, calendar, appointments, clients, services,
-  weekly hours and day overrides, and settings
-- Stripe Connect Express onboarding — deposits are paid out directly to the
-  braider's connected account, and refunds reverse the transfer
-- Post-appointment close-out: mark each booking completed or no-show
-- Automated 24h and 2h reminders via an hourly cron
-- Transactional email for confirmation, reminders, cancellation, reschedule,
-  and refund
+### For the client
+- **Book in about ninety seconds.** Pick a style, pick a slot, pay the deposit.
+- **Guest checkout.** No account required to book; the booking is managed from a secure link.
+- **A real marketplace.** Search a directory of braiders with ratings, open a public
+  profile with reviews, reschedule (the deposit carries over) or cancel from a link.
 
-**Platform**
-- Authorization on every mutation (server actions + Edge middleware); guests act
-  on a booking through a signed capability token, never a shared login
-- Server-side slot re-validation on every booking request guards double-booking
-- Idempotent Stripe webhook as the source of truth for payment state
-- Zod validation on every server action, audit logging, and Sentry monitoring
-- TypeScript strict mode with `noUncheckedIndexedAccess`
+### Under the hood
+- **Deposit-driven booking state machine:** `pending_payment → confirmed → completed / cancelled`,
+  with Stripe **webhooks** as the source of truth.
+- **Vercel Cron** sends 24h/2h reminders and automatically releases holds that were never paid.
+- Transactional email through **Resend**, error monitoring through **Sentry**, security
+  headers, rate limiting, and audit logging — each an optional integration that no-ops
+  cleanly without keys.
+
+---
+
+## Screenshots
+
+<div align="center">
+
+|  |  |
+|:--:|:--:|
+| ![Dashboard overview](marketing/screenshots/06-dashboard-overview.png) | ![Weekly calendar](marketing/screenshots/08-calendar.png) |
+| **Dashboard** — the week at a glance | **Calendar** — every slot, confirmed or awaiting deposit |
+| ![Appointments](marketing/screenshots/09-bookings.png) | ![Services & pricing](marketing/screenshots/11-services.png) |
+| **Appointments** — past and upcoming, with status and totals | **Services** — price, duration, and a deposit per style |
+| ![Braider directory](marketing/screenshots/04-braiders-directory.png) | ![Mobile dashboard](marketing/screenshots/16-mobile-dashboard.png) |
+| **Directory** — a searchable marketplace with ratings | **Mobile** — the full workspace in a pocket |
+
+</div>
+
+More in [`marketing/screenshots`](marketing/screenshots).
+
+---
+
+## Architecture
+
+BraidFlow is a **Next.js 14 App Router** application. Reads are server components;
+every mutation is a **server action** validated with **Zod**. Route protection runs on
+the **Edge** from a signed session cookie — no backend round-trip to know who you are.
+
+```mermaid
+flowchart LR
+    C[Client picks style + slot] -->|server action| B[Booking: pending_payment]
+    B --> S[Stripe Checkout / Elements]
+    S -->|webhook: payment_intent.succeeded| W[Webhook handler]
+    W --> CF[Booking: confirmed]
+    B -. unpaid past TTL .-> X[Cron: release hold → cancelled]
+    CF -->|service done| DONE[completed]
+```
+
+**The data layer is deliberately swappable.** In this demo it's an in-memory store
+behind a PostgREST-style query builder with a deterministic seed, reached through a
+single `db()` / `dbAdmin()` interface. Because feature code only ever talks to that
+interface, the store can be replaced with a real Postgres/Supabase backend without
+touching a single page or action. That's what lets the whole app **build and deploy
+with zero configuration** — no database, no auth provider, nothing to wire up.
+
+- **Auth** — a signed httpOnly cookie (Web Crypto **HMAC-SHA256**). The exact same
+  verification runs in Edge middleware and in Node server actions, so there's one code
+  path for "who is this request."
+- **Payments** — Stripe Connect for payouts, Elements for checkout, and a webhook that
+  is the single source of truth for confirming a booking.
+- **Time** — `date-fns` + `@date-fns/tz` so "this week" and "revenue this month" are
+  computed in the braider's timezone.
+- **Jobs** — Vercel Cron endpoints for reminders and hold expiry.
+
+---
 
 ## Tech stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 14 (App Router, Server Components, Server Actions) |
-| Data & Auth | In-memory demo store + signed-cookie session auth (no external services) |
-| Payments | Stripe (PaymentIntents, Connect Express, Elements, Webhooks) — optional |
-| Email | Resend + React Email |
-| Monitoring | Sentry (optional) |
-| UI | Tailwind CSS, lucide-react |
-| Language | TypeScript (strict) + Zod |
-| Hosting | Vercel (hourly cron) |
+| Layer | Choices |
+|---|---|
+| **Framework** | Next.js 14 (App Router, RSC, Server Actions), React 18 |
+| **Language** | TypeScript (strict) |
+| **Styling** | Tailwind CSS + a custom design system |
+| **Payments** | Stripe — Connect, Elements, webhooks |
+| **Email** | Resend (transactional) |
+| **Validation** | Zod |
+| **Dates / timezones** | date-fns, @date-fns/tz |
+| **Monitoring** | Sentry (`@sentry/nextjs`) |
+| **Testing** | Vitest |
+| **Runtime** | Edge Middleware, Vercel Cron |
+| **Hosting** | Vercel |
+
+---
+
+## Project structure
+
+```
+braidflow/
+├── app/
+│   ├── (marketing)/        # public landing, pricing, legal
+│   ├── (auth)/             # login, signup, password reset
+│   ├── (braider)/dashboard # overview, calendar, appointments, clients,
+│   │                       #   services, availability, settings
+│   ├── (client)/           # braider directory, profiles, booking, my bookings
+│   ├── api/                # stripe webhook, cron (reminders, expire holds)
+│   └── layout.tsx · sitemap.ts · robots.ts · opengraph-image.tsx · manifest.ts
+├── components/
+│   ├── ui/                 # design-system primitives (button, card, input…)
+│   ├── booking/ · braider/ · review/    # feature components
+│   ├── marketing/ · motion/ · demo/     # landing visuals + reveal/motion
+│   └── shared/             # navbar, footer, page header, empty state
+├── lib/
+│   ├── db/                 # in-memory store + query builder + deterministic seed
+│   ├── auth/               # signed-cookie sessions, personas, server actions
+│   ├── bookings/ · availability/ · services/ · reviews/   # domain logic
+│   ├── braider/ · payments/ · stripe/   # Connect, checkout, payouts
+│   ├── email/ · cron/ · audit/ · monitoring.ts
+│   └── timezones.ts · format-date.ts · env.ts · utils.ts
+├── marketing/              # screenshots, demo package, case study, listings
+├── test/ · vitest.config.ts
+└── middleware.ts · next.config.mjs · vercel.json · tailwind.config.ts
+```
+
+---
 
 ## Getting started
 
+**Prerequisites:** Node.js 20+ and npm.
+
 ```bash
+git clone https://github.com/elkamohammad1988/braidflow-saas.git
+cd braidflow-saas
 npm install
 npm run dev
 ```
 
-The app runs with **zero configuration**. Copy `.env.example` to `.env.local`
-only to enable optional integrations (Stripe payments, Resend email, cron).
+Open **http://localhost:3000**. That's it — the app runs with **zero configuration**.
+It ships with local session auth and an in-memory dataset, so there's no database or
+auth provider to set up. Sign in with any email and password; use `amara@braidflow.app`
+to land in the braider dashboard.
 
-### Demo data & auth
+**Scripts**
 
-There's nothing to set up. On first request the app seeds a realistic in-memory
-dataset — a braider studio ("Amara Braids") with services, availability,
-bookings, payments and reviews, plus a public directory of other braiders — and
-serves every screen from it. Data lives for the lifetime of the server instance:
-edits persist while it's warm and reset to the known-good seed on a cold start.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | Next.js ESLint |
+| `npm run test` | Vitest suite |
 
-Authentication is fully local. Sign-in accepts **any** email and password and
-issues a signed, httpOnly session cookie; logout clears it. Signing up as a
-**braider** — or signing in with `amara@braidflow.app` — lands you in the
-populated braider dashboard; anyone else gets the client experience. No email
-verification step.
+**Optional environment variables** — every one of these is optional; the app runs
+without them. Copy `.env.example` to `.env.local` and fill in only what you want to turn on.
 
-To run this as a real multi-user product, implement a durable store behind the
-`db()` / `dbAdmin()` interface in `lib/db/server.ts` — no call sites change.
+| Variable | Enables |
+|---|---|
+| `AUTH_SECRET` | Signs session cookies (set a long random string in production) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Live deposits & payouts |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Transactional email (skipped/logged otherwise) |
+| `CRON_SECRET` | Authorizes the Vercel Cron endpoints |
+| `NEXT_PUBLIC_SITE_URL` | Absolute URLs for sitemap, OpenGraph, emails |
+| `NEXT_PUBLIC_SENTRY_DSN` | Error monitoring |
 
-### Stripe
+---
 
-Enable **Connect → Express** on the platform account, then add `account.updated`
-to the webhook's events. For local development:
+## Deployment
 
-```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-# copy the signing secret into STRIPE_WEBHOOK_SECRET
-```
+BraidFlow deploys to **Vercel** with no configuration. Import the repository, keep the
+auto-detected **Next.js** preset, and ship — no environment variables are required for a
+working deploy. Add the optional keys above to switch on real payments, email, and
+monitoring.
 
-### Run
+`vercel.json` registers two cron jobs (reminders, and releasing abandoned holds). The
+live demo is deployed exactly this way at **[braidflow.vercel.app](https://braidflow.vercel.app)**.
 
-```bash
-npm run dev
-```
+Full notes: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-## Scripts
+---
 
-```bash
-npm run dev        # local dev server
-npm run build      # production build
-npm run typecheck  # tsc --noEmit
-npm run lint       # next lint
-npm run test       # vitest
-```
+## Demo & walkthrough
 
-CI runs typecheck, lint, and the test suite on every push and pull request
-(`.github/workflows/ci.yml`).
+- **Live app:** https://braidflow.vercel.app
+- **Product demo package** (storyboard, scripts, shot list, thumbnail): [`marketing/demo`](marketing/demo)
+- **Full case study** (problem → design → architecture → results): [`marketing/portfolio-case-study.md`](marketing/portfolio-case-study.md)
 
-## Deploy to Vercel
+---
 
-1. Push to GitHub and import the repo in Vercel (framework auto-detected).
-2. No environment variables are required — it deploys and runs as-is. Add any
-   from `.env.example` only to enable optional integrations; set `AUTH_SECRET`
-   to a long random string in production.
-3. The hourly reminder cron is configured in `vercel.json`.
+## FAQ
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full production checklist and
-[docs/QA_CHECKLIST.md](docs/QA_CHECKLIST.md) for the manual test pass.
+**Is this a real product with real users?**
+It's a complete, production-deployed product running on realistic sample data — built
+to be evaluated, demoed, and handed over. The data resets to a seeded state, so every
+screen is always populated.
 
-## Project layout
+**Do I need a database or a Stripe account to run it?**
+No. It runs and deploys with zero configuration. Add Stripe/Resend/Sentry keys only when
+you want live payments, email, or monitoring.
 
-```
-app/
-  (marketing)/   landing, pricing, privacy, terms
-  (auth)/        login, signup, password reset
-  (client)/      directory, braider profiles, booking, payment, my bookings
-  (braider)/     dashboard, calendar, services, availability, clients, settings,
-                 Stripe Connect onboarding
-  api/stripe/    webhook
-  api/cron/      hourly reminders, abandoned-booking expiry
-components/
-  ui/            primitives (button, input, card, badge, spinner)
-  shared/        navbar, footer, page header, empty state
-  booking/       service list, slot picker, cancel/refund buttons
-  braider/       braider card, reviews, Connect banner
-lib/
-  db/            in-memory store, seed data, and the query layer (db / dbAdmin)
-  auth/          signed-cookie sessions, demo personas, login/logout actions
-  stripe/        server SDK, Connect helpers, client-secret helper
-  bookings/      availability, create/cancel/refund/reschedule, guest access, Zod schemas
-  braider/       profile and Connect actions
-  email/         send + notification orchestration + React Email templates
-  timezones.ts   timezone list and helpers
-types/db.ts      database row / enum types (shape the in-memory store)
-```
+**How do deposits work?**
+A client pays a per-service deposit through Stripe to confirm a booking; the remaining
+balance is paid in person. With Stripe Connect, deposits pay out to the braider directly.
 
-## Booking flow
+**Could it work for salons, barbers, or lash techs — not just braiders?**
+Yes. The model — deposits, long appointments, per-service pricing — fits any
+appointment business. Braiding is simply the sharp end it was designed around.
 
-1. The client picks a service and an open slot on `/braiders/[slug]/book`.
-2. `createBookingAction` re-validates the slot server-side and inserts the
-   booking as `pending_payment`, so two clients can't hold the same slot.
-3. The server creates a Stripe PaymentIntent for the deposit as a destination
-   charge to the braider's connected account, links it to a `payments` row, and
-   redirects to the payment page.
-4. Stripe Elements collects the card and the client confirms.
-5. The `payment_intent.succeeded` webhook flips the booking to `confirmed`, marks
-   the payment `succeeded`, and sends confirmation emails to both parties.
-6. The hourly cron sends a 24h reminder, then a 2h reminder, each atomically
-   claimed so it can't double-send.
-7. The remaining balance is collected in person at the appointment.
+**Can I swap the in-memory store for a real database?**
+Yes. Feature code talks to a single `db()` interface, so a Postgres/Supabase adapter
+drops in without changing pages or actions.
 
-## Reschedule and refund
+---
 
-- **Reschedule** — either party can move a booking; the deposit carries over and
-  both reminder flags reset so the cron re-arms for the new time. The other party
-  is notified.
-- **Refund** — the braider can refund from the appointment view. The Stripe
-  refund reverses the Connect transfer and the client is notified, with the same
-  idempotent webhook handling.
+## License
 
-## Roadmap
+**Proprietary — © 2026 Mohammed El Kabouri. All rights reserved.**
 
-Deliberately out of scope today, and straightforward to add on top of the
-existing abstractions:
+This source is made available for evaluation and portfolio review only. It is **not**
+licensed for copying, modification, redistribution, or commercial use without a written
+agreement. The complete product and handover package are **available for acquisition or
+licensing** — see [`LICENSE`](LICENSE).
 
-- SMS reminders (email only for now)
-- Braider subscription billing (deposits are the only money flow; the pricing
-  page is a free beta)
-- Multi-stylist studio accounts (single-braider data model today)
+## Contributing
+
+BraidFlow is a proprietary project and isn't accepting outside contributions, but the
+engineering conventions and local setup are documented in
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for anyone evaluating or handed the codebase.
+
+## Credits
+
+Designed and built by **Mohammed El Kabouri** — [@elkamohammad1988](https://github.com/elkamohammad1988).
+Product, design system, and full-stack engineering by one person.
