@@ -152,7 +152,7 @@ export default async function AppointmentsPage() {
                     const deposit = depositStateFromPayments(a.payments);
 
                     return (
-                      <tr key={a.id} className="transition-colors hover:bg-cream/40">
+                      <tr key={a.id} className="transition-colors hover:bg-ink/[0.04]">
                         <td className="px-5 py-3">
                           <p className="font-medium text-ink">
                             {relativeDayLabel(a.scheduled_at, tz)}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Logo } from './logo';
 import { SignOutLink } from './sign-out';
 import { MobileMenu } from './mobile-menu';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export async function Navbar() {
   const session = await getSession();
@@ -37,6 +38,7 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle className="hidden md:inline-flex" />
           {session ? (
             <>
               <Link href={isBraider ? '/dashboard' : '/bookings'} className="hidden md:inline-flex">

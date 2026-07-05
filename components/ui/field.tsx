@@ -55,7 +55,10 @@ function FieldShell({
         <span
           id={descId}
           role={error ? 'alert' : undefined}
-          className={cn('mt-1.5 block text-xs', error ? 'text-red-600' : 'text-ink-muted')}
+          className={cn(
+            'mt-1.5 block text-xs',
+            error ? 'text-red-600 dark:text-red-400' : 'text-ink-muted'
+          )}
         >
           {error ?? hint}
         </span>

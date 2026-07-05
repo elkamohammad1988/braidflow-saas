@@ -50,7 +50,7 @@ export function Logo({
         <span
           className={cn(
             'font-display text-[1.35rem] font-medium tracking-[-0.03em]',
-            tone === 'cream' ? 'text-cream' : 'text-ink'
+            tone === 'cream' ? 'text-ivory' : 'text-ink'
           )}
         >
           Braid<span className="text-clay">flow</span>

@@ -50,7 +50,7 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
               className={cn(
                 'rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ease-spring active:scale-[0.98]',
                 role === r
-                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-cream shadow-soft ring-1 ring-gold/25'
+                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-ivory shadow-soft ring-1 ring-gold/25'
                   : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.03]'
               )}
             >

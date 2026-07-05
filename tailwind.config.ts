@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -10,15 +11,15 @@ const config: Config = {
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace']
       },
       colors: {
-        // Warm espresso — text and near-black surfaces. Never a neutral gray.
+        // Theme-able semantic tokens resolve through CSS variables (globals.css)
+        // so light/dark flip automatically. Channels are space-separated RGB so
+        // Tailwind's /opacity modifiers keep working (bg-ink/[0.06] etc.).
         ink: {
-          DEFAULT: '#231810',
-          muted: '#6d5c4e',
-          // Faintest text tier. Tuned to clear WCAG AA (4.5:1) for small text on
-          // ivory/paper while staying clearly below `muted` in the hierarchy.
-          subtle: '#776756'
+          DEFAULT: 'rgb(var(--color-ink) / <alpha-value>)',
+          muted: 'rgb(var(--color-ink-muted) / <alpha-value>)',
+          subtle: 'rgb(var(--color-ink-subtle) / <alpha-value>)'
         },
-        // The dark "stage" register for marketing drama.
+        // The dark "stage" register — fixed; the always-dark brand surfaces.
         night: {
           DEFAULT: '#140d08',
           deep: '#0d0805'
@@ -28,43 +29,43 @@ const config: Config = {
           soft: '#271b12',
           line: 'rgba(245,238,227,0.09)'
         },
-        // The daylight register — warm ivory, never pure white.
+        // The daylight/surface register — flips to warm dark in dark mode.
         cream: {
-          DEFAULT: '#f5eee3',
-          deep: '#ece0d0'
+          DEFAULT: 'rgb(var(--color-cream) / <alpha-value>)',
+          deep: 'rgb(var(--color-cream-deep) / <alpha-value>)'
         },
-        paper: '#fdfaf4',
-        // Signature accent: molten gold, used surgically as light.
-        // Kept on the `clay` key so existing usages promote straight into gold.
+        paper: 'rgb(var(--color-paper) / <alpha-value>)',
+        // Fixed warm ivory — light text/overlays on the always-dark surfaces,
+        // where a flipping token would invert and disappear.
+        ivory: '#f5eee3',
+        // Signature accent: molten gold, fixed in both themes. `text` flips to a
+        // bright gold in dark so eyebrows/labels/warnings stay legible.
         clay: {
           DEFAULT: '#c78a3a',
           soft: '#ecd3ac',
           deep: '#b47a24',
-          // Accessible gold for TEXT on light surfaces — the bright `clay`/`gold`
-          // read ~2.6:1 as text and fail AA, so eyebrows, labels, hints and the
-          // "warning" badge use this deeper gold (~5.4:1 on cream/paper). Bright
-          // clay stays reserved for dots, borders, icons and glows.
-          text: '#8a5512'
+          text: 'rgb(var(--color-clay-text) / <alpha-value>)'
         },
         gold: {
           DEFAULT: '#e0a33f',
           bright: '#f2c464',
           deep: '#b47a24'
         },
-        // Depth + aurora tones.
+        // Depth + aurora tones (fixed).
         plum: {
           DEFAULT: '#6a2f52',
           deep: '#3f1930'
         },
         ember: '#c65a3c',
-        // Reserved semantic: secured / paid.
+        // Reserved semantic: secured / paid. DEFAULT flips lighter in dark so it
+        // reads as text; soft/bright stay fixed.
         moss: {
-          DEFAULT: '#3f5c40',
+          DEFAULT: 'rgb(var(--color-moss) / <alpha-value>)',
           soft: '#dbe7d7',
           bright: '#5c8a5a'
         },
-        line: 'rgba(35,24,16,0.09)',
-        'line-strong': 'rgba(35,24,16,0.15)'
+        line: 'var(--color-line)',
+        'line-strong': 'var(--color-line-strong)'
       },
       borderRadius: {
         card: '18px',

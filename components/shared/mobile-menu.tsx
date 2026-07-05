@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 type Props = {
   isLoggedIn: boolean;
@@ -41,7 +42,7 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
         <>
           <div
             aria-hidden
-            className="fixed inset-0 top-16 z-40 bg-ink/20 backdrop-blur-sm"
+            className="fixed inset-0 top-16 z-40 bg-night/40 backdrop-blur-sm"
             onClick={close}
           />
           <div
@@ -52,14 +53,14 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
               <Link
                 href="/braiders"
                 onClick={close}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-cream"
+                className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
               >
                 Find a braider
               </Link>
               <Link
                 href="/pricing"
                 onClick={close}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-cream"
+                className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
               >
                 Pricing
               </Link>
@@ -67,7 +68,7 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
                 <Link
                   href="/signup?role=braider"
                   onClick={close}
-                  className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-cream"
+                  className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
                 >
                   I&apos;m a braider
                 </Link>
@@ -90,6 +91,10 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
                   </Link>
                 </>
               )}
+            </div>
+            <div className="mt-3 flex items-center justify-between border-t border-line px-1 pt-3">
+              <span className="text-sm font-medium text-ink-muted">Theme</span>
+              <ThemeToggle />
             </div>
           </div>
         </>

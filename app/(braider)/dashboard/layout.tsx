@@ -13,6 +13,7 @@ import { Logo, LogoMark } from '@/components/shared/logo';
 import { ConnectBanner } from '@/components/braider/connect-banner';
 import { initials } from '@/lib/utils';
 import { DashboardNav } from './dashboard-nav';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, profile } = await requireBraider();
@@ -55,6 +56,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-clay/15 text-sm font-semibold text-clay">
               {initials(profile.full_name) || 'B'}
             </span>
+            <ThemeToggle />
             <SignOutLink />
           </div>
         </div>
@@ -88,6 +90,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 View site
               </Link>
               <SignOutLink />
+            </div>
+            <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
+              <span className="text-xs font-medium text-ink-muted">Theme</span>
+              <ThemeToggle />
             </div>
           </div>
         </aside>

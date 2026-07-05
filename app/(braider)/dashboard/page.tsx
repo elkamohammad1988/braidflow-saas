@@ -211,7 +211,7 @@ export default async function DashboardOverview({
               <Link
                 key={b.id}
                 href="/dashboard/appointments"
-                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-cream/50 focus-visible:[outline-offset:-2px]"
+                className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-ink/[0.04] focus-visible:[outline-offset:-2px]"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
                   {initials(b.profiles?.full_name ?? b.guest_name ?? '') || '—'}

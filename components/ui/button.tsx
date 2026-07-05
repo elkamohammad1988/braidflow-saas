@@ -17,7 +17,7 @@ const variants: Record<Variant, string> = {
     'bg-paper text-ink border border-line-strong shadow-card hover:-translate-y-[1px] hover:border-ink/25 hover:shadow-lifted active:translate-y-0',
   ghost: 'text-ink hover:bg-ink/[0.06]',
   danger:
-    'bg-gradient-to-b from-red-500 to-red-600 text-white shadow-sm hover:-translate-y-[1px] hover:brightness-105 active:translate-y-0'
+    'bg-gradient-to-b from-red-500 to-red-600 text-white shadow-[0_1px_0_rgba(255,235,230,0.3)_inset,0_8px_24px_-8px_rgba(198,90,60,0.5),0_2px_8px_-2px_rgba(160,60,40,0.4)] hover:-translate-y-[1px] hover:brightness-105 active:translate-y-0'
 };
 
 const sizes: Record<Size, string> = {

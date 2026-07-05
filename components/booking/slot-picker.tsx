@@ -46,7 +46,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
               className={cn(
                 'flex w-[3.75rem] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2.5 transition-all duration-200 ease-spring active:scale-[0.96]',
                 active
-                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-cream shadow-soft ring-1 ring-gold/25'
+                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-ivory shadow-soft ring-1 ring-gold/25'
                   : 'border-line bg-paper text-ink hover:-translate-y-px hover:border-clay/30 hover:shadow-card',
                 empty && 'cursor-not-allowed opacity-35 hover:translate-y-0 hover:border-line hover:shadow-none active:scale-100'
               )}

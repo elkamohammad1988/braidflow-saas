@@ -113,7 +113,7 @@ export default function Home() {
   return (
     <>
       {/* ───────────────────────── HERO — the night stage ───────────────────────── */}
-      <section className="relative overflow-hidden bg-night text-cream">
+      <section className="relative overflow-hidden bg-night text-ivory">
         <AtelierBackdrop className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-0 bg-grid-gold bg-radial-fade opacity-60" aria-hidden />
         {/* seam fade into the ivory page below */}
@@ -129,7 +129,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={90}>
-              <h1 className="mt-6 max-w-xl font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-cream sm:text-[4.25rem] md:text-[5.25rem]">
+              <h1 className="mt-6 max-w-xl font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
                 Quit the DMs.
                 <br />
                 Get paid{' '}
@@ -138,7 +138,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={180}>
-              <p className="mt-7 max-w-lg text-lg leading-relaxed text-cream/65">
+              <p className="mt-7 max-w-lg text-lg leading-relaxed text-ivory/65">
                 BraidFlow holds the deposit, locks in the slot, and keeps your week organized — so
                 you can focus on the chair, not the back-and-forth.
               </p>
@@ -156,7 +156,7 @@ export default function Home() {
                 </Magnetic>
                 <Link
                   href="/braiders"
-                  className="group inline-flex items-center gap-2 rounded-full border border-cream/15 px-6 py-3.5 text-[15px] font-medium text-cream/85 transition-colors duration-200 hover:border-gold/40 hover:text-cream"
+                  className="group inline-flex items-center gap-2 rounded-full border border-ivory/15 px-6 py-3.5 text-[15px] font-medium text-ivory/85 transition-colors duration-200 hover:border-gold/40 hover:text-ivory"
                 >
                   Browse braiders
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -167,7 +167,7 @@ export default function Home() {
             <Reveal delay={340}>
               <div className="mt-11 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
-                  <div key={p.label} className="flex items-center gap-2 text-sm text-cream/75">
+                  <div key={p.label} className="flex items-center gap-2 text-sm text-ivory/75">
                     <p.icon className="h-4 w-4 text-gold" strokeWidth={1.9} />
                     <span>{p.label}</span>
                   </div>
@@ -325,7 +325,7 @@ export default function Home() {
 
           <Reveal delay={120}>
             <div className="mt-12 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
-              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50">
+              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50">
                 <div>Feature</div>
                 <div className="w-24 text-center text-gold">BraidFlow</div>
                 <div className="w-24 text-center">Generic tools</div>
@@ -333,7 +333,7 @@ export default function Home() {
               {comparisons.map((row, i) => (
                 <div
                   key={row.feature}
-                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-6 py-4 text-sm transition-colors hover:bg-cream/50 ${
+                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-6 py-4 text-sm transition-colors hover:bg-ink/[0.04] ${
                     i !== comparisons.length - 1 ? 'border-b border-line' : ''
                   }`}
                 >
@@ -394,7 +394,7 @@ export default function Home() {
       </section>
 
       {/* ───────────────────────── FINAL CTA — bookend the night ───────────────────────── */}
-      <section className="relative overflow-hidden bg-night text-cream">
+      <section className="relative overflow-hidden bg-night text-ivory">
         <AtelierBackdrop className="absolute inset-0 opacity-90" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream to-transparent" aria-hidden />
         <div className="relative mx-auto max-w-4xl px-6 py-28 text-center md:py-36">
@@ -412,7 +412,7 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={170}>
-            <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-cream/65">
+            <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-ivory/65">
               You keep 100% of every deposit. Set up your page in fifteen minutes — no credit card to
               start.
             </p>
@@ -429,7 +429,7 @@ export default function Home() {
               </Magnetic>
               <Link
                 href="/pricing"
-                className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-cream/75 underline-offset-4 transition-colors hover:text-gold-bright"
+                className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-ivory/75 underline-offset-4 transition-colors hover:text-gold-bright"
               >
                 See pricing
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -508,9 +508,9 @@ function HeroPreview() {
           </div>
 
           {/* CTA */}
-          <div className="mt-5 flex items-center justify-between rounded-card bg-night px-4 py-3 text-cream">
+          <div className="mt-5 flex items-center justify-between rounded-card bg-night px-4 py-3 text-ivory">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-cream/50">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-ivory/50">
                 Pay deposit to confirm
               </p>
               <p className="font-display text-lg font-medium leading-tight">$40.00</p>

@@ -79,7 +79,7 @@ export function BraiderCard({
                   <span className="font-mono text-xs text-ink-subtle">({reviewCount})</span>
                 </span>
               ) : (
-                <span className="rounded-full bg-moss-soft px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-moss">
+                <span className="rounded-full bg-moss-soft px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-moss dark:bg-moss/20">
                   New
                 </span>
               )}

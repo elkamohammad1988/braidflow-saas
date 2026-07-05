@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-screen">
       {/* Brand panel — the night atelier */}
-      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-12 text-cream lg:flex">
+      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-12 text-ivory lg:flex">
         <div className="absolute inset-0 bg-aurora opacity-90" aria-hidden />
         <div className="absolute inset-0 bg-grid-gold bg-radial-fade opacity-60" aria-hidden />
         <div className="relative">
@@ -25,7 +25,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                   <circle cx="12" cy="12" r="1.6" fill="currentColor" />
                 </svg>
               </span>
-              <span className="font-display text-xl font-medium tracking-[-0.03em] text-cream">
+              <span className="font-display text-xl font-medium tracking-[-0.03em] text-ivory">
                 Braid<span className="text-gold">flow</span>
               </span>
             </span>
@@ -38,7 +38,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
           <ul className="mt-9 space-y-4">
             {highlights.map((h) => (
-              <li key={h.text} className="flex items-center gap-3.5 text-cream/85">
+              <li key={h.text} className="flex items-center gap-3.5 text-ivory/85">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 text-gold ring-1 ring-gold/20">
                   <h.icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
                 </span>
@@ -48,16 +48,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </ul>
         </div>
 
-        <div className="relative rounded-card border border-onyx-line bg-cream/[0.04] p-5 backdrop-blur-sm">
+        <div className="relative rounded-card border border-onyx-line bg-ivory/[0.04] p-5 backdrop-blur-sm">
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} aria-hidden strokeWidth={0} className="h-3.5 w-3.5 fill-gold text-gold" />
             ))}
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-cream/85">
+          <p className="mt-3 text-sm leading-relaxed text-ivory/85">
             &ldquo;Setup took 15 minutes. The link in my bio finally does the work instead of me.&rdquo;
           </p>
-          <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-cream/55">
+          <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ivory/55">
             Kemi A. · Goddess locs, Houston
           </p>
         </div>

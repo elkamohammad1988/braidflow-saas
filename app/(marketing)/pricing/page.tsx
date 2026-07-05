@@ -79,7 +79,7 @@ export default function PricingPage() {
 
       <section className="mx-auto max-w-2xl px-6 pb-24">
         <Reveal>
-          <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-8 text-cream shadow-lifted md:p-11">
+          <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-8 text-ivory shadow-lifted md:p-11">
             <AtelierBackdrop className="absolute inset-0 opacity-70" />
             <div className="relative">
               <p className="absolute -top-3 left-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
@@ -88,11 +88,11 @@ export default function PricingPage() {
               <p className="pt-3 font-display text-2xl font-medium">Everything, free</p>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="font-display text-7xl font-medium tracking-tight text-gilt">$0</span>
-                <span className="font-mono text-xs uppercase tracking-wider text-cream/50">
+                <span className="font-mono text-xs uppercase tracking-wider text-ivory/50">
                   while in beta
                 </span>
               </div>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/65">
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-ivory/65">
                 The full product, no limits we&apos;re hiding. We&apos;ll add paid plans down the
                 road — with notice — but everything below is yours today.
               </p>
@@ -113,7 +113,7 @@ export default function PricingPage() {
                       <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold-bright ring-1 ring-gold/25">
                         <Check className="h-3 w-3" strokeWidth={2.5} />
                       </span>
-                      <span className="text-cream/85">{feature}</span>
+                      <span className="text-ivory/85">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -149,7 +149,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-night text-cream">
+      <section className="relative overflow-hidden bg-night text-ivory">
         <AtelierBackdrop className="absolute inset-0 opacity-90" />
         <div className="relative mx-auto max-w-4xl px-6 py-28 text-center md:py-36">
           <Reveal>
@@ -158,7 +158,7 @@ export default function PricingPage() {
             </p>
           </Reveal>
           <Reveal delay={110}>
-            <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-cream/65">
+            <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-ivory/65">
               Most braiders we talk to lose 1–2 appointments a month to ghosting. Deposits up front
               stop that — and right now the whole thing is free.
             </p>
