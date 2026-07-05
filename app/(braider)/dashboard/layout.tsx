@@ -94,7 +94,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         {/* Main */}
         <main id="main-content" className="min-w-0 flex-1 px-5 py-8 md:px-10 md:py-12">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-5xl motion-safe:animate-fade-in-up">
             {needsConnect && (
               <ConnectBanner onboardingComplete={connect?.stripe_onboarding_complete ?? false} />
             )}

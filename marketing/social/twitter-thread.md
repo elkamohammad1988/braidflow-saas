@@ -50,7 +50,7 @@ So availability is built for that — weekly hours, plus one-tap day-blocks for 
 ---
 
 **6/ how it's built**
-*Attach: `07-analytics.png`*
+*Attach: `06-dashboard-overview.png`*
 
 Stack: Next.js 14 (App Router + Server Actions), TypeScript strict, Stripe Connect, Tailwind, Zod, date-fns.
 
@@ -77,7 +77,7 @@ pending_payment → confirmed → completed / cancelled, plus auto-expiring unpa
 ---
 
 **9/ CTA**
-*Attach: `03-landing-full.png`*
+*Attach: `01-landing-hero.png`*
 
 Live demo — no signup, sample data, poke at everything:
 https://braidflow.vercel.app

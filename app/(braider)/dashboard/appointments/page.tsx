@@ -108,6 +108,7 @@ export default async function AppointmentsPage() {
     .from('bookings')
     .select(
       `id, scheduled_at, duration_minutes, status, price_cents, deposit_cents,
+       guest_name, guest_phone,
        services(name),
        profiles!bookings_client_id_fkey(full_name, phone),
        payments(kind, status, amount_cents)`
@@ -161,9 +162,11 @@ export default async function AppointmentsPage() {
                           </p>
                         </td>
                         <td className="px-5 py-3">
-                          <p className="text-ink">{a.profiles?.full_name}</p>
-                          {a.profiles?.phone && (
-                            <p className="text-xs text-ink-muted">{a.profiles.phone}</p>
+                          <p className="text-ink">{a.profiles?.full_name ?? a.guest_name}</p>
+                          {(a.profiles?.phone ?? a.guest_phone) && (
+                            <p className="text-xs text-ink-muted">
+                              {a.profiles?.phone ?? a.guest_phone}
+                            </p>
                           )}
                         </td>
                         <td className="px-5 py-3 text-ink-muted">{a.services?.name}</td>
@@ -209,9 +212,11 @@ export default async function AppointmentsPage() {
                     </div>
 
                     <div className="mt-3 text-sm">
-                      <p className="text-ink">{a.profiles?.full_name}</p>
-                      {a.profiles?.phone && (
-                        <p className="text-xs text-ink-muted">{a.profiles.phone}</p>
+                      <p className="text-ink">{a.profiles?.full_name ?? a.guest_name}</p>
+                      {(a.profiles?.phone ?? a.guest_phone) && (
+                        <p className="text-xs text-ink-muted">
+                          {a.profiles?.phone ?? a.guest_phone}
+                        </p>
                       )}
                       <p className="mt-0.5 text-ink-muted">{a.services?.name}</p>
                     </div>

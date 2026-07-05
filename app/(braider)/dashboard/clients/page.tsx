@@ -14,6 +14,7 @@ type ClientRow = {
   visits: number;
   lifetimeCents: number;
   lastVisit: Date | null;
+  lastActivity: Date | null;
 };
 
 export default async function ClientsPage() {
@@ -55,17 +56,26 @@ export default async function ClientsPage() {
       phone,
       visits: 0,
       lifetimeCents: 0,
-      lastVisit: null
+      lastVisit: null,
+      lastActivity: null
     };
-    existing.visits += 1;
-    if (b.status === 'completed') existing.lifetimeCents += b.price_cents;
-    const visitDate = new Date(b.scheduled_at);
-    if (!existing.lastVisit || visitDate > existing.lastVisit) existing.lastVisit = visitDate;
+    // Count "visits" and lifetime from appointments they actually sat for, so the
+    // two can never contradict (a pending/cancelled-only client reads as new, not
+    // "1 visit · $0"). lastActivity tracks any booking, for a sensible sort order.
+    const bookingDate = new Date(b.scheduled_at);
+    if (!existing.lastActivity || bookingDate > existing.lastActivity) {
+      existing.lastActivity = bookingDate;
+    }
+    if (b.status === 'completed') {
+      existing.visits += 1;
+      existing.lifetimeCents += b.price_cents;
+      if (!existing.lastVisit || bookingDate > existing.lastVisit) existing.lastVisit = bookingDate;
+    }
     map.set(key, existing);
   });
 
   const clients = Array.from(map.values()).sort(
-    (a, b) => (b.lastVisit?.getTime() ?? 0) - (a.lastVisit?.getTime() ?? 0)
+    (a, b) => (b.lastActivity?.getTime() ?? 0) - (a.lastActivity?.getTime() ?? 0)
   );
 
   return (
@@ -93,15 +103,23 @@ export default async function ClientsPage() {
                   )}
                 </div>
                 <div className="shrink-0 text-right text-sm text-ink-muted">
-                  <p className="tabular-nums">
-                    {c.visits} {c.visits === 1 ? 'visit' : 'visits'} ·{' '}
-                    <span className="font-medium text-ink">{formatMoney(c.lifetimeCents)}</span>{' '}
-                    lifetime
-                  </p>
-                  {c.lastVisit && (
-                    <p className="mt-0.5 text-xs tabular-nums">
-                      last seen {format(c.lastVisit, 'MMM d, yyyy')}
-                    </p>
+                  {c.visits > 0 ? (
+                    <>
+                      <p className="tabular-nums">
+                        {c.visits} {c.visits === 1 ? 'visit' : 'visits'} ·{' '}
+                        <span className="font-medium text-ink">
+                          {formatMoney(c.lifetimeCents)}
+                        </span>{' '}
+                        lifetime
+                      </p>
+                      {c.lastVisit && (
+                        <p className="mt-0.5 text-xs tabular-nums">
+                          last seen {format(c.lastVisit, 'MMM d, yyyy')}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="font-medium text-ink">New client</p>
                   )}
                 </div>
               </CardBody>

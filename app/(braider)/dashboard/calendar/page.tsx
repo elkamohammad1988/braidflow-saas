@@ -26,7 +26,7 @@ export default async function CalendarPage() {
   const { data: bookings, error } = await database
     .from('bookings')
     .select(
-      'id, scheduled_at, duration_minutes, status, price_cents, services(name), profiles!bookings_client_id_fkey(full_name)'
+      'id, scheduled_at, duration_minutes, status, price_cents, guest_name, services(name), profiles!bookings_client_id_fkey(full_name)'
     )
     .eq('braider_id', user.id)
     .gte('scheduled_at', weekStart.toISOString())
@@ -142,7 +142,7 @@ export default async function CalendarPage() {
                       {formatInZone(b.scheduled_at, tz, 'h:mm a')}
                     </p>
                     <p className="mt-0.5 truncate text-xs font-medium text-ink">
-                      {b.profiles?.full_name}
+                      {b.profiles?.full_name ?? b.guest_name}
                     </p>
                     <p className="truncate text-[11px] text-ink-muted">{b.services?.name}</p>
                   </li>
@@ -228,7 +228,7 @@ export default async function CalendarPage() {
                       />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-ink">
-                          {b.profiles?.full_name}
+                          {b.profiles?.full_name ?? b.guest_name}
                         </p>
                         <p className="truncate text-xs text-ink-muted">{b.services?.name}</p>
                       </div>

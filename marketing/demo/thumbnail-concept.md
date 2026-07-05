@@ -41,7 +41,7 @@ Three cover options for YouTube (1280×720) and the social recuts (1:1 / 9:16). 
 **The click:** the transformation in one frame — chaos vs. calm — which braiders feel instantly.
 
 - **Layout:** vertical or diagonal split. Left = the problem, desaturated; right = BraidFlow, warm and lit. A thin gold seam (a braid strand) runs down the divide.
-- **Focal image:** **Left:** a stylized "DM pile" — overlapping message bubbles ("what's the deposit?", "still available?", "she never paid") rendered in muted gray, deliberately messy. **Right:** a clean crop of the **dashboard KPI band** (`07-analytics.png`) or the calendar (`08-calendar.png`) — "$740," "Confirmed," one tidy week.
+- **Focal image:** **Left:** a stylized "DM pile" — overlapping message bubbles ("what's the deposit?", "still available?", "she never paid") rendered in muted gray, deliberately messy. **Right:** a clean crop of the **dashboard KPI band** (`06-dashboard-overview.png`) or the calendar (`08-calendar.png`) — "$740," "Confirmed," one tidy week.
 - **Headline (serif, ink, top or bottom bar on cream):** **"From the DMs → to** ***done.****"** — *done* in gold.
 - **Eyebrow (caps, gold):** `ONE LINK. DEPOSIT UP FRONT.`
 - **Brand mark:** BraidFlow mark on the calm (right) side, bottom corner.
@@ -52,5 +52,5 @@ Three cover options for YouTube (1280×720) and the social recuts (1:1 / 9:16). 
 ### Production notes for all three
 - Export **1280×720** (YouTube), plus **1080×1080** and **1080×1920** crops that keep the headline and gold keyword inside the safe area.
 - Test each at **~120px wide** (feed/sidebar size): the headline and the one gold word must still read. If not, cut words.
-- Pull screenshots from `marketing/screenshots/` — Concept 1 uses `01-landing-hero.png`; Concept 3 uses `07-analytics.png` and/or `08-calendar.png`. Crop tight, keep the app's own type crisp, don't restyle the UI.
+- Pull screenshots from `marketing/screenshots/` — Concept 1 uses `01-landing-hero.png`; Concept 3 uses `06-dashboard-overview.png` and/or `08-calendar.png`. Crop tight, keep the app's own type crisp, don't restyle the UI.
 - Keep all figures true to the seeded demo ($740, $40 deposit, $180 style). No invented metrics anywhere on the cover.

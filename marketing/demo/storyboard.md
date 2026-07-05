@@ -22,7 +22,7 @@ Every scene walks a real recording. Lower-thirds are set in the brand serif over
 | 5 | 0:26–0:33 | Calendar | `/dashboard/calendar` — 08-calendar | Every slot, one view |
 | 6 | 0:33–0:39 | Clients & services | `/dashboard/clients` → `/dashboard/services` — 10, 11 | Who + what you offer |
 | 7 | 0:39–0:57 | **Booking workflow (money moment)** | `/braiders/amara-braids/book` | Style → slot → deposit → **locked** |
-| 8 | 0:57–1:04 | KPIs / no commission | `/dashboard` KPI band — 07-analytics | It all rolls up, 0% cut |
+| 8 | 0:57–1:04 | KPIs / no commission | `/dashboard` KPI band — 06-dashboard-overview | It all rolls up, 0% cut |
 | 9 | 1:04–1:10 | Responsive mobile | `/dashboard` @ 390px — 16-mobile-dashboard | Runs from the phone |
 | 10 | 1:10–1:15 | Outro CTA | Brand card + URL | Quit the DMs |
 
@@ -97,8 +97,8 @@ Every scene walks a real recording. Lower-thirds are set in the brand serif over
 
 ## Scene 8 — KPIs / no commission
 - **Time:** 0:57–1:04 (7s)
-- **On-screen action:** Tight framing on the KPI band (07-analytics.png): **Booked this week / Revenue this month $740 / Awaiting deposit / Total clients**. Slow push-in on **Revenue this month — $740**. A small gold callout stamps in near the revenue card: **0% commission**. The point: the deposit we just took is the braider's, in full.
-- **Screen / route:** `/dashboard` KPI band (07-analytics.png).
+- **On-screen action:** Tight framing on the KPI band (06-dashboard-overview.png): **Booked this week / Revenue this month $740 / Awaiting deposit / Total clients**. Slow push-in on **Revenue this month — $740**. A small gold callout stamps in near the revenue card: **0% commission**. The point: the deposit we just took is the braider's, in full.
+- **Screen / route:** `/dashboard` KPI band (06-dashboard-overview.png).
 - **On-screen text / lower-third:** callout chip → **0% commission · 100% yours**
 - **VO:** "Every dollar of that deposit is yours — zero commission, no per-booking cut."
 - **Transition out:** The KPI band scales/reflows into a phone frame — a device-morph transition into mobile (the cards restack vertically as they would responsively).

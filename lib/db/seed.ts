@@ -5,7 +5,14 @@
 // profiles, reviews and a client's own bookings — is populated out of the box.
 // Rebuilt on each cold start; ids are stable constants so the personas in
 // lib/auth/personas.ts always line up with their data.
+//
+// Times are anchored to the braider's own timezone (America/New_York) and to the
+// *current* week, so appointments always render at sane wall-clock hours (never a
+// server-UTC-shifted "6 AM") and the calendar/dashboard are full whatever day the
+// demo is opened. Never derive a displayed time from the server's wall clock.
 
+import { TZDate } from '@date-fns/tz';
+import { addDays, startOfWeek } from 'date-fns';
 import { BRAIDER_PERSONA, CLIENT_PERSONA } from '@/lib/auth/personas';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 
@@ -42,15 +49,38 @@ const SVC_CORNROWS = 'a0000000-0000-4000-8000-000000000003';
 const SVC_TWISTS = 'a0000000-0000-4000-8000-000000000004';
 const SVC_KIDS = 'a0000000-0000-4000-8000-000000000005';
 
+// Amara's timezone. All of her appointment instants are built as wall-clock
+// times in this zone (see `wall` below) so they display exactly as intended.
+const BRAIDER_TZ = 'America/New_York';
+
+// The public "money shot": a confirmed guest booking with a stable capability
+// token, so the deposit-secured confirmation renders deterministically at
+//   /bookings/<MONEY_SHOT_BOOKING>/confirmation?t=<MONEY_SHOT_TOKEN>
+// with no login. Keep these stable — the screenshot guide references them.
+const MONEY_SHOT_BOOKING = 'e0000000-0000-4000-8000-0000000000f1';
+const MONEY_SHOT_TOKEN = 'demo-confirm-simone';
+
 export function seed(): Store {
   const now = new Date();
 
-  // ISO timestamp `days` from now at a given local hour.
-  const at = (days: number, hour: number, minute = 0): string => {
-    const d = new Date(now);
-    d.setDate(d.getDate() + days);
-    d.setHours(hour, minute, 0, 0);
-    return d.toISOString();
+  // "Now" and this week's Monday, expressed in the braider's zone. date-fns
+  // carries the TZDate through, so these stay zone-anchored.
+  const zNow = new TZDate(now, BRAIDER_TZ);
+  const monday = startOfWeek(zNow, { weekStartsOn: 1 });
+
+  // Absolute instant for a wall-clock time in the braider's zone, `dayOffset`
+  // days from this week's Monday. e.g. wall(0, 10) → Monday 10:00 in New York.
+  const wall = (dayOffset: number, hour: number, minute = 0): string => {
+    const day = addDays(monday, dayOffset);
+    return new TZDate(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+      hour,
+      minute,
+      0,
+      BRAIDER_TZ
+    ).toISOString();
   };
   const daysAgo = (days: number): string => {
     const d = new Date(now);
@@ -157,12 +187,13 @@ export function seed(): Store {
     end_minute: 1020
   }));
 
+  // A clean, future "time off" block (a weekend away), in the braider's zone.
   const availability_overrides = [
     {
       id: 'd0000000-0000-4000-8000-000000000001',
       braider_id: AMARA,
-      starts_at: at(9, 0),
-      ends_at: at(10, 0),
+      starts_at: wall(12, 0),
+      ends_at: wall(14, 0),
       kind: 'block',
       note: 'Out of town'
     }
@@ -190,53 +221,94 @@ export function seed(): Store {
   };
 
   const bookings = [
-    // Upcoming (this week) — confirmed
-    booking({ client_id: NIA, service_id: SVC_KNOTLESS, scheduled_at: at(1, 10), duration_minutes: 300, status: 'confirmed', price_cents: 18000, deposit_cents: 4000 }),
-    booking({ client_id: ZOE, service_id: SVC_BOHO, scheduled_at: at(2, 13), duration_minutes: 360, status: 'confirmed', price_cents: 22000, deposit_cents: 5000 }),
-    booking({ client_id: IMANI, service_id: SVC_TWISTS, scheduled_at: at(3, 11), duration_minutes: 240, status: 'confirmed', price_cents: 16000, deposit_cents: 4000 }),
-    // Upcoming — awaiting deposit
-    booking({ service_id: SVC_CORNROWS, scheduled_at: at(4, 15), duration_minutes: 120, status: 'pending_payment', price_cents: 9000, deposit_cents: 2500, guest_name: 'Tasha Green', guest_email: 'tasha@example.com', guest_phone: '(404) 555-0120', guest_token: 'demo-guest-token-tasha' }),
-    booking({ client_id: DESTINY, service_id: SVC_KIDS, scheduled_at: at(5, 9, 30), duration_minutes: 90, status: 'pending_payment', price_cents: 7000, deposit_cents: 2000 }),
-    booking({ client_id: ZOE, service_id: SVC_KIDS, scheduled_at: at(6, 16), duration_minutes: 90, status: 'pending_payment', price_cents: 7000, deposit_cents: 2000 }),
-    // Past — completed (this month → revenue, and eligible for reviews)
-    booking({ client_id: NIA, service_id: SVC_KNOTLESS, scheduled_at: daysAgo(3), duration_minutes: 300, status: 'completed', price_cents: 18000, deposit_cents: 4000 }),
-    booking({ client_id: ZOE, service_id: SVC_CORNROWS, scheduled_at: daysAgo(6), duration_minutes: 120, status: 'completed', price_cents: 9000, deposit_cents: 2500 }),
-    booking({ client_id: IMANI, service_id: SVC_BOHO, scheduled_at: daysAgo(11), duration_minutes: 360, status: 'completed', price_cents: 22000, deposit_cents: 5000 }),
-    booking({ client_id: JASMINE, service_id: SVC_TWISTS, scheduled_at: daysAgo(15), duration_minutes: 240, status: 'completed', price_cents: 16000, deposit_cents: 4000 }),
-    booking({ client_id: DESTINY, service_id: SVC_KNOTLESS, scheduled_at: daysAgo(24), duration_minutes: 300, status: 'completed', price_cents: 18000, deposit_cents: 4000 }),
-    // Past — cancelled (for variety in history)
-    booking({ service_id: SVC_CORNROWS, scheduled_at: daysAgo(8), duration_minutes: 120, status: 'cancelled', price_cents: 9000, deposit_cents: 2500, guest_name: 'Mia Cole', guest_email: 'mia@example.com', guest_phone: '(470) 555-0133', guest_token: 'demo-guest-token-mia' })
+    // ── This week — confirmed (green on the calendar) ──────────────────────
+    booking({ client_id: NIA, service_id: SVC_KNOTLESS, scheduled_at: wall(0, 10), duration_minutes: 300, status: 'confirmed', price_cents: 18000, deposit_cents: 4000 }),
+    booking({ client_id: IMANI, service_id: SVC_TWISTS, scheduled_at: wall(1, 13), duration_minutes: 240, status: 'confirmed', price_cents: 16000, deposit_cents: 4000 }),
+    booking({ client_id: ZOE, service_id: SVC_BOHO, scheduled_at: wall(2, 11), duration_minutes: 360, status: 'confirmed', price_cents: 22000, deposit_cents: 5000 }),
+    booking({ client_id: DESTINY, service_id: SVC_KNOTLESS, scheduled_at: wall(4, 9, 30), duration_minutes: 300, status: 'confirmed', price_cents: 18000, deposit_cents: 4000 }),
+    // The money shot: a confirmed guest booking with a stable token.
+    booking({ id: MONEY_SHOT_BOOKING, service_id: SVC_KNOTLESS, scheduled_at: wall(5, 12), duration_minutes: 300, status: 'confirmed', price_cents: 18000, deposit_cents: 4000, guest_name: 'Simone Carter', guest_email: 'simone.carter@example.com', guest_phone: '(404) 555-0198', guest_token: MONEY_SHOT_TOKEN }),
+    // ── This week — awaiting deposit (amber on the calendar) ───────────────
+    booking({ service_id: SVC_CORNROWS, scheduled_at: wall(3, 15), duration_minutes: 120, status: 'pending_payment', price_cents: 9000, deposit_cents: 2500, guest_name: 'Tasha Green', guest_email: 'tasha@example.com', guest_phone: '(404) 555-0120', guest_token: 'demo-guest-token-tasha' }),
+    booking({ client_id: JASMINE, service_id: SVC_TWISTS, scheduled_at: wall(5, 16, 30), duration_minutes: 240, status: 'pending_payment', price_cents: 16000, deposit_cents: 4000 }),
+    booking({ client_id: ZOE, service_id: SVC_CORNROWS, scheduled_at: wall(6, 14), duration_minutes: 120, status: 'pending_payment', price_cents: 9000, deposit_cents: 2500 }),
+    // ── Past — completed (revenue this month + review-eligible) ────────────
+    booking({ client_id: NIA, service_id: SVC_KNOTLESS, scheduled_at: wall(-2, 11), duration_minutes: 300, status: 'completed', price_cents: 18000, deposit_cents: 4000 }),
+    booking({ client_id: ZOE, service_id: SVC_CORNROWS, scheduled_at: wall(-4, 14), duration_minutes: 120, status: 'completed', price_cents: 9000, deposit_cents: 2500 }),
+    booking({ client_id: IMANI, service_id: SVC_BOHO, scheduled_at: wall(-6, 10), duration_minutes: 360, status: 'completed', price_cents: 22000, deposit_cents: 5000 }),
+    booking({ client_id: JASMINE, service_id: SVC_TWISTS, scheduled_at: wall(-9, 13), duration_minutes: 240, status: 'completed', price_cents: 16000, deposit_cents: 4000 }),
+    booking({ client_id: DESTINY, service_id: SVC_KNOTLESS, scheduled_at: wall(-13, 15), duration_minutes: 300, status: 'completed', price_cents: 18000, deposit_cents: 4000 }),
+    // Returning clients — a second completed visit each (lifetime value builds).
+    booking({ client_id: NIA, service_id: SVC_CORNROWS, scheduled_at: wall(-16, 11), duration_minutes: 120, status: 'completed', price_cents: 9000, deposit_cents: 2500 }),
+    booking({ client_id: ZOE, service_id: SVC_KIDS, scheduled_at: wall(-20, 10), duration_minutes: 90, status: 'completed', price_cents: 7000, deposit_cents: 2000 }),
+    // Tasha has braided here before, too — so her upcoming (awaiting) booking
+    // isn't her first (she reads as a returning client, not a $0 ghost).
+    booking({ service_id: SVC_CORNROWS, scheduled_at: wall(-11, 16), duration_minutes: 120, status: 'completed', price_cents: 9000, deposit_cents: 2500, guest_name: 'Tasha Green', guest_email: 'tasha@example.com', guest_phone: '(404) 555-0120' }),
+    // ── Past — no-show (deposit kept: the whole "no-show protection" pitch) ─
+    booking({ client_id: JASMINE, service_id: SVC_KIDS, scheduled_at: wall(-8, 16), duration_minutes: 90, status: 'no_show', price_cents: 7000, deposit_cents: 2000 }),
+    // ── Past — cancelled in policy → deposit refunded ──────────────────────
+    booking({ service_id: SVC_CORNROWS, scheduled_at: wall(-5, 12), duration_minutes: 120, status: 'cancelled', price_cents: 9000, deposit_cents: 2500, guest_name: 'Mia Cole', guest_email: 'mia@example.com', guest_phone: '(470) 555-0133', guest_token: 'demo-guest-token-mia' })
   ];
 
-  // Deposit payment per booking. Succeeded once confirmed/completed, otherwise
-  // pending. (Cancelled here retains a pending record for realism.)
+  // Deposit payment per booking, plus a refund row for the cancelled one.
+  //   • confirmed / completed / no_show → deposit succeeded (collected/kept)
+  //   • pending_payment                 → deposit pending (not yet collected)
+  //   • cancelled                       → deposit succeeded, then refunded
   let paymentSeq = 0;
-  const payments = bookings.map((b) => {
+  const payments = bookings.flatMap((b) => {
     paymentSeq += 1;
-    return {
+    const collected =
+      b.status === 'confirmed' ||
+      b.status === 'completed' ||
+      b.status === 'no_show' ||
+      b.status === 'cancelled';
+    const deposit = {
       id: `f0000000-0000-4000-8000-0000000000${String(paymentSeq).padStart(2, '0')}`,
       booking_id: b.id,
       kind: 'deposit',
       amount_cents: b.deposit_cents,
-      status: b.status === 'confirmed' || b.status === 'completed' ? 'succeeded' : 'pending',
+      status: collected ? 'succeeded' : 'pending',
       stripe_payment_intent_id: `pi_demo_${paymentSeq}`,
-      stripe_charge_id: b.status === 'confirmed' || b.status === 'completed' ? `ch_demo_${paymentSeq}` : null,
+      stripe_charge_id: collected ? `ch_demo_${paymentSeq}` : null,
       stripe_refund_id: null,
       created_at: b.created_at
     };
+    if (b.status !== 'cancelled') return [deposit];
+    paymentSeq += 1;
+    const refund = {
+      id: `f0000000-0000-4000-8000-0000000000${String(paymentSeq).padStart(2, '0')}`,
+      booking_id: b.id,
+      kind: 'refund',
+      amount_cents: b.deposit_cents,
+      status: 'refunded',
+      stripe_payment_intent_id: `pi_demo_${paymentSeq}`,
+      stripe_charge_id: deposit.stripe_charge_id,
+      stripe_refund_id: `re_demo_${paymentSeq}`,
+      created_at: b.created_at
+    };
+    return [deposit, refund];
   });
 
   // --- Reviews ---------------------------------------------------------------
-  const completed = bookings.filter((b) => b.status === 'completed' && b.client_id);
+  // One review per client, attached to their most recent completed booking, so a
+  // returning client with several completed visits doesn't produce duplicates.
   const reviewBodies: Record<string, { rating: number; body: string | null }> = {
     [NIA]: { rating: 5, body: 'Amara is incredible — my knotless braids came out so neat and lasted weeks. Gentle on my edges too.' },
     [ZOE]: { rating: 5, body: 'Fast, friendly and the parts were perfect. Already booked my next appointment.' },
     [IMANI]: { rating: 4, body: 'Beautiful boho knotless. Took a little longer than expected but worth it.' },
     [JASMINE]: { rating: 5, body: 'Best passion twists I have ever had. Lightweight and full.' }
   };
+  const completedForReview = bookings
+    .filter((b) => b.status === 'completed' && b.client_id && reviewBodies[b.client_id as string])
+    .sort((a, b) => (a.scheduled_at < b.scheduled_at ? 1 : -1));
+  const reviewedClients = new Set<string>();
   let reviewSeq = 0;
-  const reviews = completed
-    .filter((b) => reviewBodies[b.client_id as string])
+  const reviews = completedForReview
+    .filter((b) => {
+      if (reviewedClients.has(b.client_id as string)) return false;
+      reviewedClients.add(b.client_id as string);
+      return true;
+    })
     .map((b) => {
       reviewSeq += 1;
       const r = reviewBodies[b.client_id as string]!;

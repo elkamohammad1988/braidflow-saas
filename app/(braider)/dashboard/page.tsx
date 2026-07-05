@@ -65,7 +65,7 @@ export default async function DashboardOverview({
     database
       .from('bookings')
       .select(
-        'id, scheduled_at, status, price_cents, services(name), profiles!bookings_client_id_fkey(full_name)'
+        'id, scheduled_at, status, price_cents, guest_name, services(name), profiles!bookings_client_id_fkey(full_name)'
       )
       .eq('braider_id', user.id)
       .gte('scheduled_at', startOfDay(now).toISOString())
@@ -84,7 +84,7 @@ export default async function DashboardOverview({
       .select('id', { count: 'exact', head: true })
       .eq('braider_id', user.id)
       .eq('status', 'pending_payment'),
-    database.from('bookings').select('client_id').eq('braider_id', user.id),
+    database.from('bookings').select('client_id, guest_email').eq('braider_id', user.id),
     database
       .from('services')
       .select('id', { count: 'exact', head: true })
@@ -103,7 +103,14 @@ export default async function DashboardOverview({
   const upcomingThisWeek = upcomingRes.data ?? [];
   const monthRevenue = (monthRevenueRes.data ?? []).reduce((sum, b) => sum + b.price_cents, 0);
   const pendingCount = pendingRes.count ?? 0;
-  const totalClients = new Set((distinctClientsRes.data ?? []).map((b) => b.client_id)).size;
+  // Count distinct people the same way the Clients page groups them: registered
+  // clients by account id, guests by email — so this KPI matches that list.
+  const clientKeys = new Set<string>();
+  (distinctClientsRes.data ?? []).forEach((b) => {
+    if (b.client_id) clientKeys.add(b.client_id);
+    else if (b.guest_email) clientKeys.add(`guest:${b.guest_email.toLowerCase()}`);
+  });
+  const totalClients = clientKeys.size;
 
   // First-run activation: a braider can't take bookings until they have a
   // service, set hours, and Stripe can accept charges. Show a guided checklist
@@ -207,10 +214,12 @@ export default async function DashboardOverview({
                 className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-cream/50 focus-visible:[outline-offset:-2px]"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
-                  {initials(b.profiles?.full_name ?? '') || '—'}
+                  {initials(b.profiles?.full_name ?? b.guest_name ?? '') || '—'}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-ink">{b.profiles?.full_name}</p>
+                  <p className="truncate font-medium text-ink">
+                    {b.profiles?.full_name ?? b.guest_name}
+                  </p>
                   <p className="truncate text-sm text-ink-muted">{b.services?.name}</p>
                 </div>
                 <div className="hidden text-right sm:block">

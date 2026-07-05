@@ -56,7 +56,7 @@ Deposit-first booking for hair braiders, built solo with Next.js 14 and Stripe. 
 4. `08-calendar.png` — A weekly calendar built for 4–8 hour blocks, not 30-minute meetings.
 5. `09-bookings.png` — Every appointment, past and upcoming, with status and totals — no more scrolling DMs to find a booking.
 6. `11-services.png` — Set each style's price, duration, and its own deposit amount.
-7. `12-availability.png` — Weekly hours plus one-tap day-blocks for vacations and kids' events.
+7. `10-clients.png` — Every client and their lifetime value, rolled up from bookings — a CRM you didn't have to build.
 8. `16-mobile-dashboard.png` — The whole thing works on the phone you actually run your day from.
 
 ---

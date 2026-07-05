@@ -167,7 +167,7 @@ export default function Home() {
             <Reveal delay={340}>
               <div className="mt-11 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
-                  <div key={p.label} className="flex items-center gap-2 text-sm text-cream/60">
+                  <div key={p.label} className="flex items-center gap-2 text-sm text-cream/75">
                     <p.icon className="h-4 w-4 text-gold" strokeWidth={1.9} />
                     <span>{p.label}</span>
                   </div>
