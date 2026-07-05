@@ -17,6 +17,7 @@ import { Reveal } from '@/components/motion/reveal';
 import { Magnetic } from '@/components/motion/magnetic';
 import { CountUp } from '@/components/motion/count-up';
 import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
+import { useTranslations } from 'next-intl';
 
 const stats = [
   { to: 100, suffix: '%', label: 'of every deposit stays yours' },
@@ -75,11 +76,11 @@ const comparisons = [
 ];
 
 const proofPoints = [
-  { icon: CreditCard, label: 'Deposits via Stripe' },
-  { icon: ShieldCheck, label: 'No-show protection' },
-  { icon: Smartphone, label: 'Mobile-first booking' },
-  { icon: Sparkles, label: 'Free to start' }
-];
+  { icon: CreditCard, key: 'deposits' },
+  { icon: ShieldCheck, key: 'noShow' },
+  { icon: Smartphone, key: 'mobile' },
+  { icon: Sparkles, key: 'free' }
+] as const;
 
 const valueProps = [
   'Set your services, durations, and deposit amounts once.',
@@ -110,6 +111,7 @@ const steps = [
 ];
 
 export default function Home() {
+  const t = useTranslations('landing');
   return (
     <>
       {/* ───────────────────────── HERO — the night stage ───────────────────────── */}
@@ -124,23 +126,26 @@ export default function Home() {
             <Reveal delay={0}>
               <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/[0.07] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold-bright backdrop-blur-sm">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgba(242,196,100,0.9)]" />
-                Booking, made for braiders
+                {t('eyebrow')}
               </span>
             </Reveal>
 
             <Reveal delay={90}>
               <h1 className="mt-6 max-w-xl font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
-                Quit the DMs.
-                <br />
-                Get paid{' '}
-                <span className="italic text-gilt [font-variation-settings:'opsz'_144]">up front.</span>
+                {t.rich('title', {
+                  br: () => <br />,
+                  em: (chunks) => (
+                    <span className="italic text-gilt [font-variation-settings:'opsz'_144]">
+                      {chunks}
+                    </span>
+                  )
+                })}
               </h1>
             </Reveal>
 
             <Reveal delay={180}>
               <p className="mt-7 max-w-lg text-lg leading-relaxed text-ivory/65">
-                BraidFlow holds the deposit, locks in the slot, and keeps your week organized — so
-                you can focus on the chair, not the back-and-forth.
+                {t('subtitle')}
               </p>
             </Reveal>
 
@@ -149,7 +154,7 @@ export default function Home() {
                 <Magnetic strength={0.5}>
                   <Link href="/signup?role=braider">
                     <Button size="lg">
-                      Set up your booking page
+                      {t('ctaPrimary')}
                       <ArrowRight />
                     </Button>
                   </Link>
@@ -158,7 +163,7 @@ export default function Home() {
                   href="/braiders"
                   className="group inline-flex items-center gap-2 rounded-full border border-ivory/15 px-6 py-3.5 text-[15px] font-medium text-ivory/85 transition-colors duration-200 hover:border-gold/40 hover:text-ivory"
                 >
-                  Browse braiders
+                  {t('ctaSecondary')}
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
               </div>
@@ -167,9 +172,9 @@ export default function Home() {
             <Reveal delay={340}>
               <div className="mt-11 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
-                  <div key={p.label} className="flex items-center gap-2 text-sm text-ivory/75">
+                  <div key={p.key} className="flex items-center gap-2 text-sm text-ivory/75">
                     <p.icon className="h-4 w-4 text-gold" strokeWidth={1.9} />
-                    <span>{p.label}</span>
+                    <span>{t(`proof.${p.key}`)}</span>
                   </div>
                 ))}
               </div>

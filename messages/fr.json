@@ -1,0 +1,48 @@
+{
+  "common": {
+    "getStarted": "Commencer",
+    "logIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "dashboard": "Tableau de bord",
+    "myBookings": "Mes réservations",
+    "viewSite": "Voir le site",
+    "language": "Langue",
+    "theme": "Thème"
+  },
+  "nav": {
+    "findBraider": "Trouver une tresseuse",
+    "pricing": "Tarifs",
+    "forBraiders": "Pour les tresseuses",
+    "imBraider": "Je suis tresseuse"
+  },
+  "theme": {
+    "label": "Thème de couleur",
+    "light": "Clair",
+    "system": "Système",
+    "dark": "Sombre"
+  },
+  "dashboardNav": {
+    "workspace": "Espace de travail",
+    "overview": "Aperçu",
+    "calendar": "Calendrier",
+    "appointments": "Rendez-vous",
+    "clients": "Clientes",
+    "services": "Prestations",
+    "availability": "Disponibilités",
+    "settings": "Paramètres",
+    "braider": "Tresseuse"
+  },
+  "landing": {
+    "eyebrow": "La réservation, pensée pour les tresseuses",
+    "title": "Fini les DM.<br></br>Payée <em>d’avance.</em>",
+    "subtitle": "BraidFlow encaisse l’acompte, verrouille le créneau et organise votre semaine — pour que vous vous concentriez sur le fauteuil, pas sur les allers-retours.",
+    "ctaPrimary": "Créer votre page de réservation",
+    "ctaSecondary": "Parcourir les tresseuses",
+    "proof": {
+      "deposits": "Acomptes via Stripe",
+      "noShow": "Protection anti-absences",
+      "mobile": "Réservation pensée mobile",
+      "free": "Gratuit au départ"
+    }
+  }
+}

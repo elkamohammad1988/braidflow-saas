@@ -1,0 +1,48 @@
+{
+  "common": {
+    "getStarted": "Get started",
+    "logIn": "Log in",
+    "signOut": "Sign out",
+    "dashboard": "Dashboard",
+    "myBookings": "My bookings",
+    "viewSite": "View site",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "nav": {
+    "findBraider": "Find a braider",
+    "pricing": "Pricing",
+    "forBraiders": "For braiders",
+    "imBraider": "I'm a braider"
+  },
+  "theme": {
+    "label": "Color theme",
+    "light": "Light",
+    "system": "System",
+    "dark": "Dark"
+  },
+  "dashboardNav": {
+    "workspace": "Workspace",
+    "overview": "Overview",
+    "calendar": "Calendar",
+    "appointments": "Appointments",
+    "clients": "Clients",
+    "services": "Services",
+    "availability": "Availability",
+    "settings": "Settings",
+    "braider": "Braider"
+  },
+  "landing": {
+    "eyebrow": "Booking, made for braiders",
+    "title": "Quit the DMs.<br></br>Get paid <em>up front.</em>",
+    "subtitle": "BraidFlow holds the deposit, locks in the slot, and keeps your week organized — so you can focus on the chair, not the back-and-forth.",
+    "ctaPrimary": "Set up your booking page",
+    "ctaSecondary": "Browse braiders",
+    "proof": {
+      "deposits": "Deposits via Stripe",
+      "noShow": "No-show protection",
+      "mobile": "Mobile-first booking",
+      "free": "Free to start"
+    }
+  }
+}

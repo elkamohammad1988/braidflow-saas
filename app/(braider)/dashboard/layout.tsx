@@ -12,8 +12,10 @@ import { SignOutLink } from '@/components/shared/sign-out';
 import { Logo, LogoMark } from '@/components/shared/logo';
 import { ConnectBanner } from '@/components/braider/connect-banner';
 import { initials } from '@/lib/utils';
+import { getTranslations } from 'next-intl/server';
 import { DashboardNav } from './dashboard-nav';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, profile } = await requireBraider();
@@ -31,6 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq('id', user.id)
     .maybeSingle();
   const needsConnect = !connect?.charges_enabled;
+  const t = await getTranslations();
 
   const userBlock = (
     <div className="flex items-center gap-3">
@@ -39,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </span>
       <div className="min-w-0">
         <p className="truncate text-sm font-medium text-ink">{profile.full_name}</p>
-        <p className="text-xs text-ink-muted">Braider</p>
+        <p className="text-xs text-ink-muted">{t('dashboardNav.braider')}</p>
       </div>
     </div>
   );
@@ -74,7 +77,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
           <div className="mt-8 flex-1">
             <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-subtle">
-              Workspace
+              {t('dashboardNav.workspace')}
             </p>
             <DashboardNav />
           </div>
@@ -87,12 +90,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-ink"
               >
                 <LogoMark className="h-3.5 w-3.5" />
-                View site
+                {t('common.viewSite')}
               </Link>
               <SignOutLink />
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
-              <span className="text-xs font-medium text-ink-muted">Theme</span>
+              <span className="text-xs font-medium text-ink-muted">{t('common.language')}</span>
+              <LanguageSwitcher />
+            </div>
+            <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
+              <span className="text-xs font-medium text-ink-muted">{t('common.theme')}</span>
               <ThemeToggle />
             </div>
           </div>

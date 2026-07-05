@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Fraunces, Space_Mono } from 'next/font/google';
 import { JsonLd } from '@/components/shared/json-ld';
 import { DemoBadge } from '@/components/demo/demo-badge';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { isRtl } from '@/i18n/config';
 import { isDemoMode } from '@/lib/demo';
 import './globals.css';
 
@@ -73,10 +76,14 @@ export const viewport: Viewport = {
   initialScale: 1
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const dir = isRtl(locale) ? 'rtl' : 'ltr';
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={dir}
       className={`${sans.variable} ${display.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
@@ -124,8 +131,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <ThemeProvider>
-          {children}
-          {isDemoMode() && <DemoBadge />}
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {children}
+            {isDemoMode() && <DemoBadge />}
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

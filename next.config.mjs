@@ -1,4 +1,7 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 // Conservative security headers applied to every response. Deliberately no
 // strict CSP here — Stripe Elements + Next's inline runtime need a carefully
@@ -31,7 +34,7 @@ const nextConfig = {
 // Wrap with Sentry. This is safe with no Sentry env configured: source-map
 // upload is skipped without SENTRY_AUTH_TOKEN, and the runtime SDK stays inert
 // without a DSN. `silent` keeps the build log clean when nothing is set.
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withNextIntl(nextConfig), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,

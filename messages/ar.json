@@ -1,0 +1,48 @@
+{
+  "common": {
+    "getStarted": "ابدئي الآن",
+    "logIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم",
+    "myBookings": "حجوزاتي",
+    "viewSite": "عرض الموقع",
+    "language": "اللغة",
+    "theme": "المظهر"
+  },
+  "nav": {
+    "findBraider": "ابحثي عن مصفِّفة",
+    "pricing": "الأسعار",
+    "forBraiders": "للمصفِّفات",
+    "imBraider": "أنا مصفِّفة"
+  },
+  "theme": {
+    "label": "سمة الألوان",
+    "light": "فاتح",
+    "system": "النظام",
+    "dark": "داكن"
+  },
+  "dashboardNav": {
+    "workspace": "مساحة العمل",
+    "overview": "نظرة عامة",
+    "calendar": "التقويم",
+    "appointments": "المواعيد",
+    "clients": "العميلات",
+    "services": "الخدمات",
+    "availability": "أوقات التوفّر",
+    "settings": "الإعدادات",
+    "braider": "مصفِّفة"
+  },
+  "landing": {
+    "eyebrow": "حجوزات مصمَّمة للمصفِّفات",
+    "title": "وداعًا للرسائل.<br></br>واحصلي على أجرك <em>مقدَّمًا.</em>",
+    "subtitle": "يحتفظ BraidFlow بالعربون، ويؤكّد الموعد، وينظّم أسبوعك — لتركّزي على عملك لا على أخذ وردّ الرسائل.",
+    "ctaPrimary": "أنشئي صفحة حجوزاتك",
+    "ctaSecondary": "تصفّحي المصفِّفات",
+    "proof": {
+      "deposits": "عربون عبر Stripe",
+      "noShow": "حماية من عدم الحضور",
+      "mobile": "حجز مُحسَّن للجوال",
+      "free": "ابدئي مجانًا"
+    }
+  }
+}

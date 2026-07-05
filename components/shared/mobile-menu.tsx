@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 type Props = {
   isLoggedIn: boolean;
@@ -14,6 +16,7 @@ type Props = {
 export function MobileMenu({ isLoggedIn, isBraider }: Props) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+  const t = useTranslations();
 
   // Close on Escape while the menu is open.
   useEffect(() => {
@@ -55,14 +58,14 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
                 onClick={close}
                 className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
               >
-                Find a braider
+                {t('nav.findBraider')}
               </Link>
               <Link
                 href="/pricing"
                 onClick={close}
                 className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
               >
-                Pricing
+                {t('nav.pricing')}
               </Link>
               {!isLoggedIn && (
                 <Link
@@ -70,30 +73,36 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
                   onClick={close}
                   className="rounded-lg px-3 py-3 text-sm font-medium text-ink hover:bg-ink/[0.05]"
                 >
-                  I&apos;m a braider
+                  {t('nav.imBraider')}
                 </Link>
               )}
             </nav>
             <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
               {isLoggedIn ? (
                 <Link href={isBraider ? '/dashboard' : '/bookings'} onClick={close}>
-                  <Button className="w-full">{isBraider ? 'Dashboard' : 'My bookings'}</Button>
+                  <Button className="w-full">
+                    {isBraider ? t('common.dashboard') : t('common.myBookings')}
+                  </Button>
                 </Link>
               ) : (
                 <>
                   <Link href="/login" onClick={close}>
                     <Button variant="secondary" className="w-full">
-                      Log in
+                      {t('common.logIn')}
                     </Button>
                   </Link>
                   <Link href="/signup" onClick={close}>
-                    <Button className="w-full">Get started</Button>
+                    <Button className="w-full">{t('common.getStarted')}</Button>
                   </Link>
                 </>
               )}
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-line px-1 pt-3">
-              <span className="text-sm font-medium text-ink-muted">Theme</span>
+              <span className="text-sm font-medium text-ink-muted">{t('common.language')}</span>
+              <LanguageSwitcher />
+            </div>
+            <div className="mt-3 flex items-center justify-between px-1">
+              <span className="text-sm font-medium text-ink-muted">{t('common.theme')}</span>
               <ThemeToggle />
             </div>
           </div>

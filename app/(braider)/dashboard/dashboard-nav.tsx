@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -14,14 +15,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const links: { href: string; label: string; icon: LucideIcon }[] = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
-  { href: '/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
-  { href: '/dashboard/clients', label: 'Clients', icon: Users },
-  { href: '/dashboard/services', label: 'Services', icon: Scissors },
-  { href: '/dashboard/availability', label: 'Availability', icon: Clock },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings }
+const links: { href: string; key: string; icon: LucideIcon }[] = [
+  { href: '/dashboard', key: 'overview', icon: LayoutDashboard },
+  { href: '/dashboard/calendar', key: 'calendar', icon: CalendarDays },
+  { href: '/dashboard/appointments', key: 'appointments', icon: CalendarCheck },
+  { href: '/dashboard/clients', key: 'clients', icon: Users },
+  { href: '/dashboard/services', key: 'services', icon: Scissors },
+  { href: '/dashboard/availability', key: 'availability', icon: Clock },
+  { href: '/dashboard/settings', key: 'settings', icon: Settings }
 ];
 
 function isActive(pathname: string, href: string) {
@@ -32,6 +33,7 @@ function isActive(pathname: string, href: string) {
 
 export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vertical' | 'horizontal' }) {
   const pathname = usePathname();
+  const t = useTranslations('dashboardNav');
 
   if (orientation === 'horizontal') {
     return (
@@ -51,7 +53,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
               )}
             >
               <Icon className={cn('h-4 w-4', active && 'text-gold')} />
-              {l.label}
+              {t(l.key)}
             </Link>
           );
         })}
@@ -86,7 +88,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
                   className={cn('h-[18px] w-[18px]', active ? 'text-gold' : 'text-ink-subtle group-hover:text-ink')}
                   strokeWidth={active ? 2 : 1.75}
                 />
-                {l.label}
+                {t(l.key)}
               </Link>
             </li>
           );

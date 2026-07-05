@@ -1,0 +1,48 @@
+{
+  "common": {
+    "getStarted": "开始使用",
+    "logIn": "登录",
+    "signOut": "退出登录",
+    "dashboard": "仪表板",
+    "myBookings": "我的预约",
+    "viewSite": "查看网站",
+    "language": "语言",
+    "theme": "主题"
+  },
+  "nav": {
+    "findBraider": "寻找编发师",
+    "pricing": "价格",
+    "forBraiders": "编发师专区",
+    "imBraider": "我是编发师"
+  },
+  "theme": {
+    "label": "配色主题",
+    "light": "浅色",
+    "system": "跟随系统",
+    "dark": "深色"
+  },
+  "dashboardNav": {
+    "workspace": "工作区",
+    "overview": "概览",
+    "calendar": "日历",
+    "appointments": "预约",
+    "clients": "客户",
+    "services": "服务",
+    "availability": "可预约时间",
+    "settings": "设置",
+    "braider": "编发师"
+  },
+  "landing": {
+    "eyebrow": "专为编发师打造的预约工具",
+    "title": "告别私信。<br></br><em>预付</em>到账。",
+    "subtitle": "BraidFlow 帮你收取定金、锁定时段并安排好一周日程——让你专注于手上的活儿，而不是来回沟通。",
+    "ctaPrimary": "创建你的预约页面",
+    "ctaSecondary": "浏览编发师",
+    "proof": {
+      "deposits": "通过 Stripe 收取定金",
+      "noShow": "爽约保护",
+      "mobile": "移动端优先预约",
+      "free": "免费开始"
+    }
+  }
+}

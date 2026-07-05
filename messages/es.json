@@ -1,0 +1,48 @@
+{
+  "common": {
+    "getStarted": "Comenzar",
+    "logIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "dashboard": "Panel",
+    "myBookings": "Mis reservas",
+    "viewSite": "Ver sitio",
+    "language": "Idioma",
+    "theme": "Tema"
+  },
+  "nav": {
+    "findBraider": "Buscar trenzadora",
+    "pricing": "Precios",
+    "forBraiders": "Para trenzadoras",
+    "imBraider": "Soy trenzadora"
+  },
+  "theme": {
+    "label": "Tema de color",
+    "light": "Claro",
+    "system": "Sistema",
+    "dark": "Oscuro"
+  },
+  "dashboardNav": {
+    "workspace": "Espacio de trabajo",
+    "overview": "Resumen",
+    "calendar": "Calendario",
+    "appointments": "Citas",
+    "clients": "Clientas",
+    "services": "Servicios",
+    "availability": "Disponibilidad",
+    "settings": "Ajustes",
+    "braider": "Trenzadora"
+  },
+  "landing": {
+    "eyebrow": "Reservas hechas para trenzadoras",
+    "title": "Adiós a los DM.<br></br>Cobra <em>por adelantado.</em>",
+    "subtitle": "BraidFlow retiene el depósito, asegura el turno y organiza tu semana — para que te concentres en la silla, no en los mensajes de ida y vuelta.",
+    "ctaPrimary": "Crea tu página de reservas",
+    "ctaSecondary": "Explorar trenzadoras",
+    "proof": {
+      "deposits": "Depósitos con Stripe",
+      "noShow": "Protección contra ausencias",
+      "mobile": "Reservas desde el móvil",
+      "free": "Empieza gratis"
+    }
+  }
+}

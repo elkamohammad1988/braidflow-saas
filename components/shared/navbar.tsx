@@ -2,13 +2,16 @@ import Link from 'next/link';
 import { getSession } from '@/lib/auth/session';
 import { Button } from '@/components/ui/button';
 import { Logo } from './logo';
+import { getTranslations } from 'next-intl/server';
 import { SignOutLink } from './sign-out';
 import { MobileMenu } from './mobile-menu';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 export async function Navbar() {
   const session = await getSession();
   const isBraider = session?.profile.role === 'braider';
+  const t = await getTranslations();
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-cream/70 backdrop-blur-xl backdrop-saturate-150">
@@ -19,9 +22,9 @@ export async function Navbar() {
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 text-sm font-medium text-ink-muted md:flex">
           {[
-            { href: '/braiders', label: 'Find a braider' },
-            { href: '/pricing', label: 'Pricing' },
-            ...(!session ? [{ href: '/signup?role=braider', label: 'For braiders' }] : [])
+            { href: '/braiders', label: t('nav.findBraider') },
+            { href: '/pricing', label: t('nav.pricing') },
+            ...(!session ? [{ href: '/signup?role=braider', label: t('nav.forBraiders') }] : [])
           ].map((item) => (
             <Link
               key={item.href}
@@ -38,12 +41,13 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <LanguageSwitcher className="hidden md:inline-flex" />
           <ThemeToggle className="hidden md:inline-flex" />
           {session ? (
             <>
               <Link href={isBraider ? '/dashboard' : '/bookings'} className="hidden md:inline-flex">
                 <Button variant="secondary" size="sm">
-                  {isBraider ? 'Dashboard' : 'My bookings'}
+                  {isBraider ? t('common.dashboard') : t('common.myBookings')}
                 </Button>
               </Link>
               <SignOutLink className="hidden md:inline-flex" />
@@ -54,10 +58,10 @@ export async function Navbar() {
                 href="/login"
                 className="hidden text-sm font-medium text-ink-muted transition-colors hover:text-ink md:block"
               >
-                Log in
+                {t('common.logIn')}
               </Link>
               <Link href="/signup" className="hidden md:inline-flex">
-                <Button size="sm">Get started</Button>
+                <Button size="sm">{t('common.getStarted')}</Button>
               </Link>
             </>
           )}

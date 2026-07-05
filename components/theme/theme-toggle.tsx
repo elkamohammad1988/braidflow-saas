@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const OPTIONS = [
-  { value: 'light', icon: Sun, label: 'Light' },
-  { value: 'system', icon: Monitor, label: 'System' },
-  { value: 'dark', icon: Moon, label: 'Dark' }
+  { value: 'light', icon: Sun, key: 'light' },
+  { value: 'system', icon: Monitor, key: 'system' },
+  { value: 'dark', icon: Moon, key: 'dark' }
 ] as const;
 
 // Segmented Light / System / Dark control. Renders inert until mounted so the
@@ -16,20 +17,22 @@ const OPTIONS = [
 // state fills in after mount.
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations('theme');
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
     <div
       role="radiogroup"
-      aria-label="Color theme"
+      aria-label={t('label')}
       className={cn(
         'inline-flex items-center gap-0.5 rounded-full border border-line bg-paper p-0.5 shadow-card',
         className
       )}
     >
-      {OPTIONS.map(({ value, icon: Icon, label }) => {
+      {OPTIONS.map(({ value, icon: Icon, key }) => {
         const active = mounted && theme === value;
+        const label = t(key);
         return (
           <button
             key={value}
