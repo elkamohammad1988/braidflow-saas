@@ -1,4 +1,5 @@
 import { stripe } from './client';
+import { isStripeConfigured } from './config';
 import { dbAdmin } from '@/lib/db/server';
 import { guestTokenMatches } from '@/lib/bookings/guest-token';
 
@@ -40,6 +41,13 @@ export async function getDepositClientSecret(bookingId: string, access: DepositA
 
   if (!payment?.stripe_payment_intent_id) return null;
   if (payment.status === 'succeeded') return { clientSecret: null, alreadyPaid: true as const };
+
+  // Keyless demo: there is no real PaymentIntent to retrieve. Signal the pay page
+  // to render the simulated checkout (see confirmDemoDepositAction). The caller is
+  // already authorized above, so this never leaks across bookings.
+  if (!isStripeConfigured()) {
+    return { clientSecret: null, alreadyPaid: false as const, demo: true as const };
+  }
 
   try {
     const intent = await stripe.paymentIntents.retrieve(payment.stripe_payment_intent_id);

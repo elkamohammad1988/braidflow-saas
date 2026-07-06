@@ -13,7 +13,7 @@ import { FinalizeBookingButtons } from '@/components/booking/complete-buttons';
 import { formatMoney } from '@/lib/utils';
 import { relativeDayLabel, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
-import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
+import { depositStateFromPayments, DEPOSIT_LABEL_KEY } from '@/lib/payments/status';
 import { getTranslations } from 'next-intl/server';
 
 const TONE = {
@@ -38,7 +38,7 @@ type DepositState = ReturnType<typeof depositStateFromPayments>;
 type Translate = (key: string) => string;
 
 // Status + optional deposit badge, shared by the desktop table and mobile cards.
-function statusBadges(status: Status, deposit: DepositState, t: Translate): ReactNode {
+function statusBadges(status: Status, deposit: DepositState, t: Translate, td: Translate): ReactNode {
   return (
     <div className="flex flex-wrap items-start gap-1.5">
       <Badge tone={TONE[status]}>{t(`status.${STATUS_KEY[status]}`)}</Badge>
@@ -52,7 +52,7 @@ function statusBadges(status: Status, deposit: DepositState, t: Translate): Reac
               : 'warning'
           }
         >
-          {DEPOSIT_LABEL[deposit]}
+          {td(DEPOSIT_LABEL_KEY[deposit])}
         </Badge>
       )}
     </div>
@@ -101,6 +101,7 @@ export default async function AppointmentsPage() {
   const { user } = await requireBraider();
   const database = db();
   const t = await getTranslations('dashboard');
+  const td = await getTranslations('deposit');
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -140,13 +141,13 @@ export default async function AppointmentsPage() {
             {/* Desktop: table */}
             <div className="hidden overflow-hidden rounded-card border border-line bg-paper shadow-soft md:block">
               <table className="w-full text-sm">
-                <thead className="bg-ink/[0.03] text-left text-xs uppercase tracking-wider text-ink-muted">
+                <thead className="bg-ink/[0.03] text-start text-xs uppercase tracking-wider text-ink-muted">
                   <tr>
                     <th className="px-5 py-3">{t('appointments.table.when')}</th>
                     <th className="px-5 py-3">{t('appointments.table.client')}</th>
                     <th className="px-5 py-3">{t('appointments.table.service')}</th>
                     <th className="px-5 py-3">{t('appointments.table.status')}</th>
-                    <th className="px-5 py-3 text-right">{t('appointments.table.total')}</th>
+                    <th className="px-5 py-3 text-end">{t('appointments.table.total')}</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
@@ -175,11 +176,11 @@ export default async function AppointmentsPage() {
                           )}
                         </td>
                         <td className="px-5 py-3 text-ink-muted">{a.services?.name}</td>
-                        <td className="px-5 py-3">{statusBadges(status, deposit, t)}</td>
-                        <td className="px-5 py-3 text-right tabular-nums text-ink">
+                        <td className="px-5 py-3">{statusBadges(status, deposit, t, td)}</td>
+                        <td className="px-5 py-3 text-end tabular-nums text-ink">
                           {formatMoney(a.price_cents)}
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-5 py-3 text-end">
                           {bookingActions(a, status, upcoming, deposit, t)}
                         </td>
                       </tr>
@@ -226,7 +227,7 @@ export default async function AppointmentsPage() {
                       <p className="mt-0.5 text-ink-muted">{a.services?.name}</p>
                     </div>
 
-                    <div className="mt-3">{statusBadges(status, deposit, t)}</div>
+                    <div className="mt-3">{statusBadges(status, deposit, t, td)}</div>
 
                     {actions && (
                       <div className="mt-4 border-t border-line pt-3">{actions}</div>

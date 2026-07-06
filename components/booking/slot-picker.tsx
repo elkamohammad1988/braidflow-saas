@@ -20,9 +20,13 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
   const t = useTranslations('booking');
   const dayKey = (d: Date) => formatInZone(d, timeZone, 'yyyy-MM-dd');
 
-  const [activeKey, setActiveKey] = useState(
-    slotsByDay[0] ? dayKey(slotsByDay[0].date) : ''
-  );
+  // Default to the first day that actually has openings, so the picker never
+  // greets the client with an empty "no availability" state when a later day is
+  // free (today may be a day off, past its cutoff, or fully booked).
+  const [activeKey, setActiveKey] = useState(() => {
+    const firstOpen = slotsByDay.find((d) => d.slots.length > 0) ?? slotsByDay[0];
+    return firstOpen ? dayKey(firstOpen.date) : '';
+  });
 
   const activeDay = useMemo(
     () => slotsByDay.find((d) => dayKey(d.date) === activeKey),

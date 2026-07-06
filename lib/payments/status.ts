@@ -33,3 +33,14 @@ export const DEPOSIT_LABEL: Record<DepositState, string> = {
   refunded: 'Deposit refunded',
   refund_failed: 'Refund failed'
 };
+
+// i18n key per deposit state, under the shared `deposit` message namespace.
+// Kept separate from DEPOSIT_LABEL (English fallbacks) so badges localize.
+export const DEPOSIT_LABEL_KEY: Record<DepositState, string> = {
+  no_deposit: 'depositNone',
+  deposit_pending: 'depositPending',
+  deposit_held: 'depositHeld',
+  refund_pending: 'depositRefundPending',
+  refunded: 'depositRefunded',
+  refund_failed: 'depositRefundFailed'
+};

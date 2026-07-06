@@ -117,7 +117,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
               <select
                 value={minutes}
                 onChange={(e) => setMinutes(Number(e.target.value))}
-                className={cn(fieldSurface, 'h-11 w-full cursor-pointer appearance-none px-3.5 pr-10')}
+                className={cn(fieldSurface, 'h-11 w-full cursor-pointer appearance-none px-3.5 pe-10')}
               >
                 {[0, 15, 30, 45].map((m) => (
                   <option key={m} value={m}>
@@ -128,7 +128,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
               <ChevronDown
                 aria-hidden
                 strokeWidth={2}
-                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+                className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
               />
             </div>
           </label>
@@ -155,7 +155,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         />
         <span className="text-sm">
           <span className="font-medium text-ink">{t('services.form.showLabel')}</span>
-          <span className="ml-2 text-ink-muted">{t('services.form.showHint')}</span>
+          <span className="ms-2 text-ink-muted">{t('services.form.showHint')}</span>
         </span>
       </label>
 
@@ -172,7 +172,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         <Button type="submit" disabled={pending}>
           {pending ? (
             <>
-              <Spinner className="mr-2" />
+              <Spinner className="me-2" />
               {t('services.form.saving')}
             </>
           ) : editing ? t('services.form.saveChanges') : t('services.form.create')}
@@ -208,7 +208,7 @@ function DollarInput({
     <label className="block">
       <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
       <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-muted">
+        <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-ink-muted">
           $
         </span>
         <input
@@ -218,7 +218,7 @@ function DollarInput({
           onChange={(e) => onChange(e.target.value)}
           required={required}
           placeholder="0.00"
-          className={cn(fieldSurface, 'h-11 w-full pl-7 pr-3.5')}
+          className={cn(fieldSurface, 'h-11 w-full ps-7 pe-3.5')}
         />
       </div>
       {hint && <span className="mt-1 block text-xs text-ink-muted">{hint}</span>}

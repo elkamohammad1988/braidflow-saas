@@ -10,6 +10,7 @@ import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { formatInZone } from '@/lib/format-date';
 import { Button } from '@/components/ui/button';
 import { Checkout } from './checkout';
+import { DemoCheckout } from './demo-checkout';
 import { formatMoney } from '@/lib/utils';
 
 export default async function PayPage({
@@ -70,7 +71,12 @@ export default async function PayPage({
     redirect(`/bookings/${booking.id}/confirmation${tokenQuery}`);
   }
 
-  if (!secret?.clientSecret) {
+  // Demo mode (no Stripe keys) renders a simulated checkout; real mode needs the
+  // PaymentIntent client secret. Either way, no viable payment → the fallback.
+  const demo = secret != null && 'demo' in secret && secret.demo === true;
+  const clientSecret = secret && 'clientSecret' in secret ? secret.clientSecret : null;
+
+  if (!demo && !clientSecret) {
     return (
       <div className="mx-auto max-w-md px-6 py-20 text-center">
         <h1 className="font-display text-3xl text-ink">{t('cantLoadTitle')}</h1>
@@ -104,12 +110,21 @@ export default async function PayPage({
       </div>
 
       <div className="mt-8 grid gap-8 md:grid-cols-[1fr_320px]">
-        <Checkout
-          clientSecret={secret.clientSecret}
-          bookingId={booking.id}
-          depositCents={booking.deposit_cents}
-          returnQuery={tokenQuery}
-        />
+        {demo ? (
+          <DemoCheckout
+            bookingId={booking.id}
+            depositCents={booking.deposit_cents}
+            token={token}
+            returnQuery={tokenQuery}
+          />
+        ) : (
+          <Checkout
+            clientSecret={clientSecret!}
+            bookingId={booking.id}
+            depositCents={booking.deposit_cents}
+            returnQuery={tokenQuery}
+          />
+        )}
 
         <aside className="space-y-4 md:sticky md:top-6 md:self-start">
           <div className="rounded-card border border-line bg-paper p-6 shadow-soft">

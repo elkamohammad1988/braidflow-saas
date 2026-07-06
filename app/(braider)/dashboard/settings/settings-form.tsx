@@ -142,7 +142,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
             />
             <span className="text-sm">
               <span className="font-medium text-ink">{t('settings.acceptingBookings')}</span>
-              <span className="ml-2 text-ink-muted">
+              <span className="ms-2 text-ink-muted">
                 {t('settings.acceptingBookingsHint')}
               </span>
             </span>
@@ -186,7 +186,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
         <Button type="submit" disabled={pending}>
           {pending ? (
             <>
-              <Spinner className="mr-2" />
+              <Spinner className="me-2" />
               {t('settings.saving')}
             </>
           ) : (

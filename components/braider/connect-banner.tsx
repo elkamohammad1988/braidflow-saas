@@ -60,7 +60,7 @@ export function ConnectBanner({ onboardingComplete }: { onboardingComplete: bool
             <Button size="sm" onClick={begin} disabled={pending}>
               {pending ? (
                 <>
-                  <Spinner className="mr-2" />
+                  <Spinner className="me-2" />
                   {t('opening')}
                 </>
               ) : (

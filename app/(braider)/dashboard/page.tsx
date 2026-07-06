@@ -224,7 +224,7 @@ export default async function DashboardOverview({
                   </p>
                   <p className="truncate text-sm text-ink-muted">{b.services?.name}</p>
                 </div>
-                <div className="hidden text-right sm:block">
+                <div className="hidden text-end sm:block">
                   <p className="text-sm text-ink">{formatAppointment(b.scheduled_at, tz)}</p>
                 </div>
                 <Badge tone={b.status === 'confirmed' ? 'success' : 'warning'} dot>

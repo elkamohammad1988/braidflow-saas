@@ -3,7 +3,7 @@ import { Inter, Fraunces, Space_Mono } from 'next/font/google';
 import { JsonLd } from '@/components/shared/json-ld';
 import { DemoBadge } from '@/components/demo/demo-badge';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { isRtl } from '@/i18n/config';
 import { isDemoMode } from '@/lib/demo';
@@ -79,6 +79,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const t = await getTranslations('common');
   const dir = isRtl(locale) ? 'rtl' : 'ltr';
   return (
     <html
@@ -90,9 +91,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <a
           href="#main-content"
-          className="sr-only rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-cream shadow-lifted focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200]"
+          className="sr-only rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-cream shadow-lifted focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200]"
         >
-          Skip to content
+          {t('skipToContent')}
         </a>
         {/* Flag JS on before first paint so scroll-reveal content is hidden only
             when we can actually animate it in — without JS it stays visible. */}

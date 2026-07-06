@@ -46,7 +46,7 @@ export function BraiderSearch({
       <div className="relative flex-1">
         <Search
           aria-hidden
-          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-clay"
+          className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-clay"
         />
         <input
           type="search"
@@ -55,7 +55,7 @@ export function BraiderSearch({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
           aria-label={t('searchAriaLabel')}
-          className={`h-12 w-full rounded-full border border-line-strong bg-paper pl-11 pr-4 text-sm text-ink shadow-card placeholder:text-ink-subtle transition-colors ${pillFocus}`}
+          className={`h-12 w-full rounded-full border border-line-strong bg-paper ps-11 pe-4 text-sm text-ink shadow-card placeholder:text-ink-subtle transition-colors ${pillFocus}`}
         />
       </div>
       <div className="flex items-center gap-2">

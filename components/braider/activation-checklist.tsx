@@ -166,7 +166,7 @@ function StripeStep({
           >
             {pending ? (
               <>
-                <Spinner className="mr-2" />
+                <Spinner className="me-2" />
                 {t('stripe.opening')}
               </>
             ) : (

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { WARM_BLUR, GALLERY_PHOTOS } from '@/lib/media';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
@@ -129,6 +130,8 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                   fill
                   sizes="(min-width: 768px) 60vw, 100vw"
                   priority
+                  placeholder="blur"
+                  blurDataURL={WARM_BLUR}
                   className="object-cover"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/30 via-transparent to-transparent" />
@@ -194,6 +197,31 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           {braider.bio && (
             <p className="mt-6 max-w-prose text-[17px] leading-relaxed text-ink-muted">{braider.bio}</p>
           )}
+
+          <section className="mt-8" aria-label={t('workHeading')}>
+            <h2 className="label mb-4 flex items-center gap-2 text-clay-text">
+              <span className="h-1 w-1 rounded-full bg-clay" />
+              {t('workHeading')}
+            </h2>
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+              {GALLERY_PHOTOS.slice(0, 3).map((src, i) => (
+                <div
+                  key={i}
+                  className="group relative aspect-square overflow-hidden rounded-xl ring-1 ring-line"
+                >
+                  <Image
+                    src={src}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 18vw, 30vw"
+                    placeholder="blur"
+                    blurDataURL={WARM_BLUR}
+                    className="object-cover transition-transform duration-500 ease-spring group-hover:scale-[1.06]"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
 
           <section className="mt-12">
             <h2 className="label mb-4 flex items-center gap-2 text-clay-text">

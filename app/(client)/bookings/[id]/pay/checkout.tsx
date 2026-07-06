@@ -14,7 +14,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { formatMoney } from '@/lib/utils';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Null when no publishable key is set — in that case the pay page renders the
+// demo checkout instead of this component, so Stripe.js is never needed.
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 // Tuned to the atelier palette so Stripe's fields feel like part of the page,
 // not a cold white iframe dropped into warm paper.
@@ -125,7 +129,7 @@ function CheckoutForm({
         {!ready && (
           <div className="flex items-center justify-center py-8 text-ink-muted">
             <Spinner />
-            <span className="ml-2 text-sm">{t('loadingCheckout')}</span>
+            <span className="ms-2 text-sm">{t('loadingCheckout')}</span>
           </div>
         )}
         <div className={ready ? 'block' : 'hidden'}>
@@ -153,7 +157,7 @@ function CheckoutForm({
       >
         {submitting ? (
           <>
-            <Spinner className="mr-2" />
+            <Spinner className="me-2" />
             {t('charging')}
           </>
         ) : (

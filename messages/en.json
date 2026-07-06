@@ -10,6 +10,7 @@
     "theme": "Theme",
     "copied": "Copied",
     "copy": "Copy",
+    "skipToContent": "Skip to content",
     "demoBadge": {
       "label": "Demo Mode",
       "title": "You're exploring an interactive demo",
@@ -518,6 +519,14 @@
       "deposit": "Deposit"
     }
   },
+  "deposit": {
+    "depositNone": "No deposit",
+    "depositPending": "Awaiting deposit",
+    "depositHeld": "Deposit held",
+    "depositRefundPending": "Refund pending",
+    "depositRefunded": "Deposit refunded",
+    "depositRefundFailed": "Refund failed"
+  },
   "auth": {
     "panel": {
       "tagline": "The booking platform built for <em>braiders.</em>",
@@ -785,6 +794,9 @@
     "when": "When"
   },
   "pay": {
+    "testMode": "Test mode",
+    "demoNote": "no real card is charged. Pay to simulate the deposit and see your confirmation.",
+    "demoCard": "Test card",
     "backToBraider": "Back to braider",
     "balanceAtAppointment": "Balance at appointment",
     "bookingWith": "Booking with",
@@ -883,6 +895,7 @@
     "sortNewest": "Newest"
   },
   "profile": {
+    "workHeading": "Recent work",
     "bookHeading": "Book an appointment",
     "bookSubtitle": "Pick a service and a time that works. Deposit holds your slot.",
     "cancel": "Cancel",

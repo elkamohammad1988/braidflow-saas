@@ -60,7 +60,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
           disabled={pending}
           className="inline-flex items-center font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
         >
-          {pending && <Spinner className="mr-1.5 h-3 w-3" />}
+          {pending && <Spinner className="me-1.5 h-3 w-3" />}
           {t('yesCancel')}
         </button>
         <button

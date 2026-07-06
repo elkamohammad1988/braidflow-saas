@@ -63,7 +63,7 @@ export default async function ServicesPage() {
                     {formatDuration(s.duration_minutes)} · {t('services.depositLabel')} {formatMoney(s.deposit_cents)}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents)}</p>
                   <Link
                     href={`/dashboard/services/${s.id}`}

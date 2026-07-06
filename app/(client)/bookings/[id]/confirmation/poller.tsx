@@ -60,7 +60,7 @@ export function ConfirmationPoller({
       role="status"
       className="mt-8 inline-flex items-center justify-center text-sm text-ink-muted"
     >
-      <Spinner className="mr-2" />
+      <Spinner className="me-2" />
       {t('waitingConfirmation')}
     </div>
   );

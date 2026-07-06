@@ -12,7 +12,7 @@ import { ReviewForm } from '@/components/review/review-form';
 import { formatMoney } from '@/lib/utils';
 import { formatAppointment } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
-import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
+import { depositStateFromPayments, DEPOSIT_LABEL_KEY } from '@/lib/payments/status';
 
 const STATUS_TONE = {
   pending_payment: { label: 'statusPendingPayment', tone: 'warning' as const },
@@ -24,6 +24,7 @@ const STATUS_TONE = {
 
 export default async function MyBookings() {
   const t = await getTranslations('bookings');
+  const td = await getTranslations('deposit');
   const { user } = await requireSession();
   const database = db();
 
@@ -102,7 +103,7 @@ export default async function MyBookings() {
                   {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-end">
                 <Badge tone={status.tone}>{t(status.label)}</Badge>
                 {showDepositBadge && (
                   <div className="mt-1">
@@ -115,7 +116,7 @@ export default async function MyBookings() {
                           : 'warning'
                       }
                     >
-                      {DEPOSIT_LABEL[deposit]}
+                      {td(DEPOSIT_LABEL_KEY[deposit])}
                     </Badge>
                   </div>
                 )}

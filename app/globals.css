@@ -95,6 +95,22 @@ body {
   outline-offset: 2px;
 }
 
+/* RTL: mirror directional icons (arrows + horizontal chevrons) so they point
+   the correct way in right-to-left locales. Scoped to [dir='rtl'] so the LTR
+   layout is untouched; `!important` keeps them flipped even while Tailwind
+   applies its own hover transforms (translate/rotate) to the same SVG. Vertical
+   chevrons (chevron-down/up) are intentionally excluded — they don't mirror. */
+[dir='rtl'] :is(
+    .lucide-arrow-right,
+    .lucide-arrow-left,
+    .lucide-chevron-right,
+    .lucide-chevron-left,
+    .lucide-arrow-up-right,
+    .lucide-move-right
+  ) {
+  transform: scaleX(-1) !important;
+}
+
 @layer utilities {
   /* Editorial grid backdrop used behind hero / marketing sections. */
   .bg-grid {

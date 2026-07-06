@@ -128,7 +128,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
   }
 
   return (
-    <div className="mt-3 flex flex-wrap items-end gap-3 pl-24">
+    <div className="mt-3 flex flex-wrap items-end gap-3 ps-24">
       <label className="text-xs text-ink-muted">
         {t('availability.from')}
         <input
@@ -148,7 +148,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
         />
       </label>
       <Button size="sm" onClick={save} disabled={pending}>
-        {pending ? <Spinner className="mr-2" /> : null}
+        {pending ? <Spinner className="me-2" /> : null}
         {t('availability.save')}
       </Button>
       <button

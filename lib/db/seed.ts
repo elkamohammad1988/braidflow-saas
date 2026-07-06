@@ -15,6 +15,7 @@ import { TZDate } from '@date-fns/tz';
 import { addDays, startOfWeek } from 'date-fns';
 import { BRAIDER_PERSONA, CLIENT_PERSONA } from '@/lib/auth/personas';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
+import { BRAID_PHOTOS } from '@/lib/media';
 
 export type Store = {
   profiles: any[];
@@ -124,6 +125,7 @@ export function seed(): Store {
       business_name: 'Amara Braids',
       bio: 'Protective styles done with care in the heart of Atlanta. Knotless, boho, twists and cornrows — clean parts, comfortable tension, and a relaxed chair. Ten years braiding and still obsessed with the craft.',
       city: 'Atlanta, GA',
+      hero_image_url: BRAID_PHOTOS.triangleParts,
       instagram_handle: 'amara.braids',
       timezone: 'America/New_York'
     }),
@@ -133,6 +135,7 @@ export function seed(): Store {
       business_name: 'Kekeli Studio',
       bio: 'Boutique braiding studio specialising in micro braids and goddess locs.',
       city: 'Brooklyn, NY',
+      hero_image_url: BRAID_PHOTOS.boxBraidsTop,
       instagram_handle: 'kekeli.studio',
       timezone: 'America/New_York'
     }),
@@ -142,6 +145,7 @@ export function seed(): Store {
       business_name: 'Crown & Coils',
       bio: 'Fulani braids, cornrows and feed-ins. Fast, neat, and kid-friendly.',
       city: 'Houston, TX',
+      hero_image_url: BRAID_PHOTOS.feedInClose,
       instagram_handle: 'crownandcoils',
       timezone: 'America/Chicago'
     }),
@@ -151,6 +155,7 @@ export function seed(): Store {
       business_name: 'Sable & Gold',
       bio: 'Luxury knotless and twist styling on the North Side.',
       city: 'Chicago, IL',
+      hero_image_url: BRAID_PHOTOS.longBeaded,
       instagram_handle: 'sableandgold',
       timezone: 'America/Chicago'
     })

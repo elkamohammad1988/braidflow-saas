@@ -56,7 +56,7 @@ export default function PricingPage() {
           <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-8 text-ivory shadow-lifted md:p-11">
             <AtelierBackdrop className="absolute inset-0 opacity-70" />
             <div className="relative">
-              <p className="absolute -top-3 left-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
+              <p className="absolute -top-3 start-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
                 {t('card.badge')}
               </p>
               <p className="pt-3 font-display text-2xl font-medium">{t('card.title')}</p>

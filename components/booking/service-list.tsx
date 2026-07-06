@@ -32,7 +32,7 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
               onClick={() => onSelect(s.id)}
               aria-pressed={active}
               className={cn(
-                'group w-full rounded-card border px-5 py-4 text-left transition-all duration-300 ease-spring active:scale-[0.99]',
+                'group w-full rounded-card border px-5 py-4 text-start transition-all duration-300 ease-spring active:scale-[0.99]',
                 active
                   ? 'border-clay/40 bg-gold/[0.05] shadow-card ring-1 ring-gold/20'
                   : 'border-line bg-paper hover:-translate-y-0.5 hover:border-clay/30 hover:shadow-card'
@@ -54,11 +54,11 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                     <p className="font-medium text-ink">{s.name}</p>
                   </div>
                   {s.description && (
-                    <p className="mt-1.5 pl-6 text-sm leading-relaxed text-ink-muted">
+                    <p className="mt-1.5 ps-6 text-sm leading-relaxed text-ink-muted">
                       {s.description}
                     </p>
                   )}
-                  <p className="mt-2 pl-6 text-xs text-ink-subtle">
+                  <p className="mt-2 ps-6 text-xs text-ink-subtle">
                     {t('durationDeposit', {
                       duration: formatDuration(s.duration_minutes),
                       deposit: formatMoney(s.deposit_cents)

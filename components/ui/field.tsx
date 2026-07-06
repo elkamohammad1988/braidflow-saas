@@ -118,7 +118,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           aria-describedby={describedById(fieldId, Boolean(hint || error))}
           className={cn(
             fieldSurface,
-            'h-11 w-full cursor-pointer appearance-none px-3.5 pr-10',
+            'h-11 w-full cursor-pointer appearance-none px-3.5 pe-10',
             error && fieldInvalid,
             className
           )}
@@ -129,7 +129,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         <ChevronDown
           aria-hidden
           strokeWidth={2}
-          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+          className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
         />
       </div>
     </FieldShell>

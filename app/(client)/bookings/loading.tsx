@@ -14,9 +14,9 @@ export default function Loading() {
                 <Skeleton className="h-3 w-32" />
                 <Skeleton className="h-3 w-40" />
               </div>
-              <div className="space-y-2 text-right">
-                <Skeleton className="ml-auto h-5 w-20" />
-                <Skeleton className="ml-auto h-3 w-16" />
+              <div className="space-y-2 text-end">
+                <Skeleton className="ms-auto h-5 w-20" />
+                <Skeleton className="ms-auto h-3 w-16" />
               </div>
             </div>
           </div>

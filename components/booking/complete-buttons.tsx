@@ -57,7 +57,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
                 : 'text-red-600 hover:text-red-700'
             )}
           >
-            {pending && <Spinner className="mr-1.5 h-3 w-3" />}
+            {pending && <Spinner className="me-1.5 h-3 w-3" />}
             {t('confirm')}
           </button>
           <button

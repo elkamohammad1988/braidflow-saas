@@ -66,7 +66,7 @@ export function RefundDepositButton({
           disabled={pending}
           className="inline-flex items-center font-medium text-ink hover:text-ink/80 disabled:opacity-50"
         >
-          {pending && <Spinner className="mr-1.5 h-3 w-3" />}
+          {pending && <Spinner className="me-1.5 h-3 w-3" />}
           {t('yesRefund')}
         </button>
         <button

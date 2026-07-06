@@ -178,7 +178,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
 
       <div className="mt-4 flex gap-3">
         <Button size="sm" onClick={save} disabled={pending}>
-          {pending && <Spinner className="mr-2" />}
+          {pending && <Spinner className="me-2" />}
           {t('availability.saveBlock')}
         </Button>
         <button

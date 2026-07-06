@@ -62,7 +62,7 @@ export default async function ConfirmationPage({
           </p>
 
           {/* Receipt — a gold-topped ticket for the moment they paid. */}
-          <dl className="mx-auto mt-9 w-full max-w-sm overflow-hidden rounded-xl2 border border-line bg-paper text-left text-sm tabular-nums shadow-lifted">
+          <dl className="mx-auto mt-9 w-full max-w-sm overflow-hidden rounded-xl2 border border-line bg-paper text-start text-sm tabular-nums shadow-lifted">
             <div className="h-1 bg-gradient-to-r from-gold-bright via-gold to-clay" aria-hidden />
             <div className="divide-y divide-line px-6">
               <div className="flex items-center justify-between gap-4 py-3.5">
@@ -71,11 +71,11 @@ export default async function ConfirmationPage({
               </div>
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <dt className="text-ink-muted">{t('service')}</dt>
-                <dd className="text-right font-medium text-ink">{booking.services?.name}</dd>
+                <dd className="text-end font-medium text-ink">{booking.services?.name}</dd>
               </div>
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <dt className="text-ink-muted">{t('when')}</dt>
-                <dd className="text-right font-medium text-ink">
+                <dd className="text-end font-medium text-ink">
                   {formatAppointment(
                     booking.scheduled_at,
                     booking.braiders?.timezone ?? DEFAULT_TIMEZONE

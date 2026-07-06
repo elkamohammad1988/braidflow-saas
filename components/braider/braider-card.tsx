@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowUpRight, MapPin, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
+import { WARM_BLUR } from '@/lib/media';
 import { formatMoney } from '@/lib/utils';
 
 type Props = {
@@ -35,6 +36,8 @@ export function BraiderCard({
               alt={businessName}
               fill
               sizes="(min-width: 768px) 33vw, 100vw"
+              placeholder="blur"
+              blurDataURL={WARM_BLUR}
               className="object-cover transition-transform duration-700 ease-spring group-hover:scale-[1.05]"
             />
           ) : (

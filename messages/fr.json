@@ -7,7 +7,16 @@
     "myBookings": "Mes réservations",
     "viewSite": "Voir le site",
     "language": "Langue",
-    "theme": "Thème"
+    "theme": "Thème",
+    "copied": "Copié",
+    "copy": "Copier",
+    "skipToContent": "Aller au contenu",
+    "demoBadge": {
+      "label": "Mode démo",
+      "title": "Vous explorez une démo interactive",
+      "description": "Chaque écran — réservations, clientes, calendrier et acomptes — fonctionne avec des données d’exemple réalistes, sans compte ni configuration. N’hésitez pas à cliquer partout.",
+      "dismiss": "Masquer le badge de démo"
+    }
   },
   "nav": {
     "findBraider": "Trouver une tresseuse",
@@ -43,6 +52,899 @@
       "noShow": "Protection anti-absences",
       "mobile": "Réservation pensée mobile",
       "free": "Gratuit au départ"
+    },
+    "stats": {
+      "suffix": {
+        "deposit": "%",
+        "commission": "%",
+        "setup": " min",
+        "booking": "s"
+      },
+      "label": {
+        "deposit": "de chaque acompte vous revient",
+        "commission": "de commission sur vos prestations",
+        "setup": "pour créer votre page",
+        "booking": "pour qu’une cliente réserve depuis son téléphone"
+      }
+    },
+    "deposit": {
+      "label": "Protection anti-absences",
+      "title": "L’acompte arrive avant le rendez-vous.",
+      "body": "Les clientes versent un acompte pour confirmer — conservé par Stripe, remboursé si vous annulez, gardé si elles disparaissent. Fini les absences qui vous coûtent un fauteuil.",
+      "props": {
+        "setup": "Définissez vos prestations, leurs durées et les montants d’acompte une seule fois.",
+        "blocks": "Bloquez les jours où vous êtes absente — vacances, événements des enfants, tout ce que la vie vous réserve cette semaine-là.",
+        "selfBook": "Les clientes réservent elles-mêmes le bon créneau. Vous le voyez sur votre calendrier instantanément.",
+        "balance": "Le solde est réglé en personne — exactement comme vous le faites aujourd’hui."
+      }
+    },
+    "how": {
+      "label": "L’ensemble",
+      "title": "Trois étapes. Ensuite, tout roule tout seul.",
+      "steps": {
+        "build": {
+          "title": "Créez votre page",
+          "desc": "Ajoutez vos prestations, vos tarifs et les jours où vous recevez vos clientes. Environ dix minutes."
+        },
+        "share": {
+          "title": "Partagez le lien",
+          "desc": "Glissez-le dans votre bio. Les nouvelles clientes réservent elles-mêmes — à toute heure, sans allers-retours."
+        },
+        "show": {
+          "title": "Présentez-vous et tressez",
+          "desc": "L’acompte est déjà versé. Vous recevez un rappel le matin même. La semaine se gère toute seule."
+        }
+      }
+    },
+    "testimonials": {
+      "label": "Dans leur fauteuil",
+      "title": "Des tresseuses qui gèrent toute leur semaine avec.",
+      "items": {
+        "aisha": {
+          "quote": "Je perdais deux têtes par semaine à cause des absences. Les acomptes y ont mis fin dès le premier mois. Mon calendrier m’appartient enfin.",
+          "name": "Aisha O.",
+          "role": "Box braids · Atlanta"
+        },
+        "nia": {
+          "quote": "Square est fait pour les cafés, pas pour des rendez-vous de 6 heures. BraidFlow comprend le métier — acomptes, durées, jours bloqués.",
+          "name": "Nia M.",
+          "role": "Knotless · Brooklyn"
+        },
+        "kemi": {
+          "quote": "La configuration a pris 15 minutes. Le lien dans ma bio fait enfin le travail à ma place, au lieu que je tape la même réponse 40 fois par semaine.",
+          "name": "Kemi A.",
+          "role": "Goddess locs · Houston"
+        }
+      }
+    },
+    "comparison": {
+      "label": "La version honnête",
+      "title": "Pourquoi ne pas simplement utiliser Square ou Acuity ?",
+      "body": "Vous pouvez. Beaucoup de tresseuses le font, et elles nous écrivent toujours pour les mêmes manques. Voici ce qui change quand l’outil est conçu pour le travail que vous faites vraiment.",
+      "feature": "Fonctionnalité",
+      "genericTools": "Outils génériques",
+      "included": "Inclus",
+      "notIncluded": "Non inclus",
+      "features": {
+        "longAppts": "Conçu pour des rendez-vous de 4 à 8 heures",
+        "deposits": "Acompte avant la confirmation de la réservation",
+        "dayBlocks": "Jours bloqués pour les vacances et la vie",
+        "perService": "Montants d’acompte par prestation",
+        "noCut": "Aucune commission sur vos prestations",
+        "quickSetup": "Configuration en 15 minutes"
+      },
+      "themValues": {
+        "addon": "Option / forfait payant",
+        "limited": "Limité",
+        "someCut": "Certains prennent 1 à 3 %"
+      }
+    },
+    "faq": {
+      "label": "Questions",
+      "title": "Questions fréquentes, vraies réponses.",
+      "stillUnsure": "Encore un doute ? <a>Écrivez-nous</a> — une vraie personne lit tout.",
+      "items": {
+        "different": {
+          "q": "En quoi est-ce différent de Square ou Acuity ?",
+          "a": "Ceux-là ont été conçus pour des créneaux de 30 minutes façon café. BraidFlow est conçu pour des rendez-vous de 4 à 8 heures où une absence fait vraiment mal. L’acompte est la règle par défaut, pas une option. Les durées de prestation et les jours bloqués fonctionnent comme les tresseuses planifient réellement une semaine."
+        },
+        "account": {
+          "q": "Mes clientes ont-elles besoin d’un compte pour réserver ?",
+          "a": "Non. Elles touchent votre lien, choisissent une prestation, choisissent un créneau, versent l’acompte. Terminé. Tout le parcours prend environ 90 secondes sur un téléphone."
+        },
+        "cancel": {
+          "q": "Que devient l’acompte si j’annule ?",
+          "a": "Il est remboursé automatiquement sur la carte de la cliente. Si elle annule dans votre délai de grâce (que vous définissez), elle le récupère. Passé ce délai, il vous revient."
+        },
+        "technical": {
+          "q": "Je ne suis pas à l’aise avec la technique. Puis-je vraiment configurer tout ça ?",
+          "a": "Oui. Si vous savez renseigner votre nom, vos tarifs et vos jours de travail, c’est fait. La plupart des tresseuses sont en ligne en moins de 15 minutes."
+        }
+      }
+    },
+    "finalCta": {
+      "badge": "Gratuit pendant notre bêta",
+      "title": "Commencez gratuitement.<br></br>Gardez <em>ce que vous gagnez.</em>",
+      "body": "Vous gardez 100 % de chaque acompte. Créez votre page en quinze minutes — sans carte bancaire pour commencer.",
+      "cta": "Créer votre page",
+      "seePricing": "Voir les tarifs"
+    },
+    "preview": {
+      "name": "Nia's Braids",
+      "location": "Knotless · Brooklyn, NY",
+      "status": "Réservation",
+      "service": "Tresses knotless — moyennes",
+      "duration": "5 heures",
+      "deposit": "40 $ d’acompte",
+      "date": "Samedi 14 juin",
+      "slots": [
+        "9h00",
+        "11h30",
+        "14h00"
+      ],
+      "payLabel": "Versez l’acompte pour confirmer",
+      "payButton": "Payer et réserver",
+      "secured": "Acompte sécurisé"
+    }
+  },
+  "legal": {
+    "shell": {
+      "label": "Mentions légales",
+      "lastUpdated": "Dernière mise à jour {updated}"
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "updatedDate": "13 juin 2026",
+      "intro": "BraidFlow (« BraidFlow », « nous ») est une plateforme de réservation qui met en relation des clientes avec des tresseuses et des spécialistes des coiffures protectrices. Cette politique explique quelles informations nous collectons, pourquoi nous les collectons et les choix dont vous disposez. Elle s’applique à notre site web et à nos services.",
+      "collect": {
+        "title": "Informations que nous collectons",
+        "account": "<s>Informations de compte.</s> Lorsque vous vous inscrivez, nous collectons votre nom, votre adresse e-mail et le fait que vous rejoigniez la plateforme en tant que cliente ou tresseuse, ainsi que le mot de passe que vous définissez (stocké uniquement sous forme de hachage salé par notre prestataire d’authentification).",
+        "profile": "<s>Profil et informations professionnelles.</s> Les tresseuses fournissent des informations telles que leur nom d’affichage, leur localisation, leurs prestations, leurs tarifs et leurs disponibilités afin que les clientes puissent les trouver et réserver.",
+        "booking": "<s>Informations de réservation.</s> Lorsqu’une réservation est effectuée, nous collectons la prestation, la date et l’heure, les notes que vous ajoutez et les parties concernées.",
+        "payment": "<s>Informations de paiement.</s> Les acomptes sont traités par Stripe. Votre numéro de carte complet est transmis directement à Stripe et n’est jamais stocké sur nos serveurs. Nous ne conservons que des métadonnées de paiement non sensibles (telles que le montant, le statut et les identifiants Stripe) nécessaires au suivi des réservations et des remboursements.",
+        "technical": "<s>Données techniques.</s> Comme la plupart des services, nous et nos prestataires recevons automatiquement des informations techniques de base (telles que l’adresse IP et le type de navigateur) afin de maintenir le service sécurisé, fonctionnel et à l’abri des abus."
+      },
+      "use": {
+        "title": "Comment nous utilisons les informations",
+        "item1": "Créer et gérer votre compte et vous authentifier.",
+        "item2": "Permettre la découverte, la réservation, les acomptes, les reports, les annulations et les remboursements.",
+        "item3": "Envoyer des e-mails transactionnels — confirmations, rappels et avis liés au compte.",
+        "item4": "Prévenir la fraude et les abus, faire respecter nos Conditions et maintenir la plateforme sécurisée.",
+        "item5": "Respecter les obligations légales et résoudre les litiges.",
+        "note": "Nous ne vendons pas vos informations personnelles et ne les utilisons pas à des fins de publicité tierce."
+      },
+      "share": {
+        "title": "Comment nous partageons les informations",
+        "lead": "Nous ne partageons les informations que dans la mesure nécessaire au fonctionnement du service :",
+        "parties": "<s>Entre les parties à une réservation.</s> Une tresseuse peut voir le nom, les coordonnées et les détails de réservation des clientes qui réservent avec elle, et inversement, afin que le rendez-vous puisse avoir lieu.",
+        "providers": "<s>Prestataires de services.</s> Nous nous appuyons sur Stripe (paiements), Resend (e-mails transactionnels) et Vercel (hébergement de l’application). Ils traitent les données pour notre compte selon leurs propres conditions et engagements de sécurité.",
+        "legal": "<s>Aspects juridiques et sécurité.</s> Nous pouvons divulguer des informations si la loi l’exige, ou pour protéger les droits, les biens ou la sécurité de nos utilisateurs ou du public."
+      },
+      "payments": {
+        "title": "Paiements",
+        "body": "Les paiements par carte sont gérés par Stripe, un processeur de paiement certifié PCI-DSS de niveau 1. Lorsque vous versez un acompte, les détails de votre carte sont transmis directement à Stripe via une connexion chiffrée. BraidFlow ne voit ni ne stocke votre numéro de carte complet, votre CVC ou votre date d’expiration. Consultez la politique de confidentialité de Stripe pour savoir comment il traite les données de paiement."
+      },
+      "cookies": {
+        "title": "Cookies et sessions",
+        "body": "Nous utilisons des cookies strictement nécessaires pour vous connecter et vous maintenir connectée en toute sécurité. Nous n’utilisons pas de cookies publicitaires ni de suivi intersites. Si nous ajoutons des outils d’analyse optionnels à l’avenir, nous mettrons à jour cette politique."
+      },
+      "retention": {
+        "title": "Conservation des données",
+        "body": "Nous conservons vos informations tant que votre compte est actif ou aussi longtemps que nécessaire pour fournir le service. Les enregistrements de réservation et de paiement peuvent être conservés plus longtemps lorsque cela est requis à des fins fiscales, comptables, de résolution de litiges ou de conformité légale. Vous pouvez nous demander de supprimer votre compte, après quoi nous supprimons ou anonymisons les données personnelles que nous ne sommes pas tenus de conserver."
+      },
+      "security": {
+        "title": "Sécurité",
+        "body": "Les données sont chiffrées en transit. L’accès est encadré par des contrôles d’autorisation côté serveur afin que, par exemple, les clientes ne voient que leurs propres réservations et les tresseuses uniquement leurs propres données professionnelles. Les opérations privilégiées s’exécutent côté serveur avec le moindre privilège. Aucun système n’est parfaitement sécurisé, mais nous œuvrons à protéger vos informations à l’aide de mesures conformes aux normes du secteur."
+      },
+      "rights": {
+        "title": "Vos droits",
+        "body": "Selon votre lieu de résidence, vous pouvez avoir le droit d’accéder à vos informations personnelles, de les corriger, de les exporter ou de les supprimer, ainsi que de vous opposer à certains traitements ou de les restreindre. Vous pouvez mettre à jour la plupart des informations depuis votre compte, ou nous contacter à l’adresse <a>privacy@braidflow.app</a> et nous vous répondrons dans un délai raisonnable."
+      },
+      "children": {
+        "title": "Enfants",
+        "body": "BraidFlow ne s’adresse pas aux enfants de moins de 16 ans, et nous ne collectons pas sciemment d’informations personnelles les concernant. Si vous pensez qu’un enfant nous a fourni des informations, contactez-nous et nous les supprimerons."
+      },
+      "changes": {
+        "title": "Modifications de cette politique",
+        "body": "Nous pouvons mettre à jour cette politique de temps à autre. Le cas échéant, nous réviserons la date de « Dernière mise à jour » ci-dessus et, pour les changements importants, fournirons un avis plus visible."
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "Des questions sur cette politique ? Écrivez à <a>privacy@braidflow.app</a>. Consultez également nos <terms>Conditions d’utilisation</terms>."
+      }
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "updatedDate": "13 juin 2026",
+      "intro": "Les présentes Conditions d’utilisation (« Conditions ») régissent votre accès à BraidFlow et votre utilisation du service. En créant un compte ou en utilisant le service, vous acceptez ces Conditions. Si vous ne les acceptez pas, n’utilisez pas BraidFlow.",
+      "s1": {
+        "title": "1. Qui nous sommes et ce que fait BraidFlow",
+        "body": "BraidFlow est une plateforme de réservation qui permet aux clientes de découvrir des tresseuses, de prendre rendez-vous et de verser un acompte pour confirmer un horaire. Les tresseuses sont des prestataires de services indépendantes — et non des employées, agentes ou partenaires de BraidFlow. Nous fournissons le logiciel qui facilite les réservations et le versement des acomptes ; nous ne sommes pas partie au contrat de service entre une cliente et une tresseuse, et nous ne fournissons pas nous-mêmes de services de tressage."
+      },
+      "s2": {
+        "title": "2. Éligibilité et comptes",
+        "body": "Vous devez être âgée d’au moins 18 ans (ou de l’âge de la majorité dans votre lieu de résidence) et capable de conclure un contrat contraignant pour utiliser BraidFlow. Vous êtes responsable de l’exactitude des informations que vous fournissez, de la confidentialité de votre mot de passe et de toute activité effectuée sous votre compte. Signalez-nous rapidement toute utilisation non autorisée."
+      },
+      "s3": {
+        "title": "3. Réservations et acomptes",
+        "body": "Pour confirmer une réservation, une cliente verse un acompte via la plateforme. Le créneau n’est retenu qu’une fois l’acompte payé ; jusque-là, il reste disponible pour d’autres. L’acompte est déduit du prix total de la prestation, et le solde restant est réglé directement à la tresseuse, généralement en personne lors du rendez-vous. Les tarifs, les montants d’acompte, les durées et les disponibilités sont fixés par chaque tresseuse."
+      },
+      "s4": {
+        "title": "4. Paiements",
+        "body": "Les acomptes sont traités par Stripe. En payant, vous autorisez le prélèvement et acceptez les conditions de Stripe. Vous déclarez être autorisée à utiliser le moyen de paiement que vous fournissez. BraidFlow n’est pas responsable des frais que votre banque ou l’émetteur de votre carte pourraient appliquer."
+      },
+      "s5": {
+        "title": "5. Annulations, reports et remboursements",
+        "body": "Une réservation peut être reportée ou annulée via la plateforme, sous réserve de la politique de la tresseuse. Lorsqu’une réservation est reportée, l’acompte existant est transféré au nouvel horaire. Une tresseuse peut procéder au remboursement de l’acompte ; le caractère remboursable d’un acompte, et selon quel délai, est déterminé par la politique d’annulation énoncée par la tresseuse et par la loi applicable. BraidFlow facilite les remboursements demandés via la plateforme mais ne garantit lui-même aucun remboursement."
+      },
+      "s6": {
+        "title": "6. Absences et retards",
+        "body": "Les acomptes existent pour protéger les tresseuses des absences, qui leur coûtent une journée de travail. Si une cliente ne se présente pas à un rendez-vous confirmé, la tresseuse peut conserver l’acompte conformément à sa politique. Les clientes doivent arriver à l’heure ; les tresseuses doivent honorer les réservations confirmées ou prévenir dans un délai raisonnable si elles ne le peuvent pas."
+      },
+      "s7": {
+        "title": "7. Responsabilités de la tresseuse",
+        "item1": "Fournir des annonces, des tarifs, des disponibilités et des descriptions de prestations exacts.",
+        "item2": "Honorer les réservations confirmées et communiquer rapidement au sujet de tout changement.",
+        "item3": "Détenir les licences, enregistrements et assurances requis dans votre juridiction, et respecter toutes les obligations applicables en matière de santé, de sécurité et de fiscalité.",
+        "item4": "Fournir les services de manière professionnelle et conforme à la description."
+      },
+      "s8": {
+        "title": "8. Utilisation acceptable",
+        "lead": "Vous vous engagez à ne pas :",
+        "item1": "Utiliser la plateforme à des fins illégales, frauduleuses ou nuisibles.",
+        "item2": "Usurper l’identité d’autrui ou fausser votre identité ou votre affiliation.",
+        "item3": "Tenter d’accéder à des comptes ou des données qui ne vous appartiennent pas, ni sonder ou perturber le service.",
+        "item4": "Extraire, surcharger ou perturber la plateforme ou ses dispositifs de sécurité.",
+        "item5": "Publier des contenus illégaux, abusifs, harcelants ou contrefaisants."
+      },
+      "s9": {
+        "title": "9. Avis et contenus des utilisateurs",
+        "body": "Les clientes peuvent laisser des avis sur les rendez-vous terminés. Les avis doivent être honnêtes, fondés sur des expériences réelles et exempts de contenu illégal ou abusif. Vous conservez la propriété des contenus que vous soumettez mais accordez à BraidFlow une licence non exclusive et gratuite pour les héberger et les afficher dans le cadre de l’exploitation du service. Nous pouvons retirer tout contenu qui enfreint ces Conditions."
+      },
+      "s10": {
+        "title": "10. Propriété intellectuelle",
+        "body": "BraidFlow ainsi que ses logos, son design et son logiciel nous appartiennent et sont protégés par les lois sur la propriété intellectuelle. Nous vous accordons un droit limité, non exclusif et non transférable d’utiliser le service conformément à ces Conditions. Vous ne pouvez pas copier, modifier ou créer des œuvres dérivées de la plateforme, sauf dans les limites autorisées par la loi."
+      },
+      "s11": {
+        "title": "11. Exclusions de garantie",
+        "body": "La plateforme est fournie « en l’état » et « selon disponibilité », sans garantie d’aucune sorte, expresse ou implicite, y compris l’adéquation à un usage particulier et l’absence de contrefaçon. BraidFlow ne garantit pas que le service sera ininterrompu ou exempt d’erreurs. Les tresseuses étant des prestataires indépendantes, BraidFlow ne garantit pas la qualité, la sécurité ou la légalité d’un service réservé via la plateforme."
+      },
+      "s12": {
+        "title": "12. Limitation de responsabilité",
+        "body": "Dans toute la mesure permise par la loi, BraidFlow ne saurait être tenu responsable de tout dommage indirect, accessoire, spécial, consécutif ou punitif, ni de la perte de bénéfices ou de données, découlant de votre utilisation du service. Notre responsabilité totale pour toute réclamation liée au service n’excédera pas le montant le plus élevé entre la somme que vous avez versée à BraidFlow au cours des trois mois précédant la réclamation, ou cinquante dollars américains."
+      },
+      "s13": {
+        "title": "13. Indemnisation",
+        "body": "Vous acceptez d’indemniser et de dégager BraidFlow de toute responsabilité à l’égard des réclamations, pertes et frais (y compris les frais juridiques raisonnables) découlant de votre utilisation du service, de vos contenus, ou de votre violation de ces Conditions ou des droits d’autrui."
+      },
+      "s14": {
+        "title": "14. Résiliation",
+        "body": "Vous pouvez cesser d’utiliser BraidFlow et fermer votre compte à tout moment. Nous pouvons suspendre ou résilier l’accès si vous enfreignez ces Conditions ou pour protéger la plateforme et ses utilisateurs. Les dispositions qui, par leur nature, doivent survivre à la résiliation — telles que les obligations de paiement, les exclusions de garantie et les limitations de responsabilité — resteront en vigueur."
+      },
+      "s15": {
+        "title": "15. Modifications de ces Conditions",
+        "body": "Nous pouvons mettre à jour ces Conditions de temps à autre. Le cas échéant, nous réviserons la date de « Dernière mise à jour » ci-dessus et, pour les changements importants, fournirons un avis plus visible. La poursuite de l’utilisation du service après l’entrée en vigueur des modifications vaut acceptation."
+      },
+      "s16": {
+        "title": "16. Droit applicable et litiges",
+        "body": "Les présentes Conditions sont régies par les lois de la juridiction dans laquelle BraidFlow exerce ses activités, sans égard aux règles de conflit de lois. Vous acceptez de nous contacter d’abord pour tenter de résoudre tout litige à l’amiable avant d’engager une action formelle."
+      },
+      "s17": {
+        "title": "17. Contact",
+        "body": "Des questions sur ces Conditions ? Écrivez à <a>legal@braidflow.app</a>. Consultez également notre <privacy>Politique de confidentialité</privacy>."
+      }
+    }
+  },
+  "dashboard": {
+    "overview": {
+      "eyebrow": "Tableau de bord",
+      "title": "Bonjour, {name}",
+      "description": "Voici comment se dessine la semaine.",
+      "connectDone": {
+        "title": "Stripe connecté.",
+        "body": "Vous pouvez accepter des réservations dès maintenant — les acomptes sont versés directement sur votre compte."
+      },
+      "connectPending": {
+        "title": "Presque terminé.",
+        "body": "Stripe examine votre compte — les acomptes démarrent dès qu’il est approuvé, généralement en quelques minutes."
+      },
+      "stats": {
+        "bookedThisWeek": "Réservé cette semaine",
+        "revenueThisMonth": "Revenus ce mois-ci",
+        "revenueHint": "Confirmés + terminés",
+        "awaitingDeposit": "En attente d’acompte",
+        "awaitingDepositHint": "Créneaux retenus non encore encaissés",
+        "totalClients": "Total des clientes",
+        "totalClientsHint": "Depuis toujours, uniques"
+      },
+      "upNext": {
+        "title": "À venir",
+        "subtitle": "Vos cinq prochains rendez-vous.",
+        "viewAll": "Tous les rendez-vous"
+      },
+      "empty": {
+        "title": "Rien de prévu cette semaine",
+        "description": "Partagez votre page de réservation et nous la remplirons.",
+        "action": "Copier votre lien"
+      }
+    },
+    "appointments": {
+      "title": "Rendez-vous",
+      "description": "Chaque réservation, passée et à venir.",
+      "empty": {
+        "title": "Aucun rendez-vous pour l’instant",
+        "description": "Quand des clientes réservent sur votre page, chaque rendez-vous — passé et à venir — apparaît ici."
+      },
+      "reschedule": "Reporter",
+      "refundDeposit": "Rembourser l’acompte",
+      "retryRefund": "Réessayer le remboursement",
+      "table": {
+        "when": "Quand",
+        "client": "Cliente",
+        "service": "Prestation",
+        "status": "Statut",
+        "total": "Total"
+      }
+    },
+    "calendar": {
+      "title": "Cette semaine",
+      "appointments": "{count, plural, one {rendez-vous} other {rendez-vous}}",
+      "bookedValue": "valeur réservée",
+      "open": "Libre",
+      "today": "Aujourd’hui"
+    },
+    "clients": {
+      "title": "Clientes",
+      "description": "Toutes celles qui ont réservé avec vous.",
+      "empty": {
+        "title": "Aucune cliente pour l’instant",
+        "description": "Dès qu’une personne réserve, elle apparaît ici — avec son historique et ses notes au même endroit."
+      },
+      "visits": "{count, plural, one {# visite} other {# visites}}",
+      "lifetime": "au total",
+      "lastSeen": "vue pour la dernière fois {date}",
+      "newClient": "Nouvelle cliente"
+    },
+    "services": {
+      "title": "Prestations",
+      "description": "Les styles que vous proposez. Les clientes choisissent dans cette liste.",
+      "addService": "Ajouter une prestation",
+      "emptyTitle": "Aucune prestation pour l’instant",
+      "emptyDescription": "Ajoutez les styles que vous proposez avec leurs tarifs et leur durée.",
+      "addFirst": "Ajouter votre première prestation",
+      "hidden": "Masquée",
+      "depositLabel": "acompte",
+      "edit": "Modifier",
+      "eyebrow": "Prestations",
+      "editDescription": "Modifiez la façon dont cela apparaît aux clientes.",
+      "newTitle": "Nouvelle prestation",
+      "newDescription": "Ajoutez un style que vous proposez. Vous pouvez le modifier à tout moment.",
+      "form": {
+        "nameLabel": "Nom de la prestation",
+        "namePlaceholder": "Box braids knotless — moyennes",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Ce qui est inclus, la longueur, à quoi s’attendre.",
+        "descriptionHint": "Facultatif. Affiché sur votre page de réservation.",
+        "duration": "Durée",
+        "hours": "Heures",
+        "minutes": "Minutes",
+        "priceLabel": "Prix de la prestation",
+        "depositLabel": "Acompte",
+        "depositHint": "Prélevé au moment de la réservation par la cliente.",
+        "showLabel": "Afficher sur ma page de réservation",
+        "showHint": "Décochez pour masquer sans supprimer.",
+        "saving": "Enregistrement…",
+        "saveChanges": "Enregistrer les modifications",
+        "create": "Ajouter une prestation",
+        "cancel": "Annuler"
+      }
+    },
+    "availability": {
+      "title": "Disponibilités",
+      "description": "Les heures auxquelles vous prenez des rendez-vous chaque semaine. Bloquez des dates précises séparément.",
+      "days": {
+        "sunday": "Dimanche",
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi"
+      },
+      "off": "Fermé",
+      "addRange": "+ Ajouter une plage",
+      "removeRange": "Supprimer la plage",
+      "invalidTime": "Choisissez une heure valide.",
+      "from": "De",
+      "to": "À",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "timeOff": "Congés",
+      "addBlock": "Ajouter un blocage",
+      "timeOffDescription": "Vous partez en vacances ou vous vous absentez un après-midi ? Bloquez ce moment ici pour que personne ne le réserve.",
+      "nothingBlocked": "Rien de bloqué pour le moment.",
+      "remove": "Supprimer",
+      "invalidDateTime": "Choisissez une date et une heure valides.",
+      "date": "Date",
+      "noteOptional": "Note (facultatif)",
+      "notePlaceholder": "Anniversaire, événement familial, déplacement…",
+      "saveBlock": "Enregistrer le blocage"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Votre page publique et votre compte.",
+      "bookingLinkLabel": "Votre page de réservation",
+      "copyLink": "Copier le lien",
+      "genericError": "Une erreur s’est produite.",
+      "bookingSection": {
+        "title": "Votre page de réservation",
+        "description": "Ce que voient les clientes lorsqu’elles arrivent sur votre lien."
+      },
+      "accountSection": {
+        "title": "Compte",
+        "description": "Vous seule voyez ceci."
+      },
+      "businessName": "Nom de l’activité",
+      "bio": "Bio",
+      "bioPlaceholder": "Spécialités, années d’expérience, ce qui fait votre différence.",
+      "city": "Ville",
+      "cityPlaceholder": "Atlanta, GA",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "braidsbyyou",
+      "instagramHint": "Sans le @.",
+      "timezone": "Fuseau horaire",
+      "timezoneHint": "Vos horaires hebdomadaires et chaque heure de rendez-vous sont affichés dans ce fuseau. Réglez-le sur le lieu où vous tressez réellement.",
+      "acceptingBookings": "Accepter de nouvelles réservations",
+      "acceptingBookingsHint": "Décochez pour mettre votre page en pause sans la retirer.",
+      "stripeRequired": "Connectez Stripe (bannière en haut de votre tableau de bord) avant de pouvoir accepter des réservations — les clientes ne peuvent pas verser d’acompte tant que votre compte n’est pas configuré.",
+      "yourName": "Votre nom",
+      "phone": "Téléphone",
+      "phonePlaceholder": "(555) 123-4567",
+      "saving": "Enregistrement…",
+      "saveChanges": "Enregistrer les modifications",
+      "saved": "Enregistré."
+    },
+    "error": {
+      "title": "Impossible de charger ceci",
+      "description": "Une erreur s’est produite lors de la récupération de vos données. C’est généralement temporaire.",
+      "reference": "Référence : {digest}",
+      "retry": "Réessayer"
+    },
+    "status": {
+      "confirmed": "Confirmé",
+      "awaitingDeposit": "En attente d’acompte",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "noShow": "Absence",
+      "deposit": "Acompte"
+    }
+  },
+  "deposit": {
+    "depositNone": "Aucun acompte",
+    "depositPending": "Acompte en attente",
+    "depositHeld": "Acompte retenu",
+    "depositRefundPending": "Remboursement en cours",
+    "depositRefunded": "Acompte remboursé",
+    "depositRefundFailed": "Échec du remboursement"
+  },
+  "auth": {
+    "panel": {
+      "tagline": "La plateforme de réservation conçue pour les <em>tresseuses.</em>",
+      "highlights": {
+        "deposits": "Encaissez les acomptes d’avance avec Stripe",
+        "noshows": "Ne perdez plus de fauteuils à cause des absences",
+        "autopilot": "Toute votre semaine, en pilotage automatique"
+      },
+      "testimonial": {
+        "quote": "La configuration a pris 15 minutes. Le lien dans ma bio fait enfin le travail à ma place.",
+        "author": "Kemi A. · Goddess locs, Houston"
+      }
+    },
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous pour gérer vos réservations.",
+      "newHere": "Nouvelle ici ?",
+      "createAccount": "Créer un compte",
+      "errors": {
+        "verification": "Ce lien est invalide ou a expiré. Essayez de vous connecter, ou réinitialisez votre mot de passe."
+      },
+      "forgotPassword": "Mot de passe oublié ?",
+      "form": {
+        "email": "E-mail",
+        "password": "Mot de passe"
+      },
+      "signIn": "Se connecter",
+      "signingIn": "Connexion…"
+    },
+    "signup": {
+      "title": {
+        "braider": "Créez votre page de réservation",
+        "client": "Créez votre compte"
+      },
+      "subtitle": {
+        "braider": "Environ une minute. Vous ajouterez vos prestations juste après.",
+        "client": "Réservez votre prochain rendez-vous en quelques clics."
+      },
+      "haveAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "roleLegend": "Je m’inscris en tant que",
+      "role": {
+        "client": "Cliente",
+        "braider": "Tresseuse"
+      },
+      "form": {
+        "fullName": "Nom complet",
+        "email": "E-mail",
+        "password": "Mot de passe",
+        "passwordHint": "Au moins 8 caractères."
+      },
+      "creatingAccount": "Création du compte…",
+      "createAccount": "Créer un compte",
+      "terms": "En créant un compte, vous acceptez nos <terms>Conditions</terms> et notre <privacy>Politique de confidentialité</privacy>."
+    },
+    "forgot": {
+      "title": "Réinitialisez votre mot de passe",
+      "subtitle": "Saisissez l’e-mail de votre compte et nous vous enverrons un lien pour définir un nouveau mot de passe.",
+      "remembered": "Vous vous en souvenez ?",
+      "backToSignIn": "Retour à la connexion",
+      "form": {
+        "email": "E-mail"
+      },
+      "sendResetLink": "Envoyer le lien de réinitialisation",
+      "sendingLink": "Envoi du lien…",
+      "sent": {
+        "title": "Vérifiez votre boîte de réception",
+        "body": "Si un compte existe pour <email>{address}</email>, nous avons envoyé un lien pour réinitialiser votre mot de passe. Il expire dans environ une heure.",
+        "retry": "Vous ne l’avez pas reçu ? Vérifiez vos spams, ou <retry>réessayez</retry>."
+      }
+    },
+    "reset": {
+      "title": "Définir un nouveau mot de passe",
+      "subtitle": "Choisissez un mot de passe fort que vous n’utilisez nulle part ailleurs.",
+      "form": {
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "passwordHint": "Au moins 8 caractères."
+      },
+      "saveNewPassword": "Enregistrer le nouveau mot de passe",
+      "saving": "Enregistrement…",
+      "errors": {
+        "mismatch": "Ces mots de passe ne correspondent pas."
+      }
+    }
+  },
+  "errors": {
+    "backToHome": "Retour à l’accueil",
+    "tryAgain": "Réessayer",
+    "reference": "Référence : {digest}",
+    "boundary": {
+      "code": "Oups",
+      "title": "Un souci de notre côté.",
+      "description": "Nous l’avons enregistré. Réessayez dans un instant — et si cela persiste, écrivez-nous."
+    },
+    "notFound": {
+      "title": "Cette page s’est glissée entre les tresses.",
+      "description": "Le lien est peut-être ancien, ou la page n’a jamais existé. Quoi qu’il en soit — nous vous remettons sur la bonne voie.",
+      "browseBraiders": "Ou parcourir les tresseuses"
+    },
+    "client": {
+      "title": "Une erreur s’est produite",
+      "description": "Impossible de charger cette page. Réessayez dans un instant."
+    },
+    "home": "Accueil"
+  },
+  "footer": {
+    "tagline": "La plateforme de réservation conçue pour les tresseuses. Encaissez des acomptes, éliminez les absences et gérez votre semaine sans les DM.",
+    "columns": {
+      "product": {
+        "heading": "Produit",
+        "links": {
+          "findBraider": "Trouver une tresseuse",
+          "pricing": "Tarifs",
+          "forBraiders": "Pour les tresseuses"
+        }
+      },
+      "account": {
+        "heading": "Compte",
+        "links": {
+          "login": "Se connecter",
+          "createAccount": "Créer un compte",
+          "myBookings": "Mes réservations"
+        }
+      },
+      "company": {
+        "heading": "Entreprise",
+        "links": {
+          "contact": "Contact",
+          "privacy": "Confidentialité",
+          "terms": "Conditions"
+        }
+      }
+    },
+    "copyright": "© {year} BraidFlow. Tous droits réservés.",
+    "securedByStripe": "Paiements sécurisés par Stripe"
+  },
+  "booking": {
+    "anythingHeading": "Ce que nous devrions savoir",
+    "balanceAtAppointment": "Solde au rendez-vous",
+    "bookAppointment": "Réservez votre rendez-vous",
+    "booksClosed": "Ses réservations sont actuellement fermées. Revenez bientôt ou parcourez d’autres tresseuses.",
+    "browseBraiders": "Parcourir les tresseuses",
+    "chooseServiceTime": "Choisissez une prestation et un horaire — un petit acompte retient votre créneau, remboursable jusqu’à {hours} heures avant.",
+    "chooseTime": "Choisissez un horaire",
+    "continue": "Continuer",
+    "continueToDeposit": "Continuer vers l’acompte",
+    "depositDueNow": "Acompte à régler maintenant",
+    "durationDeposit": "{duration} · acompte {deposit}",
+    "guestEmail": "E-mail",
+    "guestEmailHint": "Votre confirmation arrive ici",
+    "guestEmailPlaceholder": "vous@email.com",
+    "guestName": "Votre nom",
+    "guestNamePlaceholder": "Aisha Bello",
+    "guestPhone": "Téléphone (facultatif)",
+    "guestPhonePlaceholder": "Pour que votre tresseuse puisse vous joindre",
+    "haveAccountLogIn": "Vous avez un compte ? Connectez-vous",
+    "noChargeUntilConfirm": "Aucun prélèvement avant votre confirmation de paiement",
+    "noOpenings": "Aucune disponibilité ce jour-là",
+    "noServices": "Cette tresseuse n’a pas encore publié de prestations. Revenez bientôt.",
+    "notTakingBookings": "{name} n’accepte pas de réservations pour le moment",
+    "notesAria": "Notes pour votre tresseuse",
+    "notesPlaceholder": "Texture des cheveux, longueur, raie préférée…",
+    "optional": "— facultatif",
+    "pickService": "Choisissez une prestation",
+    "pickServiceTime": "Choisissez une prestation et un horaire",
+    "reserving": "Réservation…",
+    "serviceTotal": "Total de la prestation",
+    "stepDetails": "Vos informations",
+    "stepService": "Prestation",
+    "stepTime": "Horaire",
+    "trustCancellation": "Annulation gratuite jusqu’à <strong>{hours} heures</strong> avant — acompte intégralement remboursé.",
+    "trustCard": "Carte sécurisée par Stripe. Nous ne voyons jamais les détails de votre carte.",
+    "trustDeposit": "Votre acompte va directement à <strong>{name}</strong> — il est déduit de votre total.",
+    "tryOtherDates": "Essayez l’une des autres dates ci-dessus.",
+    "viewProfile": "Voir le profil",
+    "yourBooking": "Votre réservation"
+  },
+  "bookingActions": {
+    "back": "Retour",
+    "cancel": "Annuler",
+    "cancelConfirm": "Annuler cette réservation ?",
+    "confirm": "Confirmer",
+    "genericError": "Une erreur s’est produite.",
+    "keepIt": "La conserver",
+    "markCompleted": "Marquer comme terminé",
+    "markCompletedConfirm": "Marquer comme terminé ?",
+    "markNoShowConfirm": "Marquer comme absence ?",
+    "noShow": "Absence",
+    "refundConfirm": "Rembourser {amount} à la cliente ?",
+    "refundDeposit": "Rembourser l’acompte",
+    "yesCancel": "Oui, annuler",
+    "yesRefund": "Oui, rembourser"
+  },
+  "bookings": {
+    "bookAnother": "Réserver un autre",
+    "browseBraiders": "Parcourir les tresseuses",
+    "completeDeposit": "Finaliser l’acompte →",
+    "description": "Rendez-vous à venir et passés.",
+    "emptyDescription": "Trouvez une tresseuse près de chez vous et bloquez votre premier rendez-vous.",
+    "emptyTitle": "Aucune réservation pour l’instant",
+    "reschedule": "Reporter",
+    "reviewed": "Avis publié · merci !",
+    "title": "Mes réservations",
+    "with": "avec",
+    "statusPendingPayment": "En attente d’acompte",
+    "statusConfirmed": "Confirmé",
+    "statusCompleted": "Terminé",
+    "statusCancelled": "Annulé",
+    "statusNoShow": "Absence"
+  },
+  "reschedule": {
+    "appointmentsList": "liste des rendez-vous",
+    "back": "Retour",
+    "backToAppointments": "Retour aux rendez-vous",
+    "backToMyBookings": "Retour à mes réservations",
+    "bookingsList": "liste des réservations",
+    "cantFindTime": "Vous ne trouvez pas d’horaire qui convient ?",
+    "cantReschedule": "Cette réservation ne peut pas être reportée",
+    "cantRescheduleBody": "Elle est soit déjà annulée, soit terminée.",
+    "confirmNewTime": "Confirmer le nouvel horaire",
+    "confirming": "Confirmation…",
+    "currentlyScheduled": "Actuellement prévu",
+    "depositTransfers": "Votre acompte est transféré automatiquement.",
+    "keepCurrentTime": "Conserver l’horaire actuel",
+    "moved": "Déplacé.",
+    "movedBody": "Votre rendez-vous avec {business} est désormais {time}.",
+    "newAppointment": "Nouveau rendez-vous",
+    "newTime": "Nouvel horaire",
+    "orCancelFrom": "ou annulez depuis votre",
+    "pickATime": "Choisissez un horaire",
+    "pickNewTime": "Choisissez un nouvel horaire",
+    "rescheduleLabel": "Reporter",
+    "sameServiceWith": "Même {service} avec {business}. Votre acompte est reporté — aucun paiement nécessaire.",
+    "seePage": "Voir la page de {business}",
+    "takingBack": "Retour en cours…"
+  },
+  "confirmation": {
+    "backToBraider": "Retour à la tresseuse",
+    "balanceAtAppointment": "Solde au rendez-vous",
+    "bookingConfirmed": "Réservation confirmée",
+    "bookingNotActive": "Réservation inactive",
+    "braider": "Tresseuse",
+    "depositPaid": "Acompte payé",
+    "finalizing": "Finalisation de votre réservation…",
+    "finalizingBody": "Votre carte a été acceptée. Nous confirmons avec l’agenda de la tresseuse.",
+    "findAnotherTime": "Trouver un autre horaire",
+    "goToMyBookings": "Aller à mes réservations",
+    "guestEmailNote": "Votre confirmation arrive par e-mail. ",
+    "guestKeepEmail": "Conservez l’e-mail que nous vous avons envoyé — il contient le lien pour gérer cette réservation à tout moment.",
+    "justASec": "Un instant",
+    "onTheBooks": "C’est réservé.",
+    "paymentFailed": "Le paiement n’a pas abouti",
+    "pollerTimeout": "Cela prend plus de temps que d’habitude. Votre paiement est en sécurité — nous vous enverrons votre confirmation par e-mail dès qu’il sera validé.",
+    "reschedule": "Reporter",
+    "remindBefore": "Nous vous rappellerons avant votre rendez-vous.",
+    "seeAllBookings": "Voir toutes mes réservations",
+    "service": "Prestation",
+    "slotReleased": "Ce créneau a été libéré.",
+    "slotReleasedBody": "Le créneau retenu a expiré ou la réservation a été annulée. Tout remboursement d’acompte suit la politique d’annulation — un remboursement intégral si l’annulation intervient au moins {hours} heures avant le rendez-vous. Vous pouvez réserver à nouveau à tout moment.",
+    "tryAgainBody": "Votre carte a été refusée. Votre créneau est retenu encore quelques minutes.",
+    "tryAgainTitle": "Réessayons.",
+    "tryDifferentCard": "Essayer une autre carte",
+    "waitingConfirmation": "En attente de confirmation",
+    "when": "Quand"
+  },
+  "pay": {
+    "testMode": "Mode test",
+    "demoNote": "aucune carte n'est débitée. Payez pour simuler l'acompte et voir votre confirmation.",
+    "demoCard": "Carte de test",
+    "backToBraider": "Retour à la tresseuse",
+    "balanceAtAppointment": "Solde au rendez-vous",
+    "bookingWith": "Réservation avec",
+    "cancellationTerms": "En payant, vous acceptez la politique d’annulation : remboursement intégral de l’acompte si vous annulez au moins {hours} heures avant votre rendez-vous ; l’acompte n’est plus remboursable au-delà.",
+    "cancelledBody": "Si c’était une erreur, vous pouvez réserver à nouveau depuis la page de la tresseuse.",
+    "cancelledTitle": "Cette réservation a été annulée",
+    "cantLoadBody": "Réessayez dans un instant. Si cela persiste, réservez à nouveau depuis la page de la tresseuse.",
+    "cantLoadTitle": "Impossible de charger ce paiement",
+    "cardError": "Un problème est survenu avec votre carte.",
+    "cardSecured": "Carte sécurisée par Stripe — nous ne voyons jamais vos détails.",
+    "charging": "Prélèvement de votre acompte…",
+    "depositDueNow": "Acompte à régler maintenant",
+    "findAnotherTime": "Trouver un autre horaire",
+    "freeCancellation": "Annulation gratuite jusqu’à {hours} heures avant — acompte intégralement remboursé.",
+    "loadingCheckout": "Chargement du paiement sécurisé…",
+    "payDeposit": "Payer l’acompte de {amount}",
+    "payYourDeposit": "Payez votre acompte",
+    "serviceTotal": "Total de la prestation",
+    "slotHeld": "Votre créneau est retenu le temps de finaliser — cela ne prend qu’une minute.",
+    "tryAgain": "Réessayer"
+  },
+  "pricing": {
+    "badge": "Tarifs",
+    "title": "Gratuit pendant notre <em>bêta.</em>",
+    "subtitle": "Aucun abonnement mensuel. Aucune commission sur vos prestations. Vous gardez 100 % de chaque acompte — nous le versons directement sur votre compte Stripe.",
+    "card": {
+      "badge": "Bêta",
+      "title": "Tout, gratuitement",
+      "priceNote": "pendant la bêta",
+      "body": "Le produit complet, sans limites cachées. Nous ajouterons des forfaits payants plus tard — en vous prévenant — mais tout ce qui suit est à vous dès aujourd’hui."
+    },
+    "startFree": "Commencer gratuitement",
+    "included": [
+      "Votre propre page de réservation à votre image",
+      "Acomptes Stripe — vous gardez 100 %",
+      "Disponibilités hebdomadaires + jours bloqués",
+      "Montants d’acompte par prestation",
+      "Rappels automatiques par e-mail à 24 h + 2 h",
+      "Report + annulation avec une fenêtre de remboursement que vous définissez",
+      "Notes sur les clientes et historique des réservations",
+      "Avis sur les rendez-vous terminés"
+    ],
+    "stripeNote": "Les frais de traitement standard de Stripe (~2,9 % + 30 ¢) s’appliquent à chaque acompte et reviennent à Stripe, pas à nous.",
+    "faqLabel": "Les questions que nous posent les tresseuses",
+    "faqTitle": "Les détails, en clair.",
+    "cta": {
+      "title": "Une seule absence, c’est <em>déjà trop.</em>",
+      "body": "La plupart des tresseuses à qui nous parlons perdent 1 à 2 rendez-vous par mois à cause des désistements. Un acompte d’avance y met fin — et en ce moment, tout est gratuit."
+    },
+    "faqs": {
+      "cost": {
+        "q": "Combien coûte BraidFlow ?",
+        "a": "C’est gratuit pendant notre bêta. Aucun abonnement mensuel, et nous prenons 0 % de vos acomptes — vous gardez chaque centime. Stripe facture ses frais de traitement standard (~2,9 % + 30 ¢) sur l’acompte ; cela revient à Stripe, pas à nous."
+      },
+      "alwaysFree": {
+        "q": "Sera-ce toujours gratuit ?",
+        "a": "Nous introduirons des forfaits payants plus tard, à mesure que nous enrichirons le produit. Vous serez prévenue bien à l’avance avant tout changement, et nous ne ferons jamais passer en payant une fonctionnalité dont vous dépendez sans vous prévenir d’abord."
+      },
+      "cut": {
+        "q": "Prenez-vous une commission sur mes prestations ?",
+        "a": "Non. Pendant la bêta, notre commission est de 0 %. Les acomptes vont directement sur votre compte Stripe connecté — nous ne touchons jamais à l’argent au-delà de son acheminement vers vous."
+      },
+      "clientPay": {
+        "q": "Mes clientes paient-elles quelque chose pour utiliser BraidFlow ?",
+        "a": "Non. Elles réservent et versent leur acompte — le même parcours que sur n’importe quel site de salon. Elles ne voient jamais de frais BraidFlow."
+      },
+      "start": {
+        "q": "De quoi ai-je besoin pour commencer à encaisser des acomptes ?",
+        "a": "Un compte Stripe. Vous le connectez depuis votre tableau de bord en environ deux minutes (Stripe gère les détails), et vos clientes peuvent alors réserver. Tant qu’il n’est pas connecté, votre page de réservation reste en pause."
+      },
+      "noStripe": {
+        "q": "Et si Stripe n’est pas disponible dans mon pays ?",
+        "a": "Pour l’instant, BraidFlow fonctionne avec Stripe, il vous faut donc un pays pris en charge par Stripe. Si vous êtes ailleurs, écrivez-nous — nous suivons la demande et ajouterons des alternatives en conséquence."
+      }
+    }
+  },
+  "directory": {
+    "clearSearch": "Effacer la recherche",
+    "countAvailable": "{count, plural, one {# tresseuse disponible} other {# tresseuses disponibles}}",
+    "countForQuery": "{count, plural, one {# tresseuse} other {# tresseuses}} pour « {query} »",
+    "description": "De vraies coiffeuses, de vraies disponibilités. Cherchez dans votre ville, comparez et réservez en une minute.",
+    "emptyDescription": "Nous intégrons les premières coiffeuses en ce moment. Revenez bientôt.",
+    "emptyMatchDescription": "Essayez un autre nom ou une autre ville, ou effacez la recherche pour voir tout le monde.",
+    "emptyMatchTitle": "Aucune tresseuse ne correspond à « {query} »",
+    "emptyTitle": "Aucune tresseuse ici pour l’instant",
+    "eyebrow": "L’annuaire",
+    "fromPrice": "à partir de {price}",
+    "new": "Nouveau",
+    "searchAriaLabel": "Rechercher des tresseuses par nom ou par ville",
+    "searchButton": "Rechercher",
+    "searchPlaceholder": "Rechercher par nom ou par ville",
+    "sortAriaLabel": "Trier les tresseuses",
+    "title": "Trouver une tresseuse",
+    "sortRating": "Les mieux notées",
+    "sortPriceLowHigh": "Prix : croissant",
+    "sortNewest": "Les plus récentes"
+  },
+  "profile": {
+    "workHeading": "Travaux récents",
+    "bookHeading": "Prendre rendez-vous",
+    "bookSubtitle": "Choisissez une prestation et un horaire qui vous conviennent. L’acompte retient votre créneau.",
+    "cancel": "Annuler",
+    "clientFallback": "Cliente",
+    "durationDeposit": "{duration} · acompte {deposit}",
+    "howWasAppointment": "Comment s’est passé votre rendez-vous ?",
+    "leaveReview": "Laisser un avis",
+    "notBookingOnline": "{name} n’accepte pas de réservations en ligne pour le moment.",
+    "pickRating": "Choisissez une note en étoiles.",
+    "postReview": "Publier l’avis",
+    "posting": "Publication…",
+    "reachInstagram": "Contacter sur Instagram",
+    "reviewCount": "{count, plural, one {# avis} other {# avis}}",
+    "reviewPlaceholder": "Partagez ce qui vous a marquée (facultatif).",
+    "reviewsHeading": "Ce que disent les clientes",
+    "seeAvailableTimes": "Voir les horaires disponibles",
+    "servicesHeading": "Prestations",
+    "starAria": "{count, plural, one {# étoile} other {# étoiles}}",
+    "starsAriaLabel": "Noté {rating} sur 5"
+  },
+  "connect": {
+    "connect": "Connecter Stripe",
+    "continueSetup": "Continuer la configuration",
+    "description": "Les clientes ne peuvent pas réserver tant que vous n’avez pas connecté un compte Stripe pour recevoir les acomptes. Cela prend environ deux minutes, et vous gardez 100 % de chaque acompte.",
+    "opening": "Ouverture de Stripe…",
+    "title": "Connectez Stripe pour commencer à accepter des réservations",
+    "verifyingDescription": "Vos informations sont en cours d’examen. Les acomptes restent en pause jusqu’à ce que Stripe approuve votre compte — cela ne prend généralement que quelques minutes.",
+    "verifyingTitle": "Stripe vérifie votre compte"
+  },
+  "activation": {
+    "title": "Terminez la configuration de votre page de réservation",
+    "subtitle": "Trois étapes rapides et les clientes peuvent commencer à réserver et à verser des acomptes.",
+    "addService": {
+      "title": "Ajoutez votre première prestation",
+      "description": "Indiquez un style, son prix et l’acompte qui retient le créneau.",
+      "action": "Ajouter une prestation"
+    },
+    "setHours": {
+      "title": "Définissez vos horaires hebdomadaires",
+      "description": "Choisissez les jours et les heures où les clientes peuvent réserver.",
+      "action": "Définir les horaires"
+    },
+    "stripe": {
+      "title": "Connectez Stripe pour être payée",
+      "reviewDescription": "Vos informations sont en cours d’examen — les acomptes démarrent dès que Stripe approuve, généralement en quelques minutes.",
+      "description": "Les acomptes sont versés directement sur votre compte. Cela prend environ deux minutes.",
+      "opening": "Ouverture…",
+      "continue": "Continuer",
+      "connect": "Connecter Stripe"
     }
   }
 }

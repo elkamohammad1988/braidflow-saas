@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   ShieldCheck,
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Reveal } from '@/components/motion/reveal';
 import { Magnetic } from '@/components/motion/magnetic';
 import { CountUp } from '@/components/motion/count-up';
+import { BRAID_PHOTOS, STUDIO_PHOTOS, WARM_BLUR } from '@/lib/media';
 import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
 import { useTranslations } from 'next-intl';
 
@@ -228,6 +230,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ───────────────────────── CRAFT STRIP — a photographic breather ───────────────────────── */}
+      <section aria-hidden className="relative">
+        <div className="grid grid-cols-2 md:grid-cols-4">
+          {[
+            { src: BRAID_PHOTOS.boxBraidsTop, hideMobile: false },
+            { src: STUDIO_PHOTOS.warmInterior, hideMobile: false },
+            { src: BRAID_PHOTOS.sectionsClose, hideMobile: true },
+            { src: BRAID_PHOTOS.longBeaded, hideMobile: true }
+          ].map((im, i) => (
+            <div
+              key={i}
+              className={`relative aspect-[4/5] overflow-hidden md:aspect-square ${
+                im.hideMobile ? 'hidden md:block' : ''
+              }`}
+            >
+              <Image
+                src={im.src}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                placeholder="blur"
+                blurDataURL={WARM_BLUR}
+                className="object-cover transition-transform duration-[1200ms] ease-spring hover:scale-[1.05]"
+              />
+            </div>
+          ))}
+        </div>
+        {/* seam fades so the band melts into the cream sections above and below */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-cream-deep/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-cream to-transparent" />
+      </section>
+
       {/* ───────────────────────── TESTIMONIALS ───────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
         <Reveal>
@@ -422,7 +456,7 @@ function HeroPreview() {
           <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
-          <span className="ml-3 truncate font-mono text-[11px] text-ink-subtle">
+          <span className="ms-3 truncate font-mono text-[11px] text-ink-subtle">
             braidflow.app/nia-braids
           </span>
         </div>
@@ -437,7 +471,7 @@ function HeroPreview() {
               <p className="font-display text-lg font-medium leading-tight text-ink">{t('preview.name')}</p>
               <p className="font-mono text-[11px] text-ink-muted">{t('preview.location')}</p>
             </div>
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-moss/10 px-2 py-0.5 text-[11px] font-medium text-moss ring-1 ring-moss/15">
+            <span className="ms-auto inline-flex items-center gap-1 rounded-full bg-moss/10 px-2 py-0.5 text-[11px] font-medium text-moss ring-1 ring-moss/15">
               <span className="h-1.5 w-1.5 rounded-full bg-moss-bright" />
               {t('preview.status')}
             </span>
@@ -493,7 +527,7 @@ function HeroPreview() {
       </div>
 
       {/* floating confirmation chip */}
-      <div className="absolute -bottom-5 -left-5 hidden items-center gap-2 rounded-full border border-line bg-paper px-4 py-2.5 shadow-lifted sm:flex">
+      <div className="absolute -bottom-5 -start-5 hidden items-center gap-2 rounded-full border border-line bg-paper px-4 py-2.5 shadow-lifted sm:flex">
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
           <CalendarCheck className="h-3.5 w-3.5" strokeWidth={2.2} />
         </span>

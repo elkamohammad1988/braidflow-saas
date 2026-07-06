@@ -81,7 +81,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
                 {active && (
                   <span
                     aria-hidden
-                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-gold-bright to-gold"
+                    className="absolute start-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gradient-to-b from-gold-bright to-gold"
                   />
                 )}
                 <Icon

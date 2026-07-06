@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { db, dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
@@ -139,28 +140,37 @@ export async function createBookingAction(input: CreateBookingInput) {
     return { error: 'Could not create that booking. Try again.' };
   }
 
-  let intent;
-  try {
-    intent = await stripe.paymentIntents.create({
-      amount: service.deposit_cents,
-      currency: CURRENCY,
-      automatic_payment_methods: { enabled: true },
-      // Destination charge: the braider is the merchant of record and receives
-      // the full deposit in their connected account. No application_fee_amount —
-      // the platform takes no cut during beta (see lib/constants PLATFORM_FEE_BPS
-      // for the future model). Refunds reverse this transfer (see refund.ts).
-      on_behalf_of: connectedAccountId,
-      transfer_data: { destination: connectedAccountId },
-      metadata: { booking_id: booking.id, kind: 'deposit' },
-      description: `Deposit · ${service.name}`
-    });
-  } catch (err) {
-    // Roll back the hold so the slot isn't stuck until the expiry cron, and the
-    // user gets a clean error instead of an unhandled rejection.
-    console.error('[booking] PaymentIntent creation failed, rolling back', booking.id, err);
-    captureException(err, { stage: 'payment_intent.create', bookingId: booking.id });
-    await admin.from('bookings').delete().eq('id', booking.id);
-    return { error: 'Could not start payment. Please try again.' };
+  // Deposit PaymentIntent. With real Stripe configured this is a Connect
+  // destination charge to the braider's account. In the keyless demo we skip
+  // Stripe entirely and synthesize an id — the deposit is simulated on the pay
+  // page (see confirmDemoDepositAction); no money ever moves.
+  let paymentIntentId: string;
+  if (isStripeConfigured()) {
+    try {
+      const intent = await stripe.paymentIntents.create({
+        amount: service.deposit_cents,
+        currency: CURRENCY,
+        automatic_payment_methods: { enabled: true },
+        // Destination charge: the braider is the merchant of record and receives
+        // the full deposit in their connected account. No application_fee_amount —
+        // the platform takes no cut during beta (see lib/constants PLATFORM_FEE_BPS
+        // for the future model). Refunds reverse this transfer (see refund.ts).
+        on_behalf_of: connectedAccountId,
+        transfer_data: { destination: connectedAccountId },
+        metadata: { booking_id: booking.id, kind: 'deposit' },
+        description: `Deposit · ${service.name}`
+      });
+      paymentIntentId = intent.id;
+    } catch (err) {
+      // Roll back the hold so the slot isn't stuck until the expiry cron, and the
+      // user gets a clean error instead of an unhandled rejection.
+      console.error('[booking] PaymentIntent creation failed, rolling back', booking.id, err);
+      captureException(err, { stage: 'payment_intent.create', bookingId: booking.id });
+      await admin.from('bookings').delete().eq('id', booking.id);
+      return { error: 'Could not start payment. Please try again.' };
+    }
+  } else {
+    paymentIntentId = `pi_demo_${booking.id}`;
   }
 
   const { error: paymentError } = await admin.from('payments').insert({
@@ -168,7 +178,7 @@ export async function createBookingAction(input: CreateBookingInput) {
     kind: 'deposit',
     amount_cents: service.deposit_cents,
     status: 'pending',
-    stripe_payment_intent_id: intent.id
+    stripe_payment_intent_id: paymentIntentId
   });
 
   if (paymentError) {
@@ -176,13 +186,15 @@ export async function createBookingAction(input: CreateBookingInput) {
     // and the webhook would match nothing. Cancel the intent and release the
     // hold rather than proceed.
     console.error('[booking] payment row insert failed, rolling back', booking.id, paymentError);
-    try {
-      await stripe.paymentIntents.cancel(intent.id);
-    } catch (cancelErr) {
-      // Worst case: a live PaymentIntent with no local payment row. Alert loudly
-      // so it can be reconciled before a client is charged for a phantom booking.
-      console.error('[booking] PI cancel during rollback failed', intent.id, cancelErr);
-      captureException(cancelErr, { stage: 'payment_intent.cancel', paymentIntentId: intent.id });
+    if (isStripeConfigured()) {
+      try {
+        await stripe.paymentIntents.cancel(paymentIntentId);
+      } catch (cancelErr) {
+        // Worst case: a live PaymentIntent with no local payment row. Alert loudly
+        // so it can be reconciled before a client is charged for a phantom booking.
+        console.error('[booking] PI cancel during rollback failed', paymentIntentId, cancelErr);
+        captureException(cancelErr, { stage: 'payment_intent.cancel', paymentIntentId });
+      }
     }
     await admin.from('bookings').delete().eq('id', booking.id);
     return { error: 'Could not start payment. Please try again.' };

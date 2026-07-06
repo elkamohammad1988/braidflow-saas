@@ -116,8 +116,8 @@ export function BookingFlow({
 
   return (
     <>
-      <div className="grid gap-8 pb-28 md:grid-cols-[1fr_340px] md:pb-0">
-        <div className="space-y-9">
+      <div className="grid gap-8 pb-28 md:grid-cols-[minmax(0,1fr)_340px] md:pb-0">
+        <div className="min-w-0 space-y-9">
           <section>
             <StepHeader n={1} label={t('stepService')} done={Boolean(serviceId)} />
             <ServiceList services={services} selectedId={serviceId} onSelect={onSelectService} />

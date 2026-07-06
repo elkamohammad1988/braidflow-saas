@@ -30,7 +30,7 @@ export function SignOutLink({ className }: { className?: string }) {
         className
       )}
     >
-      {pending && <Spinner className="mr-1.5 h-3 w-3" />}
+      {pending && <Spinner className="me-1.5 h-3 w-3" />}
       {t('signOut')}
     </button>
   );

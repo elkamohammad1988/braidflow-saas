@@ -70,7 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       <div className="mx-auto flex max-w-[1440px]">
         {/* Desktop sidebar */}
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-cream-deep/40 px-4 py-6 md:flex">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-e border-line bg-cream-deep/40 px-4 py-6 md:flex">
           <Link href="/" aria-label="BraidFlow home" className="px-2 transition-opacity hover:opacity-80">
             <Logo />
           </Link>

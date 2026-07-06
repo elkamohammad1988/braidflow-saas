@@ -136,8 +136,8 @@ export default async function CalendarPage() {
                   <li
                     key={b.id}
                     className={cn(
-                      'rounded-lg border-l-2 bg-cream/70 py-1.5 pl-2.5 pr-2',
-                      b.status === 'confirmed' ? 'border-l-moss' : 'border-l-clay'
+                      'rounded-lg border-s-2 bg-cream/70 py-1.5 ps-2.5 pe-2',
+                      b.status === 'confirmed' ? 'border-s-moss' : 'border-s-clay'
                     )}
                   >
                     <p className="font-mono text-[11px] font-medium tabular-nums text-ink">
@@ -157,7 +157,7 @@ export default async function CalendarPage() {
               </ul>
 
               {items.length > 0 && (
-                <p className="mt-2 border-t border-line pt-1.5 text-right font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+                <p className="mt-2 border-t border-line pt-1.5 text-end font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
                   {formatMoney(dayTotal)}
                 </p>
               )}
@@ -234,7 +234,7 @@ export default async function CalendarPage() {
                         </p>
                         <p className="truncate text-xs text-ink-muted">{b.services?.name}</p>
                       </div>
-                      <div className="shrink-0 text-right">
+                      <div className="shrink-0 text-end">
                         <p className="font-mono text-xs font-medium tabular-nums text-ink">
                           {formatInZone(b.scheduled_at, tz, 'h:mm a')}
                         </p>

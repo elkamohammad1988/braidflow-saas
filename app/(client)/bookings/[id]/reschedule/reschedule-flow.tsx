@@ -136,7 +136,7 @@ export function RescheduleFlow({
           >
             {pending ? (
               <>
-                <Spinner className="mr-2" />
+                <Spinner className="me-2" />
                 {t('confirming')}
               </>
             ) : (

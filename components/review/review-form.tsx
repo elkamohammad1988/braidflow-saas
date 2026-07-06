@@ -61,7 +61,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         e.preventDefault();
         submit();
       }}
-      className="mt-3 rounded-card border border-line bg-cream/50 p-4 text-left"
+      className="mt-3 rounded-card border border-line bg-cream/50 p-4 text-start"
     >
       <p className="text-sm font-medium text-ink">{t('howWasAppointment')}</p>
 
@@ -108,7 +108,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         <Button type="submit" size="sm" disabled={pending}>
           {pending ? (
             <>
-              <Spinner className="mr-2" />
+              <Spinner className="me-2" />
               {t('posting')}
             </>
           ) : (
