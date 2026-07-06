@@ -24,7 +24,7 @@ fullest dashboard and calendar:
 |---|------|-------|-------------|
 | 1 | `01-landing-hero.png` | `/` | The hook. The whole pitch + the real booking card, not a stock mock. Best single asset — lead with it everywhere. |
 | 2 | `04-braiders-directory.png` | `/braiders` | Proves it's a two-sided product (marketplace + booking). **Recapture once real braider photos are in** — the empty cards are the one weak spot. |
-| 3 | `03-booking-confirmed.png` **(NEW — capture this)** | `/bookings/e0000000-0000-4000-8000-0000000000f1/confirmation?t=demo-confirm-simone` | **The money shot.** "You're on the books" + the gold deposit receipt (Simone Carter · Knotless Box Braids · $40 paid / $140 balance). The product's entire thesis; no screenshot captured it before. |
+| 3 | `03-booking-confirmed.png` | `/bookings/e0000000-0000-4000-8000-0000000000f1/confirmation?t=demo-confirm-simone` | **The money shot.** "You're on the books" + the gold deposit receipt (Amara Braids · Knotless Box Braids · $40 paid / $140 balance). The product's entire thesis in one screen. |
 | 4 | `05-login.png` | `/login` | Premium split-screen. The craft signal that separates "designed" from "bootstrapped." Transitions the story to the braider's side. |
 | 5 | `06-dashboard-overview.png` | `/dashboard` | The command center — KPI cards + a full "Up next" (now several appointments, not one). |
 | 6 | `09-bookings.png` | `/dashboard/appointments` | The strongest data screen. Dense, real data, all five status states incl. a **no-show** (deposit kept) and a **cancelled → deposit refunded**. Real names on every row now. |
