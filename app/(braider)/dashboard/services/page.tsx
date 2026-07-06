@@ -8,10 +8,12 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDuration, formatMoney } from '@/lib/utils';
+import { getTranslations } from 'next-intl/server';
 
 export default async function ServicesPage() {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: services, error } = await database
     .from('services')
@@ -24,11 +26,11 @@ export default async function ServicesPage() {
   return (
     <div>
       <PageHeader
-        title="Services"
-        description="The styles you offer. Clients pick from this list."
+        title={t('services.title')}
+        description={t('services.description')}
         action={
           <Link href="/dashboard/services/new">
-            <Button size="sm">Add service</Button>
+            <Button size="sm">{t('services.addService')}</Button>
           </Link>
         }
       />
@@ -37,11 +39,11 @@ export default async function ServicesPage() {
         {(!services || services.length === 0) ? (
           <EmptyState
             icon={Scissors}
-            title="No services yet"
-            description="Add the styles you offer with prices and how long they take."
+            title={t('services.emptyTitle')}
+            description={t('services.emptyDescription')}
             action={
               <Link href="/dashboard/services/new">
-                <Button>Add your first service</Button>
+                <Button>{t('services.addFirst')}</Button>
               </Link>
             }
           />
@@ -52,13 +54,13 @@ export default async function ServicesPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-ink">{s.name}</p>
-                    {!s.is_active && <Badge>Hidden</Badge>}
+                    {!s.is_active && <Badge>{t('services.hidden')}</Badge>}
                   </div>
                   {s.description && (
                     <p className="mt-1 text-sm text-ink-muted">{s.description}</p>
                   )}
                   <p className="mt-2 text-xs text-ink-muted">
-                    {formatDuration(s.duration_minutes)} · deposit {formatMoney(s.deposit_cents)}
+                    {formatDuration(s.duration_minutes)} · {t('services.depositLabel')} {formatMoney(s.deposit_cents)}
                   </p>
                 </div>
                 <div className="text-right">
@@ -67,7 +69,7 @@ export default async function ServicesPage() {
                     href={`/dashboard/services/${s.id}`}
                     className="mt-2 inline-block text-sm text-ink-muted hover:text-ink"
                   >
-                    Edit
+                    {t('services.edit')}
                   </Link>
                 </div>
               </CardBody>

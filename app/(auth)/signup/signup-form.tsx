@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { signupAction } from '@/lib/auth/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 type Role = 'client' | 'braider';
 
 export function SignupForm({ defaultRole }: { defaultRole: Role }) {
+  const t = useTranslations('auth');
   const router = useRouter();
   const [role, setRole] = useState<Role>(defaultRole);
   const [pending, setPending] = useState(false);
@@ -39,7 +41,7 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-ink">I'm signing up as a</legend>
+        <legend className="mb-2 text-sm font-medium text-ink">{t('signup.roleLegend')}</legend>
         <div className="grid grid-cols-2 gap-2">
           {(['client', 'braider'] as Role[]).map((r) => (
             <button
@@ -54,22 +56,22 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
                   : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.03]'
               )}
             >
-              {r === 'client' ? 'Client' : 'Braider'}
+              {r === 'client' ? t('signup.role.client') : t('signup.role.braider')}
             </button>
           ))}
         </div>
       </fieldset>
 
-      <Input name="full_name" label="Full name" autoComplete="name" required />
-      <Input name="email" type="email" label="Email" autoComplete="email" required />
+      <Input name="full_name" label={t('signup.form.fullName')} autoComplete="name" required />
+      <Input name="email" type="email" label={t('signup.form.email')} autoComplete="email" required />
       <Input
         name="password"
         type="password"
-        label="Password"
+        label={t('signup.form.password')}
         autoComplete="new-password"
         minLength={8}
         required
-        hint="At least 8 characters."
+        hint={t('signup.form.passwordHint')}
       />
 
       {error && (
@@ -79,19 +81,25 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
       )}
 
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? 'Creating account…' : 'Create account'}
+        {pending ? t('signup.creatingAccount') : t('signup.createAccount')}
       </Button>
 
       <p className="text-xs leading-relaxed text-ink-muted">
-        By creating an account, you agree to our{' '}
-        <Link href="/terms" className="font-medium text-ink hover:underline underline-offset-4">
-          Terms
-        </Link>{' '}
-        and{' '}
-        <Link href="/privacy" className="font-medium text-ink hover:underline underline-offset-4">
-          Privacy Policy
-        </Link>
-        .
+        {t.rich('signup.terms', {
+          terms: (chunks) => (
+            <Link href="/terms" className="font-medium text-ink hover:underline underline-offset-4">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link
+              href="/privacy"
+              className="font-medium text-ink hover:underline underline-offset-4"
+            >
+              {chunks}
+            </Link>
+          )
+        })}
       </p>
     </form>
   );

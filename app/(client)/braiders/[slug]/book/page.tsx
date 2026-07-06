@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { TZDate } from '@date-fns/tz';
 import { addDays, startOfDay } from 'date-fns';
+import { getTranslations } from 'next-intl/server';
 import { dbAdmin, db } from '@/lib/db/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
@@ -22,6 +23,7 @@ export const dynamic = 'force-dynamic';
 const WINDOW_DAYS = 21;
 
 export default async function BookPage({ params }: { params: { slug: string } }) {
+  const t = await getTranslations('booking');
   // Availability is computed from privileged data — this braider's private block
   // windows and every client's busy slots. Only the derived free slots are sent
   // to the browser, never raw bookings or override notes.
@@ -57,19 +59,17 @@ export default async function BookPage({ params }: { params: { slug: string } })
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center">
         <h1 className="font-display text-2xl text-ink">
-          {braider.business_name} isn&rsquo;t taking bookings right now
+          {t('notTakingBookings', { name: braider.business_name })}
         </h1>
         <p className="mt-3 text-sm text-ink-muted">
-          {open
-            ? 'This braider hasn’t published any services yet. Check back soon.'
-            : 'Their books are currently closed. Check back soon or browse other braiders.'}
+          {open ? t('noServices') : t('booksClosed')}
         </p>
         <div className="mt-6 flex justify-center gap-4">
           <Link href={`/braiders/${params.slug}`} className="text-sm font-medium text-ink underline">
-            View profile
+            {t('viewProfile')}
           </Link>
           <Link href="/braiders" className="text-sm font-medium text-ink-muted underline">
-            Browse braiders
+            {t('browseBraiders')}
           </Link>
         </div>
       </div>
@@ -126,11 +126,10 @@ export default async function BookPage({ params }: { params: { slug: string } })
       </Link>
 
       <h1 className="mt-4 font-display text-3xl leading-tight text-ink md:text-4xl">
-        Book your appointment
+        {t('bookAppointment')}
       </h1>
       <p className="mt-2 text-sm text-ink-muted">
-        Choose a service and time — a small deposit holds your slot, refundable up to{' '}
-        {CANCELLATION_REFUND_WINDOW_HOURS} hours before.
+        {t('chooseServiceTime', { hours: CANCELLATION_REFUND_WINDOW_HOURS })}
       </p>
 
       <div className="mt-8">

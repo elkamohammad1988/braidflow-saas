@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 import { Star } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 import { db } from '@/lib/db/server';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +21,7 @@ export async function BraiderReviews({
 }) {
   if (count === 0) return null;
 
+  const t = await getTranslations('profile');
   const database = db();
   const avgDisplay = avg.toFixed(1);
 
@@ -34,10 +37,9 @@ export async function BraiderReviews({
   return (
     <section id="reviews" className="mt-10 scroll-mt-6">
       <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-2xl text-ink">What clients say</h2>
+        <h2 className="font-display text-2xl text-ink">{t('reviewsHeading')}</h2>
         <p className="text-sm text-ink-muted">
-          <span className="font-medium text-ink">{avgDisplay}</span> · {count} review
-          {count === 1 ? '' : 's'}
+          <span className="font-medium text-ink">{avgDisplay}</span> · {t('reviewCount', { count })}
         </p>
       </div>
 
@@ -52,7 +54,7 @@ export async function BraiderReviews({
               <blockquote className="mt-3 text-sm text-ink">&ldquo;{r.body}&rdquo;</blockquote>
             )}
             <figcaption className="mt-4 text-xs text-ink-muted">
-              {r.client?.full_name?.split(' ')[0] ?? 'Client'} ·{' '}
+              {r.client?.full_name?.split(' ')[0] ?? t('clientFallback')} ·{' '}
               {format(new Date(r.created_at), 'MMM yyyy')}
             </figcaption>
           </figure>
@@ -63,8 +65,9 @@ export async function BraiderReviews({
 }
 
 function Stars({ rating }: { rating: number }) {
+  const t = useTranslations('profile');
   return (
-    <div aria-label={`Rated ${rating} out of 5`} className="flex gap-0.5">
+    <div aria-label={t('starsAriaLabel', { rating })} className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}

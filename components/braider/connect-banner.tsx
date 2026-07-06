@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { startStripeOnboarding } from '@/lib/braider/connect';
 // `onboardingComplete` = the braider finished Stripe's form but charges aren't
 // live yet (under review) → distinct copy from "not started".
 export function ConnectBanner({ onboardingComplete }: { onboardingComplete: boolean }) {
+  const t = useTranslations('connect');
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -41,13 +43,13 @@ export function ConnectBanner({ onboardingComplete }: { onboardingComplete: bool
         <div className="min-w-0 flex-1">
           <p className="font-medium text-ink">
             {onboardingComplete
-              ? 'Stripe is verifying your account'
-              : 'Connect Stripe to start taking bookings'}
+              ? t('verifyingTitle')
+              : t('title')}
           </p>
           <p className="mt-1 text-sm text-ink-muted" role={error ? undefined : 'status'}>
             {onboardingComplete
-              ? 'Your details are under review. Deposits stay paused until Stripe approves your account — this usually takes just a few minutes.'
-              : 'Clients can’t book until you connect a Stripe account to receive deposits. It takes about two minutes, and you keep 100% of every deposit.'}
+              ? t('verifyingDescription')
+              : t('description')}
           </p>
           {error && (
             <p role="alert" className="mt-2 text-sm text-red-700">
@@ -59,11 +61,11 @@ export function ConnectBanner({ onboardingComplete }: { onboardingComplete: bool
               {pending ? (
                 <>
                   <Spinner className="mr-2" />
-                  Opening Stripe…
+                  {t('opening')}
                 </>
               ) : (
                 <>
-                  {onboardingComplete ? 'Continue setup' : 'Connect Stripe'}
+                  {onboardingComplete ? t('continueSetup') : t('connect')}
                   <ArrowRight />
                 </>
               )}

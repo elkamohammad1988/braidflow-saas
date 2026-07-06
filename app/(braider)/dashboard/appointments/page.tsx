@@ -14,6 +14,7 @@ import { formatMoney } from '@/lib/utils';
 import { relativeDayLabel, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
+import { getTranslations } from 'next-intl/server';
 
 const TONE = {
   pending_payment: 'warning',
@@ -23,22 +24,24 @@ const TONE = {
   no_show: 'danger'
 } as const;
 
-const LABEL = {
-  pending_payment: 'Awaiting deposit',
-  confirmed: 'Confirmed',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-  no_show: 'No-show'
+// Maps each booking status to its shared `dashboard.status.*` translation key.
+const STATUS_KEY = {
+  pending_payment: 'awaitingDeposit',
+  confirmed: 'confirmed',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  no_show: 'noShow'
 } as const;
 
-type Status = keyof typeof LABEL;
+type Status = keyof typeof STATUS_KEY;
 type DepositState = ReturnType<typeof depositStateFromPayments>;
+type Translate = (key: string) => string;
 
 // Status + optional deposit badge, shared by the desktop table and mobile cards.
-function statusBadges(status: Status, deposit: DepositState): ReactNode {
+function statusBadges(status: Status, deposit: DepositState, t: Translate): ReactNode {
   return (
     <div className="flex flex-wrap items-start gap-1.5">
-      <Badge tone={TONE[status]}>{LABEL[status]}</Badge>
+      <Badge tone={TONE[status]}>{t(`status.${STATUS_KEY[status]}`)}</Badge>
       {status === 'cancelled' && deposit !== 'deposit_held' && (
         <Badge
           tone={
@@ -62,7 +65,8 @@ function bookingActions(
   a: { id: string; deposit_cents: number },
   status: Status,
   upcoming: boolean,
-  deposit: DepositState
+  deposit: DepositState,
+  t: Translate
 ): ReactNode {
   if ((status === 'pending_payment' || status === 'confirmed') && upcoming) {
     return (
@@ -71,7 +75,7 @@ function bookingActions(
           href={`/bookings/${a.id}/reschedule`}
           className="font-medium text-ink-muted hover:text-ink"
         >
-          Reschedule
+          {t('appointments.reschedule')}
         </Link>
         <span aria-hidden className="text-ink/20">·</span>
         <CancelBookingButton bookingId={a.id} />
@@ -86,7 +90,7 @@ function bookingActions(
       <RefundDepositButton
         bookingId={a.id}
         depositCents={a.deposit_cents}
-        label={deposit === 'refund_failed' ? 'Retry refund' : 'Refund deposit'}
+        label={deposit === 'refund_failed' ? t('appointments.retryRefund') : t('appointments.refundDeposit')}
       />
     );
   }
@@ -96,6 +100,7 @@ function bookingActions(
 export default async function AppointmentsPage() {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -121,14 +126,14 @@ export default async function AppointmentsPage() {
 
   return (
     <div>
-      <PageHeader title="Appointments" description="Every booking, past and upcoming." />
+      <PageHeader title={t('appointments.title')} description={t('appointments.description')} />
 
       <div className="mt-8">
         {!appointments || appointments.length === 0 ? (
           <EmptyState
             icon={CalendarPlus}
-            title="No appointments yet"
-            description="When clients book your page, every appointment — past and upcoming — lands here."
+            title={t('appointments.empty.title')}
+            description={t('appointments.empty.description')}
           />
         ) : (
           <>
@@ -137,11 +142,11 @@ export default async function AppointmentsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-ink/[0.03] text-left text-xs uppercase tracking-wider text-ink-muted">
                   <tr>
-                    <th className="px-5 py-3">When</th>
-                    <th className="px-5 py-3">Client</th>
-                    <th className="px-5 py-3">Service</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3 text-right">Total</th>
+                    <th className="px-5 py-3">{t('appointments.table.when')}</th>
+                    <th className="px-5 py-3">{t('appointments.table.client')}</th>
+                    <th className="px-5 py-3">{t('appointments.table.service')}</th>
+                    <th className="px-5 py-3">{t('appointments.table.status')}</th>
+                    <th className="px-5 py-3 text-right">{t('appointments.table.total')}</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
@@ -170,12 +175,12 @@ export default async function AppointmentsPage() {
                           )}
                         </td>
                         <td className="px-5 py-3 text-ink-muted">{a.services?.name}</td>
-                        <td className="px-5 py-3">{statusBadges(status, deposit)}</td>
+                        <td className="px-5 py-3">{statusBadges(status, deposit, t)}</td>
                         <td className="px-5 py-3 text-right tabular-nums text-ink">
                           {formatMoney(a.price_cents)}
                         </td>
                         <td className="px-5 py-3 text-right">
-                          {bookingActions(a, status, upcoming, deposit)}
+                          {bookingActions(a, status, upcoming, deposit, t)}
                         </td>
                       </tr>
                     );
@@ -190,7 +195,7 @@ export default async function AppointmentsPage() {
                 const status = a.status as Status;
                 const upcoming = !isPast(new Date(a.scheduled_at));
                 const deposit = depositStateFromPayments(a.payments);
-                const actions = bookingActions(a, status, upcoming, deposit);
+                const actions = bookingActions(a, status, upcoming, deposit, t);
 
                 return (
                   <li
@@ -221,7 +226,7 @@ export default async function AppointmentsPage() {
                       <p className="mt-0.5 text-ink-muted">{a.services?.name}</p>
                     </div>
 
-                    <div className="mt-3">{statusBadges(status, deposit)}</div>
+                    <div className="mt-3">{statusBadges(status, deposit, t)}</div>
 
                     {actions && (
                       <div className="mt-4 border-t border-line pt-3">{actions}</div>

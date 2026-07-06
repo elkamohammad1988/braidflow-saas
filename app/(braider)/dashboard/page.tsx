@@ -30,6 +30,7 @@ import { ActivationChecklist } from '@/components/braider/activation-checklist';
 import { formatMoney, initials } from '@/lib/utils';
 import { formatAppointment, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
+import { getTranslations } from 'next-intl/server';
 
 export default async function DashboardOverview({
   searchParams
@@ -38,6 +39,7 @@ export default async function DashboardOverview({
 }) {
   const { user, profile } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -124,17 +126,17 @@ export default async function DashboardOverview({
   return (
     <div>
       <PageHeader
-        eyebrow="Dashboard"
-        title={`Hi, ${profile.full_name.split(' ')[0]}`}
-        description="Here's how the week is shaping up."
+        eyebrow={t('overview.eyebrow')}
+        title={t('overview.title', { name: profile.full_name.split(' ')[0] || profile.full_name })}
+        description={t('overview.description')}
       />
 
       {searchParams.connect === 'done' && (
         <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-moss/30 bg-moss/5 p-4">
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-moss" />
           <p className="text-sm text-ink">
-            <span className="font-medium">Stripe connected.</span> You can take bookings now —
-            deposits pay out straight to your account.
+            <span className="font-medium">{t('overview.connectDone.title')}</span>{' '}
+            {t('overview.connectDone.body')}
           </p>
         </div>
       )}
@@ -142,8 +144,8 @@ export default async function DashboardOverview({
         <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-clay/30 bg-clay/5 p-4">
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-clay" />
           <p className="text-sm text-ink">
-            <span className="font-medium">Almost there.</span> Stripe is reviewing your account —
-            deposits start as soon as it&rsquo;s approved, usually within minutes.
+            <span className="font-medium">{t('overview.connectPending.title')}</span>{' '}
+            {t('overview.connectPending.body')}
           </p>
         </div>
       )}
@@ -163,44 +165,44 @@ export default async function DashboardOverview({
         <Stat
           icon={CalendarCheck}
           tone="ink"
-          label="Booked this week"
+          label={t('overview.stats.bookedThisWeek')}
           value={upcomingThisWeek.length.toString()}
           hint={`${formatInZone(weekStart, tz, 'MMM d')} – ${formatInZone(weekEnd, tz, 'MMM d')}`}
         />
         <Stat
           icon={Wallet}
           tone="moss"
-          label="Revenue this month"
+          label={t('overview.stats.revenueThisMonth')}
           value={formatMoney(monthRevenue)}
-          hint="Confirmed + completed"
+          hint={t('overview.stats.revenueHint')}
         />
         <Stat
           icon={Hourglass}
           tone="clay"
-          label="Awaiting deposit"
+          label={t('overview.stats.awaitingDeposit')}
           value={String(pendingCount)}
-          hint="Holds not yet collected"
+          hint={t('overview.stats.awaitingDepositHint')}
         />
         <Stat
           icon={Users}
           tone="ink"
-          label="Total clients"
+          label={t('overview.stats.totalClients')}
           value={String(totalClients)}
-          hint="Lifetime, unique"
+          hint={t('overview.stats.totalClientsHint')}
         />
       </div>
 
       <section className="mt-12">
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <h2 className="font-display text-xl tracking-tight text-ink">Up next</h2>
-            <p className="text-sm text-ink-muted">Your next five appointments.</p>
+            <h2 className="font-display text-xl tracking-tight text-ink">{t('overview.upNext.title')}</h2>
+            <p className="text-sm text-ink-muted">{t('overview.upNext.subtitle')}</p>
           </div>
           <Link
             href="/dashboard/appointments"
             className="inline-flex items-center gap-1 text-sm font-medium text-ink-muted transition-colors hover:text-ink"
           >
-            All appointments
+            {t('overview.upNext.viewAll')}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -226,7 +228,7 @@ export default async function DashboardOverview({
                   <p className="text-sm text-ink">{formatAppointment(b.scheduled_at, tz)}</p>
                 </div>
                 <Badge tone={b.status === 'confirmed' ? 'success' : 'warning'} dot>
-                  {b.status === 'confirmed' ? 'Confirmed' : 'Deposit'}
+                  {b.status === 'confirmed' ? t('status.confirmed') : t('status.deposit')}
                 </Badge>
               </Link>
             ))}
@@ -234,12 +236,12 @@ export default async function DashboardOverview({
         ) : (
           <EmptyState
             icon={CalendarPlus}
-            title="Nothing on the books for this week"
-            description="Share your booking page and we'll fill this up."
+            title={t('overview.empty.title')}
+            description={t('overview.empty.description')}
             action={
               <Link href="/dashboard/settings">
                 <Button variant="secondary" size="sm">
-                  Copy your link
+                  {t('overview.empty.action')}
                 </Button>
               </Link>
             }

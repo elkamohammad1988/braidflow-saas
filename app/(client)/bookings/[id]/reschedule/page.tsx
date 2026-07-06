@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { TZDate } from '@date-fns/tz';
 import { addDays, startOfDay } from 'date-fns';
 import { requireSession } from '@/lib/auth/session';
@@ -18,6 +19,7 @@ export default async function ReschedulePage({
   params: { id: string };
   searchParams: { t?: string };
 }) {
+  const t = await getTranslations('reschedule');
   const token = searchParams.t;
   const database = dbAdmin();
 
@@ -59,15 +61,15 @@ export default async function ReschedulePage({
   if (booking.status !== 'pending_payment' && booking.status !== 'confirmed') {
     return (
       <div className="mx-auto max-w-md px-6 py-20 text-center">
-        <h1 className="font-display text-3xl text-ink">This booking can&apos;t be rescheduled</h1>
+        <h1 className="font-display text-3xl text-ink">{t('cantReschedule')}</h1>
         <p className="mt-3 text-sm text-ink-muted">
-          It&apos;s either already cancelled or completed.
+          {t('cantRescheduleBody')}
         </p>
         <Link
           href={returnTo}
           className="mt-6 inline-block text-sm font-medium text-ink underline underline-offset-4"
         >
-          ← Back
+          ← {t('back')}
         </Link>
       </div>
     );
@@ -111,17 +113,16 @@ export default async function ReschedulePage({
         href={returnTo}
         className="inline-flex items-center text-sm text-ink-muted hover:text-ink"
       >
-        ← {isBraider ? 'Back to appointments' : 'Back to my bookings'}
+        ← {isBraider ? t('backToAppointments') : t('backToMyBookings')}
       </Link>
 
       <div className="mt-6">
         <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
-          Reschedule
+          {t('rescheduleLabel')}
         </p>
-        <h1 className="mt-2 font-display text-4xl text-ink">Pick a new time</h1>
+        <h1 className="mt-2 font-display text-4xl text-ink">{t('pickNewTime')}</h1>
         <p className="mt-3 max-w-prose text-sm text-ink-muted">
-          Same {serviceName.toLowerCase()} with {businessName}. Your deposit carries over —
-          no payment needed.
+          {t('sameServiceWith', { service: serviceName.toLowerCase(), business: businessName })}
         </p>
       </div>
 
@@ -139,16 +140,16 @@ export default async function ReschedulePage({
       </div>
 
       <div className="mt-10 rounded-card border border-line bg-paper/60 px-5 py-4 text-sm text-ink-muted">
-        Can&apos;t find a time that works?{' '}
+        {t('cantFindTime')}{' '}
         <Link
           href={`/braiders/${booking.braiders?.slug ?? ''}`}
           className="text-ink underline underline-offset-4"
         >
-          See {businessName}&apos;s page
+          {t('seePage', { business: businessName })}
         </Link>{' '}
-        or cancel from your{' '}
+        {t('orCancelFrom')}{' '}
         <Link href={returnTo} className="text-ink underline underline-offset-4">
-          {isBraider ? 'appointments list' : 'bookings list'}
+          {isBraider ? t('appointmentsList') : t('bookingsList')}
         </Link>
         .
       </div>

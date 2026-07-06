@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -9,7 +10,8 @@ type Props = {
   label?: string;
 };
 
-export function CopyButton({ value, className, label = 'Copy' }: Props) {
+export function CopyButton({ value, className, label }: Props) {
+  const t = useTranslations('common');
   const [copied, setCopied] = useState(false);
 
   async function onClick() {
@@ -32,7 +34,7 @@ export function CopyButton({ value, className, label = 'Copy' }: Props) {
         className
       )}
     >
-      {copied ? 'Copied' : label}
+      {copied ? t('copied') : label ?? t('copy')}
     </button>
   );
 }

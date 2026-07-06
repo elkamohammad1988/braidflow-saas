@@ -7,6 +7,7 @@ import { BraiderSearch } from '@/components/braider/braider-search';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Reveal } from '@/components/motion/reveal';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
   title: 'Find a braider',
@@ -22,6 +23,7 @@ export default async function BraidersIndex({
 }: {
   searchParams: { q?: string; sort?: string };
 }) {
+  const t = await getTranslations('directory');
   const database = db();
   const q = (searchParams.q ?? '').trim();
   const sort: Sort =
@@ -108,9 +110,9 @@ export default async function BraidersIndex({
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <PageHeader
-        eyebrow="The directory"
-        title="Find a braider"
-        description="Real stylists, real availability. Search your city, compare, and book in a minute."
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={t('description')}
       />
 
       <div className="mt-7">
@@ -119,8 +121,9 @@ export default async function BraidersIndex({
 
       {enriched.length > 0 && (
         <p className="mt-6 font-mono text-xs uppercase tracking-[0.14em] text-ink-subtle">
-          {enriched.length} {enriched.length === 1 ? 'braider' : 'braiders'}
-          {hasQuery ? ` for “${q}”` : ' available'}
+          {hasQuery
+            ? t('countForQuery', { count: enriched.length, query: q })
+            : t('countAvailable', { count: enriched.length })}
         </p>
       )}
 
@@ -129,22 +132,22 @@ export default async function BraidersIndex({
           hasQuery ? (
             <EmptyState
               icon={SearchX}
-              title={`No braiders match “${q}”`}
-              description="Try a different name or city, or clear the search to see everyone."
+              title={t('emptyMatchTitle', { query: q })}
+              description={t('emptyMatchDescription')}
               action={
                 <Link
                   href="/braiders"
                   className="text-sm font-medium text-ink underline underline-offset-4 hover:text-clay"
                 >
-                  Clear search
+                  {t('clearSearch')}
                 </Link>
               }
             />
           ) : (
             <EmptyState
               icon={Sparkles}
-              title="No braiders here yet"
-              description="We're onboarding the first stylists now. Check back soon."
+              title={t('emptyTitle')}
+              description={t('emptyDescription')}
             />
           )
         ) : (

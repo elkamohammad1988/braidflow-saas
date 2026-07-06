@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, Textarea } from '@/components/ui/field';
@@ -25,6 +26,7 @@ type Initial = {
 };
 
 export function SettingsForm({ initial }: { initial: Initial }) {
+  const t = useTranslations('dashboard');
   const router = useRouter();
   const [fullName, setFullName] = useState(initial.fullName);
   const [phone, setPhone] = useState(initial.phone);
@@ -53,7 +55,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
         timezone
       });
       if ('error' in result) {
-        setError(result.error ?? 'Something went wrong.');
+        setError(result.error ?? t('settings.genericError'));
         return;
       }
       setSaved(true);
@@ -70,49 +72,49 @@ export function SettingsForm({ initial }: { initial: Initial }) {
       className="space-y-8"
     >
       <Section
-        title="Your booking page"
-        description="What clients see when they land on your link."
+        title={t('settings.bookingSection.title')}
+        description={t('settings.bookingSection.description')}
       >
         <Input
           name="businessName"
-          label="Business name"
+          label={t('settings.businessName')}
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           required
         />
 
         <Textarea
-          label="Bio"
+          label={t('settings.bio')}
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           rows={4}
           maxLength={800}
-          placeholder="Style specialties, years of experience, what makes you, you."
+          placeholder={t('settings.bioPlaceholder')}
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
             name="city"
-            label="City"
+            label={t('settings.city')}
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="Atlanta, GA"
+            placeholder={t('settings.cityPlaceholder')}
           />
           <Input
             name="instagramHandle"
-            label="Instagram"
+            label={t('settings.instagram')}
             value={instagramHandle}
             onChange={(e) => setInstagramHandle(e.target.value)}
-            placeholder="braidsbyyou"
-            hint="Without the @."
+            placeholder={t('settings.instagramPlaceholder')}
+            hint={t('settings.instagramHint')}
           />
         </div>
 
         <Select
-          label="Timezone"
+          label={t('settings.timezone')}
           value={timezone}
           onChange={(e) => setTimezone(e.target.value)}
-          hint="Your weekly hours and every appointment time are shown in this zone. Set it to where you actually braid."
+          hint={t('settings.timezoneHint')}
         >
           {COMMON_TIMEZONES.map((tz) => (
             <option key={tz.value} value={tz.value}>
@@ -139,35 +141,34 @@ export function SettingsForm({ initial }: { initial: Initial }) {
               className="h-4 w-4 accent-clay"
             />
             <span className="text-sm">
-              <span className="font-medium text-ink">Accepting new bookings</span>
+              <span className="font-medium text-ink">{t('settings.acceptingBookings')}</span>
               <span className="ml-2 text-ink-muted">
-                Uncheck to pause your page without taking it down.
+                {t('settings.acceptingBookingsHint')}
               </span>
             </span>
           </label>
           {!initial.chargesEnabled && (
             <p className="mt-1.5 text-xs text-clay-text">
-              Connect Stripe (banner at the top of your dashboard) before you can accept bookings —
-              clients can’t pay a deposit until your account is set up.
+              {t('settings.stripeRequired')}
             </p>
           )}
         </div>
       </Section>
 
-      <Section title="Account" description="Only you see this.">
+      <Section title={t('settings.accountSection.title')} description={t('settings.accountSection.description')}>
         <Input
           name="fullName"
-          label="Your name"
+          label={t('settings.yourName')}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
         />
         <Input
           name="phone"
-          label="Phone"
+          label={t('settings.phone')}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="(555) 123-4567"
+          placeholder={t('settings.phonePlaceholder')}
           inputMode="tel"
         />
       </Section>
@@ -186,15 +187,15 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           {pending ? (
             <>
               <Spinner className="mr-2" />
-              Saving…
+              {t('settings.saving')}
             </>
           ) : (
-            'Save changes'
+            t('settings.saveChanges')
           )}
         </Button>
         {saved && !pending && (
           <span role="status" className="motion-safe:animate-fade-in text-sm text-ink-muted">
-            Saved.
+            {t('settings.saved')}
           </span>
         )}
       </div>

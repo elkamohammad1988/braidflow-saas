@@ -6,10 +6,12 @@ import { PageHeader } from '@/components/shared/page-header';
 import { cn, formatMoney } from '@/lib/utils';
 import { formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
+import { getTranslations } from 'next-intl/server';
 
 export default async function CalendarPage() {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -52,7 +54,7 @@ export default async function CalendarPage() {
   return (
     <div>
       <PageHeader
-        title="This week"
+        title={t('calendar.title')}
         description={`${formatInZone(weekStart, tz, 'MMM d')} – ${formatInZone(
           addDays(weekStart, 6),
           tz,
@@ -65,7 +67,7 @@ export default async function CalendarPage() {
                 {bookedCount}
               </p>
               <p className="mt-1.5 text-xs text-ink-muted">
-                {bookedCount === 1 ? 'appointment' : 'appointments'}
+                {t('calendar.appointments', { count: bookedCount })}
               </p>
             </div>
             <div className="h-9 w-px bg-line" aria-hidden />
@@ -73,7 +75,7 @@ export default async function CalendarPage() {
               <p className="font-display text-2xl font-medium leading-none text-ink">
                 {formatMoney(weekTotal)}
               </p>
-              <p className="mt-1.5 text-xs text-ink-muted">booked value</p>
+              <p className="mt-1.5 text-xs text-ink-muted">{t('calendar.bookedValue')}</p>
             </div>
           </div>
         }
@@ -82,10 +84,10 @@ export default async function CalendarPage() {
       {/* Legend */}
       <div className="mt-6 flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-subtle">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-moss" /> Confirmed
+          <span className="h-2 w-2 rounded-full bg-moss" /> {t('status.confirmed')}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-clay" /> Awaiting deposit
+          <span className="h-2 w-2 rounded-full bg-clay" /> {t('status.awaitingDeposit')}
         </span>
       </div>
 
@@ -149,7 +151,7 @@ export default async function CalendarPage() {
                 ))}
                 {items.length === 0 && (
                   <li className="flex flex-1 items-center justify-center pb-4 text-[11px] text-ink-subtle/60">
-                    {isPast ? '' : 'Open'}
+                    {isPast ? '' : t('calendar.open')}
                   </li>
                 )}
               </ul>
@@ -202,7 +204,7 @@ export default async function CalendarPage() {
                     <p className="text-sm font-medium text-ink">{formatInZone(day, tz, 'EEEE')}</p>
                     <p className="text-xs text-ink-muted">
                       {formatInZone(day, tz, 'MMM d')}
-                      {isToday ? ' · Today' : ''}
+                      {isToday ? ` · ${t('calendar.today')}` : ''}
                     </p>
                   </div>
                 </div>
@@ -211,7 +213,7 @@ export default async function CalendarPage() {
                     {items.length}
                   </span>
                 ) : (
-                  <span className="text-xs text-ink-subtle">Open</span>
+                  <span className="text-xs text-ink-subtle">{t('calendar.open')}</span>
                 )}
               </div>
 

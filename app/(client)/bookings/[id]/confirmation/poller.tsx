@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Spinner } from '@/components/ui/spinner';
 
 const POLL_MS = 1500;
@@ -19,6 +20,7 @@ export function ConfirmationPoller({
   fallbackHref?: string;
   fallbackLabel?: string;
 }) {
+  const t = useTranslations('confirmation');
   const router = useRouter();
   const startedAt = useRef(Date.now());
   const [timedOut, setTimedOut] = useState(false);
@@ -41,8 +43,7 @@ export function ConfirmationPoller({
     return (
       <div role="status" className="mt-8 text-sm text-ink-muted">
         <p className="mx-auto max-w-xs">
-          This is taking longer than usual. Your payment is safe — we&apos;ll email your
-          confirmation as soon as it clears.
+          {t('pollerTimeout')}
         </p>
         <Link
           href={fallbackHref}
@@ -60,7 +61,7 @@ export function ConfirmationPoller({
       className="mt-8 inline-flex items-center justify-center text-sm text-ink-muted"
     >
       <Spinner className="mr-2" />
-      Waiting on confirmation
+      {t('waitingConfirmation')}
     </div>
   );
 }

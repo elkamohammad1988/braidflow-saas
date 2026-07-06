@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -8,8 +9,18 @@ import {
   addAvailabilityRuleAction,
   removeAvailabilityRuleAction
 } from '@/lib/availability/actions';
-import { DAY_LABELS, minutesToTime, timeStringToMinutes } from '@/lib/availability/format';
+import { minutesToTime, timeStringToMinutes } from '@/lib/availability/format';
 import { cn } from '@/lib/utils';
+
+const DAY_KEYS = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday'
+] as const;
 
 export type Rule = {
   id: string;
@@ -19,6 +30,7 @@ export type Rule = {
 };
 
 export function WeeklyEditor({ rules }: { rules: Rule[] }) {
+  const t = useTranslations('dashboard');
   const byDay = new Map<number, Rule[]>();
   rules.forEach((r) => {
     if (!byDay.has(r.day_of_week)) byDay.set(r.day_of_week, []);
@@ -27,14 +39,15 @@ export function WeeklyEditor({ rules }: { rules: Rule[] }) {
 
   return (
     <div className="divide-y divide-line">
-      {DAY_LABELS.map((label, day) => (
-        <DayRow key={day} day={day} label={label} rules={(byDay.get(day) ?? []).sort((a, b) => a.start_minute - b.start_minute)} />
+      {DAY_KEYS.map((key, day) => (
+        <DayRow key={day} day={day} label={t(`availability.days.${key}`)} rules={(byDay.get(day) ?? []).sort((a, b) => a.start_minute - b.start_minute)} />
       ))}
     </div>
   );
 }
 
 function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule[] }) {
+  const t = useTranslations('dashboard');
   const [adding, setAdding] = useState(false);
   return (
     <div className="py-4">
@@ -42,7 +55,7 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
         <p className="w-24 text-sm font-medium text-ink">{label}</p>
         <div className="flex flex-1 flex-wrap items-center gap-2">
           {rules.length === 0 && !adding && (
-            <span className="text-sm text-ink-muted">Off</span>
+            <span className="text-sm text-ink-muted">{t('availability.off')}</span>
           )}
           {rules.map((r) => (
             <RuleChip key={r.id} rule={r} />
@@ -54,7 +67,7 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
             onClick={() => setAdding(true)}
             className="text-sm font-medium text-ink hover:underline underline-offset-4"
           >
-            + Add range
+            {t('availability.addRange')}
           </button>
         )}
       </div>
@@ -70,13 +83,14 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
 }
 
 function RuleChip({ rule }: { rule: Rule }) {
+  const t = useTranslations('dashboard');
   const [pending, startTransition] = useTransition();
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-line bg-ink/[0.04] px-3 py-1 text-xs text-ink">
       {minutesToTime(rule.start_minute)} – {minutesToTime(rule.end_minute)}
       <button
         type="button"
-        aria-label="Remove range"
+        aria-label={t('availability.removeRange')}
         disabled={pending}
         onClick={() => startTransition(() => removeAvailabilityRuleAction(rule.id))}
         className="text-ink-muted hover:text-ink disabled:opacity-50"
@@ -88,6 +102,7 @@ function RuleChip({ rule }: { rule: Rule }) {
 }
 
 function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
+  const t = useTranslations('dashboard');
   const [start, setStart] = useState('09:00');
   const [end, setEnd] = useState('17:00');
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +112,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
     const startMinute = timeStringToMinutes(start);
     const endMinute = timeStringToMinutes(end);
     if (startMinute == null || endMinute == null) {
-      setError('Pick a valid time.');
+      setError(t('availability.invalidTime'));
       return;
     }
     setError(null);
@@ -115,7 +130,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
   return (
     <div className="mt-3 flex flex-wrap items-end gap-3 pl-24">
       <label className="text-xs text-ink-muted">
-        From
+        {t('availability.from')}
         <input
           type="time"
           value={start}
@@ -124,7 +139,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
         />
       </label>
       <label className="text-xs text-ink-muted">
-        To
+        {t('availability.to')}
         <input
           type="time"
           value={end}
@@ -134,14 +149,14 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
       </label>
       <Button size="sm" onClick={save} disabled={pending}>
         {pending ? <Spinner className="mr-2" /> : null}
-        Save
+        {t('availability.save')}
       </Button>
       <button
         type="button"
         onClick={onDone}
         className="text-sm text-ink-muted hover:text-ink"
       >
-        Cancel
+        {t('availability.cancel')}
       </button>
       {error && (
         <p role="alert" className="basis-full text-sm text-red-600">

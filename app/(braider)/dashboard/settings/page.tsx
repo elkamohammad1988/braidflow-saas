@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
@@ -9,6 +10,7 @@ import { SettingsForm } from './settings-form';
 export default async function SettingsPage() {
   const { user, profile } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const [braiderRes, profileRes] = await Promise.all([
     database
@@ -29,16 +31,16 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Your public page and account." />
+      <PageHeader title={t('settings.title')} description={t('settings.description')} />
 
       {bookingUrl && (
         <Card className="mt-8">
           <CardBody className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-wider text-ink-muted">Your booking page</p>
+              <p className="text-xs uppercase tracking-wider text-ink-muted">{t('settings.bookingLinkLabel')}</p>
               <p className="mt-1 truncate text-sm text-ink">{bookingUrl}</p>
             </div>
-            <CopyButton value={bookingUrl} label="Copy link" />
+            <CopyButton value={bookingUrl} label={t('settings.copyLink')} />
           </CardBody>
         </Card>
       )}

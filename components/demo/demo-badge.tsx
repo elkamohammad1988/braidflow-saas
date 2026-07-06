@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Sparkles, X } from 'lucide-react';
 
 // Floating "Demo Mode" indicator. Rendered globally (root layout) so anyone
 // evaluating the project instantly understands the data is realistic sample
 // data served entirely from within the app, with no backend to configure.
 export function DemoBadge() {
+  const t = useTranslations('common');
   const [dismissed, setDismissed] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -22,12 +24,12 @@ export function DemoBadge() {
           aria-expanded={open}
         >
           <Sparkles className="h-4 w-4 text-gold" strokeWidth={2} />
-          Demo Mode
+          {t('demoBadge.label')}
         </button>
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          aria-label="Dismiss demo badge"
+          aria-label={t('demoBadge.dismiss')}
           className="flex h-5 w-5 items-center justify-center rounded-full text-ivory/60 transition-colors hover:bg-ivory/10 hover:text-ivory"
         >
           <X className="h-3.5 w-3.5" />
@@ -36,10 +38,9 @@ export function DemoBadge() {
 
       {open && (
         <div className="absolute bottom-full mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-card border border-line bg-paper p-4 text-left shadow-[0_18px_50px_-18px_rgba(35,24,16,0.45)] md:right-0">
-          <p className="text-sm font-medium text-ink">You&apos;re exploring an interactive demo</p>
+          <p className="text-sm font-medium text-ink">{t('demoBadge.title')}</p>
           <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-            Every screen — bookings, clients, calendar and deposits — runs on realistic
-            sample data, with no account or setup required. Feel free to click around.
+            {t('demoBadge.description')}
           </p>
         </div>
       )}

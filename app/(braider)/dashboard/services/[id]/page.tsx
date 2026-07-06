@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
@@ -8,6 +9,7 @@ import { ServiceForm } from '../service-form';
 export default async function EditServicePage({ params }: { params: { id: string } }) {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: service } = await database
     .from('services')
@@ -20,7 +22,7 @@ export default async function EditServicePage({ params }: { params: { id: string
 
   return (
     <div>
-      <PageHeader eyebrow="Services" title={service.name} description="Edit how this shows up to clients." />
+      <PageHeader eyebrow={t('services.eyebrow')} title={service.name} description={t('services.editDescription')} />
       <div className="mt-8 max-w-xl">
         <Card>
           <CardBody>

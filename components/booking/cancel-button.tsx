@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { cancelBookingAction } from '@/lib/bookings/cancel';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
@@ -14,7 +15,8 @@ type Props = {
   token?: string;
 };
 
-export function CancelBookingButton({ bookingId, label = 'Cancel', className, token }: Props) {
+export function CancelBookingButton({ bookingId, label, className, token }: Props) {
+  const t = useTranslations('bookingActions');
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -25,7 +27,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className, to
     startTransition(async () => {
       const result = await cancelBookingAction(bookingId, token);
       if (result && 'error' in result) {
-        setError(result.error ?? 'Something went wrong.');
+        setError(result.error ?? t('genericError'));
         setConfirming(false);
         return;
       }
@@ -43,7 +45,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className, to
           className
         )}
       >
-        {label}
+        {label ?? t('cancel')}
       </button>
     );
   }
@@ -51,7 +53,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className, to
   return (
     <div className="motion-safe:animate-fade-in-up flex flex-col items-end gap-1">
       <div className="inline-flex items-center gap-3 text-sm">
-        <span className="text-ink-muted">Cancel this booking?</span>
+        <span className="text-ink-muted">{t('cancelConfirm')}</span>
         <button
           type="button"
           onClick={run}
@@ -59,7 +61,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className, to
           className="inline-flex items-center font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
         >
           {pending && <Spinner className="mr-1.5 h-3 w-3" />}
-          Yes, cancel
+          {t('yesCancel')}
         </button>
         <button
           type="button"
@@ -67,7 +69,7 @@ export function CancelBookingButton({ bookingId, label = 'Cancel', className, to
           disabled={pending}
           className="text-ink-muted hover:text-ink disabled:opacity-50"
         >
-          Keep it
+          {t('keepIt')}
         </button>
       </div>
       {error && (

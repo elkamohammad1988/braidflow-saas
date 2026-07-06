@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Card, CardBody } from '@/components/ui/card';
 import { formatMoney, initials } from '@/lib/utils';
+import { getTranslations } from 'next-intl/server';
 
 type ClientRow = {
   id: string;
@@ -20,6 +21,7 @@ type ClientRow = {
 export default async function ClientsPage() {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const { data: bookings, error } = await database
     .from('bookings')
@@ -80,14 +82,14 @@ export default async function ClientsPage() {
 
   return (
     <div>
-      <PageHeader title="Clients" description="Everyone who's booked with you." />
+      <PageHeader title={t('clients.title')} description={t('clients.description')} />
 
       <div className="mt-8 space-y-3">
         {clients.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No clients yet"
-            description="As soon as someone books, they'll show up here — with their history and notes in one place."
+            title={t('clients.empty.title')}
+            description={t('clients.empty.description')}
           />
         ) : (
           clients.map((c) => (
@@ -106,20 +108,20 @@ export default async function ClientsPage() {
                   {c.visits > 0 ? (
                     <>
                       <p className="tabular-nums">
-                        {c.visits} {c.visits === 1 ? 'visit' : 'visits'} ·{' '}
+                        {t('clients.visits', { count: c.visits })} ·{' '}
                         <span className="font-medium text-ink">
                           {formatMoney(c.lifetimeCents)}
                         </span>{' '}
-                        lifetime
+                        {t('clients.lifetime')}
                       </p>
                       {c.lastVisit && (
                         <p className="mt-0.5 text-xs tabular-nums">
-                          last seen {format(c.lastVisit, 'MMM d, yyyy')}
+                          {t('clients.lastSeen', { date: format(c.lastVisit, 'MMM d, yyyy') })}
                         </p>
                       )}
                     </>
                   ) : (
-                    <p className="font-medium text-ink">New client</p>
+                    <p className="font-medium text-ink">{t('clients.newClient')}</p>
                   )}
                 </div>
               </CardBody>

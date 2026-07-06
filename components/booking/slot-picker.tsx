@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 import type { Slot } from '@/lib/bookings/availability';
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) {
+  const t = useTranslations('booking');
   const dayKey = (d: Date) => formatInZone(d, timeZone, 'yyyy-MM-dd');
 
   const [activeKey, setActiveKey] = useState(
@@ -74,8 +76,8 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
           key={activeKey}
           className="motion-safe:animate-fade-in rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
         >
-          <p className="text-sm font-medium text-ink">No openings this day</p>
-          <p className="mt-1 text-sm text-ink-muted">Try one of the other dates above.</p>
+          <p className="text-sm font-medium text-ink">{t('noOpenings')}</p>
+          <p className="mt-1 text-sm text-ink-muted">{t('tryOtherDates')}</p>
         </div>
       ) : (
         <div

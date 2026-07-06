@@ -1,14 +1,16 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { ShieldCheck, CreditCard, CalendarCheck, Star } from 'lucide-react';
 import { Logo } from '@/components/shared/logo';
 
 const highlights = [
-  { icon: CreditCard, text: 'Take deposits up front with Stripe' },
-  { icon: ShieldCheck, text: 'Stop losing chairs to no-shows' },
-  { icon: CalendarCheck, text: 'Your whole week, on autopilot' }
+  { icon: CreditCard, key: 'deposits' },
+  { icon: ShieldCheck, key: 'noshows' },
+  { icon: CalendarCheck, key: 'autopilot' }
 ];
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('auth');
   return (
     <div className="flex min-h-screen">
       {/* Brand panel — the night atelier */}
@@ -34,15 +36,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative">
           <p className="font-display text-[2.5rem] font-medium leading-[1.05] tracking-[-0.03em]">
-            The booking platform built for <span className="italic text-gilt">braiders.</span>
+            {t.rich('panel.tagline', {
+              em: (chunks) => <span className="italic text-gilt">{chunks}</span>
+            })}
           </p>
           <ul className="mt-9 space-y-4">
             {highlights.map((h) => (
-              <li key={h.text} className="flex items-center gap-3.5 text-ivory/85">
+              <li key={h.key} className="flex items-center gap-3.5 text-ivory/85">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 text-gold ring-1 ring-gold/20">
                   <h.icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
                 </span>
-                <span className="text-sm">{h.text}</span>
+                <span className="text-sm">{t(`panel.highlights.${h.key}`)}</span>
               </li>
             ))}
           </ul>
@@ -55,10 +59,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             ))}
           </div>
           <p className="mt-3 text-sm leading-relaxed text-ivory/85">
-            &ldquo;Setup took 15 minutes. The link in my bio finally does the work instead of me.&rdquo;
+            &ldquo;{t('panel.testimonial.quote')}&rdquo;
           </p>
           <p className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ivory/55">
-            Kemi A. · Goddess locs, Houston
+            {t('panel.testimonial.author')}
           </p>
         </div>
       </aside>

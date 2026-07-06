@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export function ResetPasswordForm() {
+  const t = useTranslations('auth');
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ export function ResetPasswordForm() {
     const password = String(fd.get('password'));
     const confirm = String(fd.get('confirm'));
     if (password !== confirm) {
-      setError('Those passwords don\'t match.');
+      setError(t('reset.errors.mismatch'));
       setPending(false);
       return;
     }
@@ -35,16 +37,16 @@ export function ResetPasswordForm() {
       <Input
         name="password"
         type="password"
-        label="New password"
+        label={t('reset.form.newPassword')}
         autoComplete="new-password"
         minLength={8}
         required
-        hint="At least 8 characters."
+        hint={t('reset.form.passwordHint')}
       />
       <Input
         name="confirm"
         type="password"
-        label="Confirm new password"
+        label={t('reset.form.confirmPassword')}
         autoComplete="new-password"
         minLength={8}
         required
@@ -56,7 +58,7 @@ export function ResetPasswordForm() {
       )}
       <Button type="submit" disabled={pending} className="w-full">
         <ShieldCheck className="h-[18px] w-[18px]" strokeWidth={1.9} />
-        {pending ? 'Saving…' : 'Save new password'}
+        {pending ? t('reset.saving') : t('reset.saveNewPassword')}
       </Button>
     </form>
   );

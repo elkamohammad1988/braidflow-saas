@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { CalendarHeart } from 'lucide-react';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
@@ -14,14 +15,15 @@ import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { depositStateFromPayments, DEPOSIT_LABEL } from '@/lib/payments/status';
 
 const STATUS_TONE = {
-  pending_payment: { label: 'Awaiting deposit', tone: 'warning' as const },
-  confirmed: { label: 'Confirmed', tone: 'success' as const },
-  completed: { label: 'Completed', tone: 'neutral' as const },
-  cancelled: { label: 'Cancelled', tone: 'neutral' as const },
-  no_show: { label: 'No-show', tone: 'danger' as const }
+  pending_payment: { label: 'statusPendingPayment', tone: 'warning' as const },
+  confirmed: { label: 'statusConfirmed', tone: 'success' as const },
+  completed: { label: 'statusCompleted', tone: 'neutral' as const },
+  cancelled: { label: 'statusCancelled', tone: 'neutral' as const },
+  no_show: { label: 'statusNoShow', tone: 'danger' as const }
 };
 
 export default async function MyBookings() {
+  const t = await getTranslations('bookings');
   const { user } = await requireSession();
   const database = db();
 
@@ -51,11 +53,11 @@ export default async function MyBookings() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader
-        title="My bookings"
-        description="Upcoming and past appointments."
+        title={t('title')}
+        description={t('description')}
         action={
           <Link href="/braiders">
-            <Button variant="secondary" size="sm">Book another</Button>
+            <Button variant="secondary" size="sm">{t('bookAnother')}</Button>
           </Link>
         }
       />
@@ -64,11 +66,11 @@ export default async function MyBookings() {
         {(!bookings || bookings.length === 0) && (
           <EmptyState
             icon={CalendarHeart}
-            title="No bookings yet"
-            description="Find a braider near you and lock in your first appointment."
+            title={t('emptyTitle')}
+            description={t('emptyDescription')}
             action={
               <Link href="/braiders">
-                <Button>Browse braiders</Button>
+                <Button>{t('browseBraiders')}</Button>
               </Link>
             }
           />
@@ -88,7 +90,7 @@ export default async function MyBookings() {
               <div>
                 <p className="font-medium text-ink">{b.services?.name}</p>
                 <p className="mt-1 text-sm text-ink-muted">
-                  with{' '}
+                  {t('with')}{' '}
                   <Link
                     href={`/braiders/${b.braiders?.slug}`}
                     className="text-ink hover:underline underline-offset-4"
@@ -101,7 +103,7 @@ export default async function MyBookings() {
                 </p>
               </div>
               <div className="text-right">
-                <Badge tone={status.tone}>{status.label}</Badge>
+                <Badge tone={status.tone}>{t(status.label)}</Badge>
                 {showDepositBadge && (
                   <div className="mt-1">
                     <Badge
@@ -123,7 +125,7 @@ export default async function MyBookings() {
                     href={`/bookings/${b.id}/pay`}
                     className="mt-2 inline-block text-sm font-medium text-ink hover:underline underline-offset-4"
                   >
-                    Complete deposit →
+                    {t('completeDeposit')}
                   </Link>
                 )}
                 {(b.status === 'pending_payment' || b.status === 'confirmed') &&
@@ -133,7 +135,7 @@ export default async function MyBookings() {
                         href={`/bookings/${b.id}/reschedule`}
                         className="font-medium text-ink-muted hover:text-ink"
                       >
-                        Reschedule
+                        {t('reschedule')}
                       </Link>
                       <span aria-hidden className="text-ink/20">·</span>
                       <CancelBookingButton bookingId={b.id} />
@@ -141,7 +143,7 @@ export default async function MyBookings() {
                   )}
                 {b.status === 'completed' &&
                   (reviewedBookingIds.has(b.id) ? (
-                    <p className="mt-2 text-sm text-ink-muted">Reviewed · thank you!</p>
+                    <p className="mt-2 text-sm text-ink-muted">{t('reviewed')}</p>
                   ) : (
                     <ReviewForm bookingId={b.id} />
                   ))}

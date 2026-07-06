@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { loginAction } from '@/lib/auth/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export function LoginForm() {
+  const t = useTranslations('auth');
   const router = useRouter();
   const search = useSearchParams();
   // Only honour a same-origin relative path — never an attacker-supplied absolute
@@ -19,7 +21,7 @@ export function LoginForm() {
   // redirects here with ?error=verification when it can't establish a session.
   const [error, setError] = useState<string | null>(
     search.get('error') === 'verification'
-      ? 'That link is invalid or has expired. Try signing in, or reset your password.'
+      ? t('login.errors.verification')
       : null
   );
 
@@ -43,11 +45,11 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <Input name="email" type="email" label="Email" autoComplete="email" required />
+      <Input name="email" type="email" label={t('login.form.email')} autoComplete="email" required />
       <Input
         name="password"
         type="password"
-        label="Password"
+        label={t('login.form.password')}
         autoComplete="current-password"
         required
       />
@@ -56,7 +58,7 @@ export function LoginForm() {
           href="/forgot-password"
           className="text-sm font-medium text-ink hover:underline underline-offset-4"
         >
-          Forgot password?
+          {t('login.forgotPassword')}
         </Link>
       </div>
       {error && (
@@ -65,7 +67,7 @@ export function LoginForm() {
         </p>
       )}
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? 'Signing in…' : 'Sign in'}
+        {pending ? t('login.signingIn') : t('login.signIn')}
       </Button>
     </form>
   );

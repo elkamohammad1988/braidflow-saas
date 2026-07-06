@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea, fieldSurface } from '@/components/ui/field';
@@ -30,6 +31,7 @@ function centsToDollars(cents: number) {
 }
 
 export function ServiceForm({ initial }: { initial?: Initial }) {
+  const t = useTranslations('dashboard');
   const editing = Boolean(initial?.id);
   const [name, setName] = useState(initial?.name ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
@@ -78,28 +80,28 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
     >
       <Input
         name="name"
-        label="Service name"
-        placeholder="Knotless box braids — medium"
+        label={t('services.form.nameLabel')}
+        placeholder={t('services.form.namePlaceholder')}
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
       />
 
       <Textarea
-        label="Description"
+        label={t('services.form.descriptionLabel')}
         value={description ?? ''}
         onChange={(e) => setDescription(e.target.value)}
         rows={3}
         maxLength={500}
-        placeholder="What's included, length, what to expect."
-        hint="Optional. Shown on your booking page."
+        placeholder={t('services.form.descriptionPlaceholder')}
+        hint={t('services.form.descriptionHint')}
       />
 
       <fieldset>
-        <legend className="mb-1.5 block text-sm font-medium text-ink">Duration</legend>
+        <legend className="mb-1.5 block text-sm font-medium text-ink">{t('services.form.duration')}</legend>
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="block text-xs text-ink-muted">Hours</span>
+            <span className="block text-xs text-ink-muted">{t('services.form.hours')}</span>
             <input
               type="number"
               min={0}
@@ -110,7 +112,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
             />
           </label>
           <label className="block">
-            <span className="block text-xs text-ink-muted">Minutes</span>
+            <span className="block text-xs text-ink-muted">{t('services.form.minutes')}</span>
             <div className="relative mt-1">
               <select
                 value={minutes}
@@ -134,10 +136,10 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
       </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <DollarInput label="Service price" value={price} onChange={setPrice} required />
+        <DollarInput label={t('services.form.priceLabel')} value={price} onChange={setPrice} required />
         <DollarInput
-          label="Deposit"
-          hint="Charged when the client books."
+          label={t('services.form.depositLabel')}
+          hint={t('services.form.depositHint')}
           value={deposit}
           onChange={setDeposit}
           required
@@ -152,8 +154,8 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
           className="h-4 w-4 accent-clay"
         />
         <span className="text-sm">
-          <span className="font-medium text-ink">Show on my booking page</span>
-          <span className="ml-2 text-ink-muted">Uncheck to hide without deleting.</span>
+          <span className="font-medium text-ink">{t('services.form.showLabel')}</span>
+          <span className="ml-2 text-ink-muted">{t('services.form.showHint')}</span>
         </span>
       </label>
 
@@ -171,9 +173,9 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
           {pending ? (
             <>
               <Spinner className="mr-2" />
-              Saving…
+              {t('services.form.saving')}
             </>
-          ) : editing ? 'Save changes' : 'Add service'}
+          ) : editing ? t('services.form.saveChanges') : t('services.form.create')}
         </Button>
         <a
           href="/dashboard/services"
@@ -182,7 +184,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
             pending && 'pointer-events-none opacity-50'
           )}
         >
-          Cancel
+          {t('services.form.cancel')}
         </a>
       </div>
     </form>

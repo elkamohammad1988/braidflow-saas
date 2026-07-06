@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ArrowRight, Check, Clock, CreditCard, Plus, type LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -22,6 +23,7 @@ export function ActivationChecklist({
   chargesEnabled,
   onboardingComplete
 }: Props) {
+  const t = useTranslations('activation');
   const done = [hasService, hasHours, chargesEnabled].filter(Boolean).length;
   // Once everything is done there's nothing to nudge; the parent stops rendering
   // this, but guard anyway.
@@ -32,9 +34,9 @@ export function ActivationChecklist({
       <div className="border-b border-line bg-clay/5 px-6 py-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="font-display text-xl text-ink">Finish setting up your booking page</h2>
+            <h2 className="font-display text-xl text-ink">{t('title')}</h2>
             <p className="mt-1 text-sm text-ink-muted">
-              Three quick steps and clients can start booking and paying deposits.
+              {t('subtitle')}
             </p>
           </div>
           <span className="shrink-0 rounded-full bg-paper px-3 py-1 text-sm font-medium text-ink shadow-card">
@@ -53,12 +55,12 @@ export function ActivationChecklist({
         <Step
           done={hasService}
           icon={Plus}
-          title="Add your first service"
-          description="List a style, its price, and the deposit that holds the slot."
+          title={t('addService.title')}
+          description={t('addService.description')}
           action={
             <Link href="/dashboard/services/new">
               <Button size="sm" variant="secondary">
-                Add a service
+                {t('addService.action')}
                 <ArrowRight />
               </Button>
             </Link>
@@ -67,12 +69,12 @@ export function ActivationChecklist({
         <Step
           done={hasHours}
           icon={Clock}
-          title="Set your weekly hours"
-          description="Choose the days and times clients are allowed to book."
+          title={t('setHours.title')}
+          description={t('setHours.description')}
           action={
             <Link href="/dashboard/availability">
               <Button size="sm" variant="secondary">
-                Set hours
+                {t('setHours.action')}
                 <ArrowRight />
               </Button>
             </Link>
@@ -118,6 +120,7 @@ function StripeStep({
   done: boolean;
   onboardingComplete: boolean;
 }) {
+  const t = useTranslations('activation');
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -138,13 +141,13 @@ function StripeStep({
       <StatusIcon done={done} icon={CreditCard} />
       <div className="min-w-0 flex-1">
         <p className={cn('font-medium', done ? 'text-ink-muted line-through' : 'text-ink')}>
-          Connect Stripe to get paid
+          {t('stripe.title')}
         </p>
         {!done && (
           <p className="mt-0.5 text-sm text-ink-muted">
             {onboardingComplete
-              ? 'Your details are under review — deposits start once Stripe approves, usually within minutes.'
-              : 'Deposits pay out straight to your account. Takes about two minutes.'}
+              ? t('stripe.reviewDescription')
+              : t('stripe.description')}
           </p>
         )}
         {error && (
@@ -164,11 +167,11 @@ function StripeStep({
             {pending ? (
               <>
                 <Spinner className="mr-2" />
-                Opening…
+                {t('stripe.opening')}
               </>
             ) : (
               <>
-                {onboardingComplete ? 'Continue' : 'Connect Stripe'}
+                {onboardingComplete ? t('stripe.continue') : t('stripe.connect')}
                 <ArrowRight />
               </>
             )}

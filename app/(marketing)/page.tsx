@@ -20,60 +20,24 @@ import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
 import { useTranslations } from 'next-intl';
 
 const stats = [
-  { to: 100, suffix: '%', label: 'of every deposit stays yours' },
-  { to: 0, suffix: '%', label: 'commission on your services' },
-  { to: 15, suffix: ' min', label: 'to set up your page' },
-  { to: 90, suffix: 's', label: 'for a client to book on a phone' }
+  { to: 100, key: 'deposit' },
+  { to: 0, key: 'commission' },
+  { to: 15, key: 'setup' },
+  { to: 90, key: 'booking' }
 ];
 
-const testimonials = [
-  {
-    quote:
-      'I was losing two heads a week to no-shows. Deposits stopped it the first month. My calendar finally feels like mine.',
-    name: 'Aisha O.',
-    role: 'Box braids · Atlanta'
-  },
-  {
-    quote:
-      "Square was made for coffee shops, not 6-hour appointments. BraidFlow gets the work — deposits, durations, day blocks.",
-    name: 'Nia M.',
-    role: 'Knotless · Brooklyn'
-  },
-  {
-    quote:
-      'Setup took 15 minutes. The link in my bio finally does the work instead of me typing the same reply 40 times a week.',
-    name: 'Kemi A.',
-    role: 'Goddess locs · Houston'
-  }
-];
+const testimonials = [{ key: 'aisha' }, { key: 'nia' }, { key: 'kemi' }];
 
-const faqs = [
-  {
-    q: 'How is this different from Square or Acuity?',
-    a: "Those were built for 30-minute coffee shop slots. BraidFlow is built for 4–8 hour appointments where a no-show actually hurts. Deposits are the default, not an add-on. Service durations and day-blocks work the way braiders actually plan a week."
-  },
-  {
-    q: 'Do my clients need an account to book?',
-    a: 'No. They tap your link, pick a service, pick a slot, pay the deposit. Done. The whole flow takes about 90 seconds on a phone.'
-  },
-  {
-    q: 'What happens to the deposit if I cancel?',
-    a: "It's refunded automatically to the client's card. If they cancel inside your grace window (you set it), they get it back. After that, it's yours."
-  },
-  {
-    q: "I'm not technical. Can I really set this up?",
-    a: "Yes. If you can fill in your name, prices, and the days you work, you're done. Most braiders are live in under 15 minutes."
-  }
-];
+const faqs = [{ key: 'different' }, { key: 'account' }, { key: 'cancel' }, { key: 'technical' }];
 
 const comparisons = [
-  { feature: 'Built for 4–8 hour appointments', us: true, them: false },
-  { feature: 'Deposits before booking confirms', us: true, them: 'Add-on / paid plan' },
-  { feature: 'Day-blocks for vacations & life', us: true, them: 'Limited' },
-  { feature: 'Per-service deposit amounts', us: true, them: false },
-  { feature: 'No cut of your services', us: true, them: 'Some take 1–3%' },
-  { feature: 'Set up in 15 minutes', us: true, them: false }
-];
+  { key: 'longAppts', us: true, them: false },
+  { key: 'deposits', us: true, them: 'addon' },
+  { key: 'dayBlocks', us: true, them: 'limited' },
+  { key: 'perService', us: true, them: false },
+  { key: 'noCut', us: true, them: 'someCut' },
+  { key: 'quickSetup', us: true, them: false }
+] as const;
 
 const proofPoints = [
   { icon: CreditCard, key: 'deposits' },
@@ -82,32 +46,12 @@ const proofPoints = [
   { icon: Sparkles, key: 'free' }
 ] as const;
 
-const valueProps = [
-  'Set your services, durations, and deposit amounts once.',
-  "Block off days you're out — vacations, kids' events, whatever life looks like that week.",
-  'Clients book themselves into the right slot. You see it on your calendar instantly.',
-  'Balance is collected in person — same as you do it today.'
-];
+const valueProps = ['setup', 'blocks', 'selfBook', 'balance'];
 
 const steps = [
-  {
-    n: '01',
-    icon: Sparkles,
-    t: 'Build your page',
-    d: 'Add your services, prices, and the days you take clients. Takes about ten minutes.'
-  },
-  {
-    n: '02',
-    icon: Smartphone,
-    t: 'Share the link',
-    d: 'Drop it in your bio. New clients book themselves — at any hour, no back-and-forth.'
-  },
-  {
-    n: '03',
-    icon: CalendarCheck,
-    t: 'Show up and braid',
-    d: 'Deposit is already in. You get a reminder the morning of. The week runs itself.'
-  }
+  { n: '01', icon: Sparkles, key: 'build' },
+  { n: '02', icon: Smartphone, key: 'share' },
+  { n: '03', icon: CalendarCheck, key: 'show' }
 ];
 
 export default function Home() {
@@ -193,11 +137,13 @@ export default function Home() {
           <Reveal className="relative overflow-hidden rounded-xl3 border border-line bg-paper shadow-lifted">
             <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-y-0 md:grid-cols-4 md:divide-x">
               {stats.map((s) => (
-                <div key={s.label} className="px-7 py-8">
+                <div key={s.key} className="px-7 py-8">
                   <p className="font-display text-5xl font-medium tracking-tight text-ink">
-                    <CountUp to={s.to} suffix={s.suffix} />
+                    <CountUp to={s.to} suffix={t(`stats.suffix.${s.key}`)} />
                   </p>
-                  <p className="mt-2 text-sm leading-snug text-ink-muted">{s.label}</p>
+                  <p className="mt-2 text-sm leading-snug text-ink-muted">
+                    {t(`stats.label.${s.key}`)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -212,18 +158,17 @@ export default function Home() {
             <Reveal>
               <p className="label flex items-center gap-2 text-clay-text">
                 <span className="h-1 w-1 rounded-full bg-clay" />
-                No-show protection
+                {t('deposit.label')}
               </p>
             </Reveal>
             <Reveal delay={80}>
               <h2 className="mt-5 font-display text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-ink md:text-[3.25rem]">
-                Deposits land before the appointment does.
+                {t('deposit.title')}
               </h2>
             </Reveal>
             <Reveal delay={150}>
               <p className="mt-5 max-w-md text-[17px] leading-relaxed text-ink-muted">
-                Clients pay a deposit to confirm — held by Stripe, refunded if you cancel, kept if
-                they ghost. No more no-shows costing you a chair.
+                {t('deposit.body')}
               </p>
             </Reveal>
           </div>
@@ -235,7 +180,9 @@ export default function Home() {
                   <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-moss/10 text-moss ring-1 ring-moss/15">
                     <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </span>
-                  <span className="text-[15px] leading-relaxed text-ink">{v}</span>
+                  <span className="text-[15px] leading-relaxed text-ink">
+                    {t(`deposit.props.${v}`)}
+                  </span>
                 </div>
               </Reveal>
             ))}
@@ -247,9 +194,9 @@ export default function Home() {
       <section className="border-y border-line bg-cream-deep/40">
         <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
           <Reveal>
-            <p className="label text-clay-text">The whole thing</p>
+            <p className="label text-clay-text">{t('how.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
-              Three steps. Then it runs itself.
+              {t('how.title')}
             </h2>
           </Reveal>
           <ol className="mt-14 grid gap-6 md:grid-cols-3">
@@ -268,8 +215,12 @@ export default function Home() {
                     </span>
                     <span className="font-mono text-2xl text-clay/70">{step.n}</span>
                   </div>
-                  <p className="mt-6 font-display text-xl font-medium text-ink">{step.t}</p>
-                  <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">{step.d}</p>
+                  <p className="mt-6 font-display text-xl font-medium text-ink">
+                    {t(`how.steps.${step.key}.title`)}
+                  </p>
+                  <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+                    {t(`how.steps.${step.key}.desc`)}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -280,14 +231,14 @@ export default function Home() {
       {/* ───────────────────────── TESTIMONIALS ───────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
         <Reveal>
-          <p className="label text-clay-text">In their chairs</p>
+          <p className="label text-clay-text">{t('testimonials.label')}</p>
           <h2 className="mt-3 max-w-2xl font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
-            Braiders running their whole week on it.
+            {t('testimonials.title')}
           </h2>
         </Reveal>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <Reveal as="figure" key={t.name} delay={i * 110} className={i === 1 ? 'md:-mt-6' : ''}>
+          {testimonials.map((item, i) => (
+            <Reveal as="figure" key={item.key} delay={i * 110} className={i === 1 ? 'md:-mt-6' : ''}>
               <figure className="flex h-full flex-col justify-between rounded-card border border-line bg-paper p-7 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1 hover:shadow-lifted">
                 <div>
                   <div className="flex gap-0.5 text-gold">
@@ -296,16 +247,20 @@ export default function Home() {
                     ))}
                   </div>
                   <blockquote className="mt-5 font-display text-[1.35rem] font-medium leading-[1.28] tracking-[-0.01em] text-ink">
-                    &ldquo;{t.quote}&rdquo;
+                    &ldquo;{t(`testimonials.items.${item.key}.quote`)}&rdquo;
                   </blockquote>
                 </div>
                 <figcaption className="mt-7 flex items-center gap-3 border-t border-line pt-5">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-clay/25 to-plum/15 font-display text-base font-medium text-clay-deep">
-                    {t.name[0]}
+                    {t(`testimonials.items.${item.key}.name`).charAt(0)}
                   </span>
                   <div className="text-sm">
-                    <p className="font-medium text-ink">{t.name}</p>
-                    <p className="font-mono text-xs text-ink-subtle">{t.role}</p>
+                    <p className="font-medium text-ink">
+                      {t(`testimonials.items.${item.key}.name`)}
+                    </p>
+                    <p className="font-mono text-xs text-ink-subtle">
+                      {t(`testimonials.items.${item.key}.role`)}
+                    </p>
                   </div>
                 </figcaption>
               </figure>
@@ -318,45 +273,46 @@ export default function Home() {
       <section className="border-y border-line bg-cream-deep/40">
         <div className="mx-auto max-w-4xl px-6 py-24">
           <Reveal>
-            <p className="label text-clay-text">The honest version</p>
+            <p className="label text-clay-text">{t('comparison.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
-              Why not just use Square or Acuity?
+              {t('comparison.title')}
             </h2>
             <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-ink-muted">
-              You can. Plenty of braiders do, and they keep emailing us about the same gaps.
-              Here&apos;s what changes when the tool was built for the work you actually do.
+              {t('comparison.body')}
             </p>
           </Reveal>
 
           <Reveal delay={120}>
             <div className="mt-12 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
               <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50">
-                <div>Feature</div>
+                <div>{t('comparison.feature')}</div>
                 <div className="w-24 text-center text-gold">BraidFlow</div>
-                <div className="w-24 text-center">Generic tools</div>
+                <div className="w-24 text-center">{t('comparison.genericTools')}</div>
               </div>
               {comparisons.map((row, i) => (
                 <div
-                  key={row.feature}
+                  key={row.key}
                   className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-6 py-4 text-sm transition-colors hover:bg-ink/[0.04] ${
                     i !== comparisons.length - 1 ? 'border-b border-line' : ''
                   }`}
                 >
-                  <div className="text-ink">{row.feature}</div>
+                  <div className="text-ink">{t(`comparison.features.${row.key}`)}</div>
                   <div className="flex w-24 justify-center">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
                       <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />
-                      <span className="sr-only">Included</span>
+                      <span className="sr-only">{t('comparison.included')}</span>
                     </span>
                   </div>
                   <div className="flex w-24 justify-center text-center text-xs text-ink-muted">
                     {row.them === false ? (
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink/[0.05]">
                         <X aria-hidden className="h-3.5 w-3.5 text-ink-subtle" strokeWidth={2.25} />
-                        <span className="sr-only">Not included</span>
+                        <span className="sr-only">{t('comparison.notIncluded')}</span>
                       </span>
                     ) : (
-                      <span className="font-mono text-[11px]">{row.them}</span>
+                      <span className="font-mono text-[11px]">
+                        {t(`comparison.themValues.${row.them}`)}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -370,27 +326,33 @@ export default function Home() {
       <section className="mx-auto max-w-5xl px-6 py-24 md:py-28">
         <div className="grid gap-12 md:grid-cols-[0.8fr_1.2fr]">
           <Reveal>
-            <p className="label text-clay-text">Questions</p>
+            <p className="label text-clay-text">{t('faq.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-[2.75rem]">
-              Common questions, real answers.
+              {t('faq.title')}
             </h2>
             <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
-              Still unsure?{' '}
-              <a
-                className="font-medium text-clay-deep underline decoration-clay/40 underline-offset-4 transition-colors hover:text-clay"
-                href="mailto:hello@braidflow.app"
-              >
-                Email us
-              </a>{' '}
-              — a real person reads everything.
+              {t.rich('faq.stillUnsure', {
+                a: (chunks) => (
+                  <a
+                    className="font-medium text-clay-deep underline decoration-clay/40 underline-offset-4 transition-colors hover:text-clay"
+                    href="mailto:hello@braidflow.app"
+                  >
+                    {chunks}
+                  </a>
+                )
+              })}
             </p>
           </Reveal>
           <dl className="divide-y divide-line">
-            {faqs.map(({ q, a }, i) => (
-              <Reveal as="div" key={q} delay={i * 70}>
+            {faqs.map((item, i) => (
+              <Reveal as="div" key={item.key} delay={i * 70}>
                 <div className="py-6">
-                  <dt className="font-display text-lg font-medium text-ink">{q}</dt>
-                  <dd className="mt-2 text-[15px] leading-relaxed text-ink-muted">{a}</dd>
+                  <dt className="font-display text-lg font-medium text-ink">
+                    {t(`faq.items.${item.key}.q`)}
+                  </dt>
+                  <dd className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+                    {t(`faq.items.${item.key}.a`)}
+                  </dd>
                 </div>
               </Reveal>
             ))}
@@ -406,20 +368,20 @@ export default function Home() {
           <Reveal>
             <p className="label mx-auto flex w-fit items-center gap-2 text-gold-bright">
               <span className="h-1 w-1 rounded-full bg-gold-bright" />
-              Free while we&apos;re in beta
+              {t('finalCta.badge')}
             </p>
           </Reveal>
           <Reveal delay={90}>
             <p className="mx-auto mt-6 max-w-2xl font-display text-[3rem] font-medium leading-[1.02] tracking-[-0.035em] md:text-[4.5rem]">
-              Start free.
-              <br />
-              Keep <span className="italic text-gilt">what you earn.</span>
+              {t.rich('finalCta.title', {
+                br: () => <br />,
+                em: (chunks) => <span className="italic text-gilt">{chunks}</span>
+              })}
             </p>
           </Reveal>
           <Reveal delay={170}>
             <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-ivory/65">
-              You keep 100% of every deposit. Set up your page in fifteen minutes — no credit card to
-              start.
+              {t('finalCta.body')}
             </p>
           </Reveal>
           <Reveal delay={250}>
@@ -427,7 +389,7 @@ export default function Home() {
               <Magnetic strength={0.5}>
                 <Link href="/signup?role=braider">
                   <Button size="lg">
-                    Set up your page
+                    {t('finalCta.cta')}
                     <ArrowRight />
                   </Button>
                 </Link>
@@ -436,7 +398,7 @@ export default function Home() {
                 href="/pricing"
                 className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-ivory/75 underline-offset-4 transition-colors hover:text-gold-bright"
               >
-                See pricing
+                {t('finalCta.seePricing')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
@@ -449,8 +411,10 @@ export default function Home() {
 
 /* Stylized booking-page preview — the product itself, glowing on the dark stage. */
 function HeroPreview() {
+  const t = useTranslations('landing');
   return (
-    <div className="relative mx-auto w-full max-w-sm animate-float md:max-w-none">
+    // The preview is a snapshot of the product's own UI, so it keeps LTR even in RTL locales.
+    <div dir="ltr" className="relative mx-auto w-full max-w-sm animate-float md:max-w-none">
       <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,rgba(224,163,63,0.35),transparent_70%)] blur-2xl" aria-hidden />
       <div className="overflow-hidden rounded-xl2 border border-cream/12 bg-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7),0_0_0_1px_rgba(242,196,100,0.06)]">
         {/* window chrome */}
@@ -470,35 +434,35 @@ function HeroPreview() {
               N
             </span>
             <div>
-              <p className="font-display text-lg font-medium leading-tight text-ink">Nia&apos;s Braids</p>
-              <p className="font-mono text-[11px] text-ink-muted">Knotless · Brooklyn, NY</p>
+              <p className="font-display text-lg font-medium leading-tight text-ink">{t('preview.name')}</p>
+              <p className="font-mono text-[11px] text-ink-muted">{t('preview.location')}</p>
             </div>
             <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-moss/10 px-2 py-0.5 text-[11px] font-medium text-moss ring-1 ring-moss/15">
               <span className="h-1.5 w-1.5 rounded-full bg-moss-bright" />
-              Booking
+              {t('preview.status')}
             </span>
           </div>
 
           {/* service */}
           <div className="mt-5 rounded-card border border-clay/30 bg-gold/[0.06] p-3.5 ring-1 ring-gold/15">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-ink">Knotless braids — medium</p>
+              <p className="text-sm font-medium text-ink">{t('preview.service')}</p>
               <p className="text-sm font-semibold text-ink">$180</p>
             </div>
             <div className="mt-1.5 flex items-center gap-3 font-mono text-[11px] text-ink-muted">
               <span className="inline-flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> 5 hours
+                <Clock className="h-3.5 w-3.5" /> {t('preview.duration')}
               </span>
               <span className="inline-flex items-center gap-1">
-                <Wallet className="h-3.5 w-3.5" /> $40 deposit
+                <Wallet className="h-3.5 w-3.5" /> {t('preview.deposit')}
               </span>
             </div>
           </div>
 
           {/* slots */}
-          <p className="label mt-5 text-ink-subtle">Saturday, Jun 14</p>
+          <p className="label mt-5 text-ink-subtle">{t('preview.date')}</p>
           <div className="mt-2.5 grid grid-cols-3 gap-2">
-            {['9:00 AM', '11:30 AM', '2:00 PM'].map((slot, i) => (
+            {(t.raw('preview.slots') as string[]).map((slot, i) => (
               <div
                 key={slot}
                 className={`rounded-lg border px-2 py-2 text-center font-mono text-[11px] font-medium ${
@@ -516,13 +480,13 @@ function HeroPreview() {
           <div className="mt-5 flex items-center justify-between rounded-card bg-night px-4 py-3 text-ivory">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-wider text-ivory/50">
-                Pay deposit to confirm
+                {t('preview.payLabel')}
               </p>
               <p className="font-display text-lg font-medium leading-tight">$40.00</p>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3.5 py-1.5 text-xs font-semibold text-night">
               <CreditCard className="h-3.5 w-3.5" />
-              Pay &amp; book
+              {t('preview.payButton')}
             </span>
           </div>
         </div>
@@ -533,7 +497,7 @@ function HeroPreview() {
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
           <CalendarCheck className="h-3.5 w-3.5" strokeWidth={2.2} />
         </span>
-        <span className="text-xs font-medium text-ink">Deposit secured</span>
+        <span className="text-xs font-medium text-ink">{t('preview.secured')}</span>
       </div>
     </div>
   );

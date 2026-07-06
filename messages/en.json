@@ -7,7 +7,15 @@
     "myBookings": "My bookings",
     "viewSite": "View site",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "copied": "Copied",
+    "copy": "Copy",
+    "demoBadge": {
+      "label": "Demo Mode",
+      "title": "You're exploring an interactive demo",
+      "description": "Every screen — bookings, clients, calendar and deposits — runs on realistic sample data, with no account or setup required. Feel free to click around.",
+      "dismiss": "Dismiss demo badge"
+    }
   },
   "nav": {
     "findBraider": "Find a braider",
@@ -43,6 +51,887 @@
       "noShow": "No-show protection",
       "mobile": "Mobile-first booking",
       "free": "Free to start"
+    },
+    "stats": {
+      "suffix": {
+        "deposit": "%",
+        "commission": "%",
+        "setup": " min",
+        "booking": "s"
+      },
+      "label": {
+        "deposit": "of every deposit stays yours",
+        "commission": "commission on your services",
+        "setup": "to set up your page",
+        "booking": "for a client to book on a phone"
+      }
+    },
+    "deposit": {
+      "label": "No-show protection",
+      "title": "Deposits land before the appointment does.",
+      "body": "Clients pay a deposit to confirm — held by Stripe, refunded if you cancel, kept if they ghost. No more no-shows costing you a chair.",
+      "props": {
+        "setup": "Set your services, durations, and deposit amounts once.",
+        "blocks": "Block off days you're out — vacations, kids' events, whatever life looks like that week.",
+        "selfBook": "Clients book themselves into the right slot. You see it on your calendar instantly.",
+        "balance": "Balance is collected in person — same as you do it today."
+      }
+    },
+    "how": {
+      "label": "The whole thing",
+      "title": "Three steps. Then it runs itself.",
+      "steps": {
+        "build": {
+          "title": "Build your page",
+          "desc": "Add your services, prices, and the days you take clients. Takes about ten minutes."
+        },
+        "share": {
+          "title": "Share the link",
+          "desc": "Drop it in your bio. New clients book themselves — at any hour, no back-and-forth."
+        },
+        "show": {
+          "title": "Show up and braid",
+          "desc": "Deposit is already in. You get a reminder the morning of. The week runs itself."
+        }
+      }
+    },
+    "testimonials": {
+      "label": "In their chairs",
+      "title": "Braiders running their whole week on it.",
+      "items": {
+        "aisha": {
+          "quote": "I was losing two heads a week to no-shows. Deposits stopped it the first month. My calendar finally feels like mine.",
+          "name": "Aisha O.",
+          "role": "Box braids · Atlanta"
+        },
+        "nia": {
+          "quote": "Square was made for coffee shops, not 6-hour appointments. BraidFlow gets the work — deposits, durations, day blocks.",
+          "name": "Nia M.",
+          "role": "Knotless · Brooklyn"
+        },
+        "kemi": {
+          "quote": "Setup took 15 minutes. The link in my bio finally does the work instead of me typing the same reply 40 times a week.",
+          "name": "Kemi A.",
+          "role": "Goddess locs · Houston"
+        }
+      }
+    },
+    "comparison": {
+      "label": "The honest version",
+      "title": "Why not just use Square or Acuity?",
+      "body": "You can. Plenty of braiders do, and they keep emailing us about the same gaps. Here's what changes when the tool was built for the work you actually do.",
+      "feature": "Feature",
+      "genericTools": "Generic tools",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "features": {
+        "longAppts": "Built for 4–8 hour appointments",
+        "deposits": "Deposits before booking confirms",
+        "dayBlocks": "Day-blocks for vacations & life",
+        "perService": "Per-service deposit amounts",
+        "noCut": "No cut of your services",
+        "quickSetup": "Set up in 15 minutes"
+      },
+      "themValues": {
+        "addon": "Add-on / paid plan",
+        "limited": "Limited",
+        "someCut": "Some take 1–3%"
+      }
+    },
+    "faq": {
+      "label": "Questions",
+      "title": "Common questions, real answers.",
+      "stillUnsure": "Still unsure? <a>Email us</a> — a real person reads everything.",
+      "items": {
+        "different": {
+          "q": "How is this different from Square or Acuity?",
+          "a": "Those were built for 30-minute coffee shop slots. BraidFlow is built for 4–8 hour appointments where a no-show actually hurts. Deposits are the default, not an add-on. Service durations and day-blocks work the way braiders actually plan a week."
+        },
+        "account": {
+          "q": "Do my clients need an account to book?",
+          "a": "No. They tap your link, pick a service, pick a slot, pay the deposit. Done. The whole flow takes about 90 seconds on a phone."
+        },
+        "cancel": {
+          "q": "What happens to the deposit if I cancel?",
+          "a": "It's refunded automatically to the client's card. If they cancel inside your grace window (you set it), they get it back. After that, it's yours."
+        },
+        "technical": {
+          "q": "I'm not technical. Can I really set this up?",
+          "a": "Yes. If you can fill in your name, prices, and the days you work, you're done. Most braiders are live in under 15 minutes."
+        }
+      }
+    },
+    "finalCta": {
+      "badge": "Free while we're in beta",
+      "title": "Start free.<br></br>Keep <em>what you earn.</em>",
+      "body": "You keep 100% of every deposit. Set up your page in fifteen minutes — no credit card to start.",
+      "cta": "Set up your page",
+      "seePricing": "See pricing"
+    },
+    "preview": {
+      "name": "Nia's Braids",
+      "location": "Knotless · Brooklyn, NY",
+      "status": "Booking",
+      "service": "Knotless braids — medium",
+      "duration": "5 hours",
+      "deposit": "$40 deposit",
+      "date": "Saturday, Jun 14",
+      "slots": [
+        "9:00 AM",
+        "11:30 AM",
+        "2:00 PM"
+      ],
+      "payLabel": "Pay deposit to confirm",
+      "payButton": "Pay & book",
+      "secured": "Deposit secured"
+    }
+  },
+  "legal": {
+    "shell": {
+      "label": "Legal",
+      "lastUpdated": "Last updated {updated}"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "updatedDate": "June 13, 2026",
+      "intro": "BraidFlow (“BraidFlow”, “we”, “us”) is a booking platform that connects clients with braiders and protective-style stylists. This policy explains what information we collect, why we collect it, and the choices you have. It applies to our website and services.",
+      "collect": {
+        "title": "Information we collect",
+        "account": "<s>Account information.</s> When you sign up we collect your name, email address, and whether you join as a client or a braider, plus the password you set (stored only as a salted hash by our authentication provider).",
+        "profile": "<s>Profile and business details.</s> Braiders provide information such as their display name, location, services, pricing, and availability so clients can find and book them.",
+        "booking": "<s>Booking information.</s> When a booking is made we collect the service, date and time, any notes you add, and the parties involved.",
+        "payment": "<s>Payment information.</s> Deposits are processed by Stripe. Your full card number is sent directly to Stripe and is never stored on our servers. We retain only non-sensitive payment metadata (such as amount, status, and Stripe identifiers) needed to track bookings and refunds.",
+        "technical": "<s>Technical data.</s> Like most services, we and our providers automatically receive basic technical information (such as IP address and browser type) to keep the service secure, working, and free from abuse."
+      },
+      "use": {
+        "title": "How we use information",
+        "item1": "Create and manage your account and authenticate you.",
+        "item2": "Enable discovery, booking, deposits, reschedules, cancellations, and refunds.",
+        "item3": "Send transactional email — confirmations, reminders, and account notices.",
+        "item4": "Prevent fraud and abuse, enforce our Terms, and keep the platform secure.",
+        "item5": "Comply with legal obligations and resolve disputes.",
+        "note": "We do not sell your personal information, and we do not use it for third-party advertising."
+      },
+      "share": {
+        "title": "How we share information",
+        "lead": "We share information only as needed to run the service:",
+        "parties": "<s>Between the parties to a booking.</s> A braider can see the name, contact details, and booking details of clients who book with them, and vice-versa, so the appointment can happen.",
+        "providers": "<s>Service providers.</s> We rely on Stripe (payments), Resend (transactional email), and Vercel (application hosting). They process data on our behalf under their own terms and security commitments.",
+        "legal": "<s>Legal and safety.</s> We may disclose information if required by law, or to protect the rights, property, or safety of our users or the public."
+      },
+      "payments": {
+        "title": "Payments",
+        "body": "Card payments are handled by Stripe, a PCI-DSS Level 1 certified payment processor. When you pay a deposit, your card details are transmitted directly to Stripe over an encrypted connection. BraidFlow does not see or store your full card number, CVC, or expiry. See Stripe's own privacy policy for details on how it processes payment data."
+      },
+      "cookies": {
+        "title": "Cookies and sessions",
+        "body": "We use cookies that are strictly necessary to sign you in and keep you signed in securely. We do not use advertising or cross-site tracking cookies. If we add optional analytics in the future, we will update this policy."
+      },
+      "retention": {
+        "title": "Data retention",
+        "body": "We keep your information for as long as your account is active or as needed to provide the service. Booking and payment records may be retained longer where required for tax, accounting, dispute resolution, or legal compliance. You can ask us to delete your account, after which we remove or anonymize personal data that we are not required to keep."
+      },
+      "security": {
+        "title": "Security",
+        "body": "Data is encrypted in transit. Access is enforced by server-side authorization checks so that, for example, clients see only their own bookings and braiders see only their own business data. Privileged operations run server-side with least privilege. No system is perfectly secure, but we work to protect your information using industry-standard safeguards."
+      },
+      "rights": {
+        "title": "Your rights",
+        "body": "Depending on where you live, you may have the right to access, correct, export, or delete your personal information, and to object to or restrict certain processing. You can update most details from your account, or contact us at <a>privacy@braidflow.app</a> and we will respond within a reasonable time."
+      },
+      "children": {
+        "title": "Children",
+        "body": "BraidFlow is not directed to children under 16, and we do not knowingly collect personal information from them. If you believe a child has provided us information, contact us and we will delete it."
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "body": "We may update this policy from time to time. When we do, we will revise the “Last updated” date above and, for material changes, provide a more prominent notice."
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "Questions about this policy? Email <a>privacy@braidflow.app</a>. See also our <terms>Terms of Service</terms>."
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "updatedDate": "June 13, 2026",
+      "intro": "These Terms of Service (“Terms”) govern your access to and use of BraidFlow. By creating an account or using the service, you agree to these Terms. If you do not agree, do not use BraidFlow.",
+      "s1": {
+        "title": "1. Who we are and what BraidFlow does",
+        "body": "BraidFlow is a booking platform that lets clients discover braiders, book appointments, and pay a deposit to confirm a time. Braiders are independent service providers — not employees, agents, or partners of BraidFlow. We provide the software that facilitates bookings and deposit payments; we are not a party to the service agreement between a client and a braider, and we do not provide braiding services ourselves."
+      },
+      "s2": {
+        "title": "2. Eligibility and accounts",
+        "body": "You must be at least 18 years old (or the age of majority where you live) and able to form a binding contract to use BraidFlow. You are responsible for the accuracy of the information you provide, for keeping your password confidential, and for all activity under your account. Notify us promptly of any unauthorized use."
+      },
+      "s3": {
+        "title": "3. Bookings and deposits",
+        "body": "To confirm a booking, a client pays a deposit through the platform. The slot is held only once the deposit is paid; until then it remains available to others. The deposit is applied toward the total price of the service, and the remaining balance is paid directly to the braider, typically in person at the appointment. Prices, deposit amounts, durations, and availability are set by each braider."
+      },
+      "s4": {
+        "title": "4. Payments",
+        "body": "Deposits are processed by Stripe. By paying, you authorize the charge and agree to Stripe's terms. You represent that you are authorized to use the payment method you provide. BraidFlow is not responsible for fees your bank or card issuer may apply."
+      },
+      "s5": {
+        "title": "5. Cancellations, reschedules, and refunds",
+        "body": "A booking may be rescheduled or cancelled through the platform subject to the braider's policy. When a booking is rescheduled, the existing deposit carries over to the new time. A braider may issue a refund of the deposit; whether a deposit is refundable, and on what timeline, is determined by the braider's stated cancellation policy and applicable law. BraidFlow facilitates refunds requested through the platform but does not itself guarantee any refund."
+      },
+      "s6": {
+        "title": "6. No-shows and late arrivals",
+        "body": "Deposits exist to protect braiders from no-shows, which cost a working day. If a client fails to attend a confirmed appointment, the braider may retain the deposit in accordance with their policy. Clients should arrive on time; braiders should honor confirmed bookings or give reasonable notice if they cannot."
+      },
+      "s7": {
+        "title": "7. Braider responsibilities",
+        "item1": "Provide accurate listings, pricing, availability, and service descriptions.",
+        "item2": "Honor confirmed bookings and communicate promptly about any changes.",
+        "item3": "Hold any licenses, registrations, and insurance required in your jurisdiction, and comply with all applicable health, safety, and tax obligations.",
+        "item4": "Deliver services professionally and as described."
+      },
+      "s8": {
+        "title": "8. Acceptable use",
+        "lead": "You agree not to:",
+        "item1": "Use the platform for any unlawful, fraudulent, or harmful purpose.",
+        "item2": "Impersonate others or misrepresent your identity or affiliation.",
+        "item3": "Attempt to access accounts or data that are not yours, or probe or disrupt the service.",
+        "item4": "Scrape, overload, or interfere with the platform or its security features.",
+        "item5": "Post content that is unlawful, abusive, harassing, or infringing."
+      },
+      "s9": {
+        "title": "9. Reviews and user content",
+        "body": "Clients may leave reviews of completed appointments. Reviews must be honest, based on genuine experiences, and free of unlawful or abusive content. You retain ownership of content you submit but grant BraidFlow a non-exclusive, royalty-free license to host and display it as part of operating the service. We may remove content that violates these Terms."
+      },
+      "s10": {
+        "title": "10. Intellectual property",
+        "body": "BraidFlow and its logos, design, and software are owned by us and protected by intellectual property laws. We grant you a limited, non-exclusive, non-transferable right to use the service in accordance with these Terms. You may not copy, modify, or create derivative works of the platform except as permitted by law."
+      },
+      "s11": {
+        "title": "11. Disclaimers",
+        "body": "The platform is provided “as is” and “as available,” without warranties of any kind, whether express or implied, including fitness for a particular purpose and non-infringement. BraidFlow does not warrant that the service will be uninterrupted or error-free. Because braiders are independent providers, BraidFlow does not guarantee the quality, safety, or legality of any service booked through the platform."
+      },
+      "s12": {
+        "title": "12. Limitation of liability",
+        "body": "To the maximum extent permitted by law, BraidFlow will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for lost profits or data, arising from your use of the service. Our total liability for any claim relating to the service will not exceed the greater of the amount you paid to BraidFlow in the three months before the claim, or fifty U.S. dollars."
+      },
+      "s13": {
+        "title": "13. Indemnification",
+        "body": "You agree to indemnify and hold BraidFlow harmless from claims, losses, and expenses (including reasonable legal fees) arising out of your use of the service, your content, or your violation of these Terms or the rights of others."
+      },
+      "s14": {
+        "title": "14. Termination",
+        "body": "You may stop using BraidFlow and close your account at any time. We may suspend or terminate access if you violate these Terms or to protect the platform and its users. Provisions that by their nature should survive termination — such as payment obligations, disclaimers, and limitations of liability — will survive."
+      },
+      "s15": {
+        "title": "15. Changes to these Terms",
+        "body": "We may update these Terms from time to time. When we do, we will revise the “Last updated” date above and, for material changes, provide a more prominent notice. Continued use of the service after changes take effect constitutes acceptance."
+      },
+      "s16": {
+        "title": "16. Governing law and disputes",
+        "body": "These Terms are governed by the laws of the jurisdiction in which BraidFlow operates, without regard to conflict-of-law rules. You agree to first contact us to attempt to resolve any dispute informally before pursuing formal action."
+      },
+      "s17": {
+        "title": "17. Contact",
+        "body": "Questions about these Terms? Email <a>legal@braidflow.app</a>. See also our <privacy>Privacy Policy</privacy>."
+      }
+    }
+  },
+  "dashboard": {
+    "overview": {
+      "eyebrow": "Dashboard",
+      "title": "Hi, {name}",
+      "description": "Here's how the week is shaping up.",
+      "connectDone": {
+        "title": "Stripe connected.",
+        "body": "You can take bookings now — deposits pay out straight to your account."
+      },
+      "connectPending": {
+        "title": "Almost there.",
+        "body": "Stripe is reviewing your account — deposits start as soon as it's approved, usually within minutes."
+      },
+      "stats": {
+        "bookedThisWeek": "Booked this week",
+        "revenueThisMonth": "Revenue this month",
+        "revenueHint": "Confirmed + completed",
+        "awaitingDeposit": "Awaiting deposit",
+        "awaitingDepositHint": "Holds not yet collected",
+        "totalClients": "Total clients",
+        "totalClientsHint": "Lifetime, unique"
+      },
+      "upNext": {
+        "title": "Up next",
+        "subtitle": "Your next five appointments.",
+        "viewAll": "All appointments"
+      },
+      "empty": {
+        "title": "Nothing on the books for this week",
+        "description": "Share your booking page and we'll fill this up.",
+        "action": "Copy your link"
+      }
+    },
+    "appointments": {
+      "title": "Appointments",
+      "description": "Every booking, past and upcoming.",
+      "empty": {
+        "title": "No appointments yet",
+        "description": "When clients book your page, every appointment — past and upcoming — lands here."
+      },
+      "reschedule": "Reschedule",
+      "refundDeposit": "Refund deposit",
+      "retryRefund": "Retry refund",
+      "table": {
+        "when": "When",
+        "client": "Client",
+        "service": "Service",
+        "status": "Status",
+        "total": "Total"
+      }
+    },
+    "calendar": {
+      "title": "This week",
+      "appointments": "{count, plural, one {appointment} other {appointments}}",
+      "bookedValue": "booked value",
+      "open": "Open",
+      "today": "Today"
+    },
+    "clients": {
+      "title": "Clients",
+      "description": "Everyone who's booked with you.",
+      "empty": {
+        "title": "No clients yet",
+        "description": "As soon as someone books, they'll show up here — with their history and notes in one place."
+      },
+      "visits": "{count, plural, one {# visit} other {# visits}}",
+      "lifetime": "lifetime",
+      "lastSeen": "last seen {date}",
+      "newClient": "New client"
+    },
+    "services": {
+      "title": "Services",
+      "description": "The styles you offer. Clients pick from this list.",
+      "addService": "Add service",
+      "emptyTitle": "No services yet",
+      "emptyDescription": "Add the styles you offer with prices and how long they take.",
+      "addFirst": "Add your first service",
+      "hidden": "Hidden",
+      "depositLabel": "deposit",
+      "edit": "Edit",
+      "eyebrow": "Services",
+      "editDescription": "Edit how this shows up to clients.",
+      "newTitle": "New service",
+      "newDescription": "Add a style you offer. You can edit it anytime.",
+      "form": {
+        "nameLabel": "Service name",
+        "namePlaceholder": "Knotless box braids — medium",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "What's included, length, what to expect.",
+        "descriptionHint": "Optional. Shown on your booking page.",
+        "duration": "Duration",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "priceLabel": "Service price",
+        "depositLabel": "Deposit",
+        "depositHint": "Charged when the client books.",
+        "showLabel": "Show on my booking page",
+        "showHint": "Uncheck to hide without deleting.",
+        "saving": "Saving…",
+        "saveChanges": "Save changes",
+        "create": "Add service",
+        "cancel": "Cancel"
+      }
+    },
+    "availability": {
+      "title": "Availability",
+      "description": "The hours you take appointments each week. Block off specific dates separately.",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "off": "Off",
+      "addRange": "+ Add range",
+      "removeRange": "Remove range",
+      "invalidTime": "Pick a valid time.",
+      "from": "From",
+      "to": "To",
+      "save": "Save",
+      "cancel": "Cancel",
+      "timeOff": "Time off",
+      "addBlock": "Add block",
+      "timeOffDescription": "Going on vacation or stepping out for an afternoon? Block it off here so no one books it.",
+      "nothingBlocked": "Nothing blocked off right now.",
+      "remove": "Remove",
+      "invalidDateTime": "Pick a valid date and time.",
+      "date": "Date",
+      "noteOptional": "Note (optional)",
+      "notePlaceholder": "Birthday, family event, traveling…",
+      "saveBlock": "Save block"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Your public page and account.",
+      "bookingLinkLabel": "Your booking page",
+      "copyLink": "Copy link",
+      "genericError": "Something went wrong.",
+      "bookingSection": {
+        "title": "Your booking page",
+        "description": "What clients see when they land on your link."
+      },
+      "accountSection": {
+        "title": "Account",
+        "description": "Only you see this."
+      },
+      "businessName": "Business name",
+      "bio": "Bio",
+      "bioPlaceholder": "Style specialties, years of experience, what makes you, you.",
+      "city": "City",
+      "cityPlaceholder": "Atlanta, GA",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "braidsbyyou",
+      "instagramHint": "Without the @.",
+      "timezone": "Timezone",
+      "timezoneHint": "Your weekly hours and every appointment time are shown in this zone. Set it to where you actually braid.",
+      "acceptingBookings": "Accepting new bookings",
+      "acceptingBookingsHint": "Uncheck to pause your page without taking it down.",
+      "stripeRequired": "Connect Stripe (banner at the top of your dashboard) before you can accept bookings — clients can't pay a deposit until your account is set up.",
+      "yourName": "Your name",
+      "phone": "Phone",
+      "phonePlaceholder": "(555) 123-4567",
+      "saving": "Saving…",
+      "saveChanges": "Save changes",
+      "saved": "Saved."
+    },
+    "error": {
+      "title": "We couldn't load this",
+      "description": "Something went wrong fetching your data. This is usually temporary.",
+      "reference": "Reference: {digest}",
+      "retry": "Try again"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "awaitingDeposit": "Awaiting deposit",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No-show",
+      "deposit": "Deposit"
+    }
+  },
+  "auth": {
+    "panel": {
+      "tagline": "The booking platform built for <em>braiders.</em>",
+      "highlights": {
+        "deposits": "Take deposits up front with Stripe",
+        "noshows": "Stop losing chairs to no-shows",
+        "autopilot": "Your whole week, on autopilot"
+      },
+      "testimonial": {
+        "quote": "Setup took 15 minutes. The link in my bio finally does the work instead of me.",
+        "author": "Kemi A. · Goddess locs, Houston"
+      }
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to manage your bookings.",
+      "newHere": "New here?",
+      "createAccount": "Create an account",
+      "errors": {
+        "verification": "That link is invalid or has expired. Try signing in, or reset your password."
+      },
+      "forgotPassword": "Forgot password?",
+      "form": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "signIn": "Sign in",
+      "signingIn": "Signing in…"
+    },
+    "signup": {
+      "title": {
+        "braider": "Set up your booking page",
+        "client": "Create your account"
+      },
+      "subtitle": {
+        "braider": "Takes about a minute. You'll add services right after.",
+        "client": "Book your next appointment in a couple of taps."
+      },
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "roleLegend": "I'm signing up as a",
+      "role": {
+        "client": "Client",
+        "braider": "Braider"
+      },
+      "form": {
+        "fullName": "Full name",
+        "email": "Email",
+        "password": "Password",
+        "passwordHint": "At least 8 characters."
+      },
+      "creatingAccount": "Creating account…",
+      "createAccount": "Create account",
+      "terms": "By creating an account, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter the email on your account and we'll send you a link to set a new password.",
+      "remembered": "Remembered it?",
+      "backToSignIn": "Back to sign in",
+      "form": {
+        "email": "Email"
+      },
+      "sendResetLink": "Send reset link",
+      "sendingLink": "Sending link…",
+      "sent": {
+        "title": "Check your inbox",
+        "body": "If an account exists for <email>{address}</email>, we've sent a link to reset your password. It expires in about an hour.",
+        "retry": "Didn't get it? Check spam, or <retry>try again</retry>."
+      }
+    },
+    "reset": {
+      "title": "Set a new password",
+      "subtitle": "Choose a strong password you don't use anywhere else.",
+      "form": {
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "passwordHint": "At least 8 characters."
+      },
+      "saveNewPassword": "Save new password",
+      "saving": "Saving…",
+      "errors": {
+        "mismatch": "Those passwords don't match."
+      }
+    }
+  },
+  "errors": {
+    "backToHome": "Back to home",
+    "tryAgain": "Try again",
+    "reference": "Reference: {digest}",
+    "boundary": {
+      "code": "Oops",
+      "title": "Something snagged on our end.",
+      "description": "We've logged it. Try again in a moment — and if it keeps happening, send us a note."
+    },
+    "notFound": {
+      "title": "That page slipped through the braid.",
+      "description": "The link might be old, or the page never existed. Either way — we'll get you back on track.",
+      "browseBraiders": "Or browse braiders"
+    },
+    "client": {
+      "title": "Something went wrong",
+      "description": "We couldn't load this page. Try again in a moment."
+    },
+    "home": "Home"
+  },
+  "footer": {
+    "tagline": "The booking platform built for braiders. Take deposits, kill no-shows, and run your week without the DMs.",
+    "columns": {
+      "product": {
+        "heading": "Product",
+        "links": {
+          "findBraider": "Find a braider",
+          "pricing": "Pricing",
+          "forBraiders": "For braiders"
+        }
+      },
+      "account": {
+        "heading": "Account",
+        "links": {
+          "login": "Log in",
+          "createAccount": "Create account",
+          "myBookings": "My bookings"
+        }
+      },
+      "company": {
+        "heading": "Company",
+        "links": {
+          "contact": "Contact",
+          "privacy": "Privacy",
+          "terms": "Terms"
+        }
+      }
+    },
+    "copyright": "© {year} BraidFlow. All rights reserved.",
+    "securedByStripe": "Payments secured by Stripe"
+  },
+  "booking": {
+    "anythingHeading": "Anything we should know",
+    "balanceAtAppointment": "Balance at appointment",
+    "bookAppointment": "Book your appointment",
+    "booksClosed": "Their books are currently closed. Check back soon or browse other braiders.",
+    "browseBraiders": "Browse braiders",
+    "chooseServiceTime": "Choose a service and time — a small deposit holds your slot, refundable up to {hours} hours before.",
+    "chooseTime": "Choose a time",
+    "continue": "Continue",
+    "continueToDeposit": "Continue to deposit",
+    "depositDueNow": "Deposit due now",
+    "durationDeposit": "{duration} · deposit {deposit}",
+    "guestEmail": "Email",
+    "guestEmailHint": "Your confirmation lands here",
+    "guestEmailPlaceholder": "you@email.com",
+    "guestName": "Your name",
+    "guestNamePlaceholder": "Aisha Bello",
+    "guestPhone": "Phone (optional)",
+    "guestPhonePlaceholder": "So your braider can reach you",
+    "haveAccountLogIn": "Have an account? Log in",
+    "noChargeUntilConfirm": "No charge until you confirm payment",
+    "noOpenings": "No openings this day",
+    "noServices": "This braider hasn’t published any services yet. Check back soon.",
+    "notTakingBookings": "{name} isn’t taking bookings right now",
+    "notesAria": "Notes for your braider",
+    "notesPlaceholder": "Hair texture, length, preferred parting…",
+    "optional": "— optional",
+    "pickService": "Pick a service",
+    "pickServiceTime": "Pick a service & time",
+    "reserving": "Reserving…",
+    "serviceTotal": "Service total",
+    "stepDetails": "Your details",
+    "stepService": "Service",
+    "stepTime": "Time",
+    "trustCancellation": "Free cancellation up to <strong>{hours} hours</strong> before — full deposit back.",
+    "trustCard": "Card secured by Stripe. We never see your card details.",
+    "trustDeposit": "Your deposit goes straight to <strong>{name}</strong> — it counts toward your total.",
+    "tryOtherDates": "Try one of the other dates above.",
+    "viewProfile": "View profile",
+    "yourBooking": "Your booking"
+  },
+  "bookingActions": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel this booking?",
+    "confirm": "Confirm",
+    "genericError": "Something went wrong.",
+    "keepIt": "Keep it",
+    "markCompleted": "Mark completed",
+    "markCompletedConfirm": "Mark as completed?",
+    "markNoShowConfirm": "Mark as a no-show?",
+    "noShow": "No-show",
+    "refundConfirm": "Refund {amount} to the client?",
+    "refundDeposit": "Refund deposit",
+    "yesCancel": "Yes, cancel",
+    "yesRefund": "Yes, refund"
+  },
+  "bookings": {
+    "bookAnother": "Book another",
+    "browseBraiders": "Browse braiders",
+    "completeDeposit": "Complete deposit →",
+    "description": "Upcoming and past appointments.",
+    "emptyDescription": "Find a braider near you and lock in your first appointment.",
+    "emptyTitle": "No bookings yet",
+    "reschedule": "Reschedule",
+    "reviewed": "Reviewed · thank you!",
+    "title": "My bookings",
+    "with": "with",
+    "statusPendingPayment": "Awaiting deposit",
+    "statusConfirmed": "Confirmed",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "statusNoShow": "No-show"
+  },
+  "reschedule": {
+    "appointmentsList": "appointments list",
+    "back": "Back",
+    "backToAppointments": "Back to appointments",
+    "backToMyBookings": "Back to my bookings",
+    "bookingsList": "bookings list",
+    "cantFindTime": "Can't find a time that works?",
+    "cantReschedule": "This booking can't be rescheduled",
+    "cantRescheduleBody": "It's either already cancelled or completed.",
+    "confirmNewTime": "Confirm new time",
+    "confirming": "Confirming…",
+    "currentlyScheduled": "Currently scheduled",
+    "depositTransfers": "Your deposit transfers automatically.",
+    "keepCurrentTime": "Keep current time",
+    "moved": "Moved.",
+    "movedBody": "Your appointment with {business} is now {time}.",
+    "newAppointment": "New appointment",
+    "newTime": "New time",
+    "orCancelFrom": "or cancel from your",
+    "pickATime": "Pick a time",
+    "pickNewTime": "Pick a new time",
+    "rescheduleLabel": "Reschedule",
+    "sameServiceWith": "Same {service} with {business}. Your deposit carries over — no payment needed.",
+    "seePage": "See {business}'s page",
+    "takingBack": "Taking you back…"
+  },
+  "confirmation": {
+    "backToBraider": "Back to braider",
+    "balanceAtAppointment": "Balance at appointment",
+    "bookingConfirmed": "Booking confirmed",
+    "bookingNotActive": "Booking not active",
+    "braider": "Braider",
+    "depositPaid": "Deposit paid",
+    "finalizing": "Finalizing your booking…",
+    "finalizingBody": "Your card went through. We're confirming with the braider's schedule.",
+    "findAnotherTime": "Find another time",
+    "goToMyBookings": "Go to my bookings",
+    "guestEmailNote": "Your confirmation is on its way by email. ",
+    "guestKeepEmail": "Keep the email we sent you — it has the link to manage this booking anytime.",
+    "justASec": "Just a sec",
+    "onTheBooks": "You’re on the books.",
+    "paymentFailed": "Payment didn't go through",
+    "pollerTimeout": "This is taking longer than usual. Your payment is safe — we'll email your confirmation as soon as it clears.",
+    "remindBefore": "We’ll remind you before your appointment.",
+    "reschedule": "Reschedule",
+    "seeAllBookings": "See all my bookings",
+    "service": "Service",
+    "slotReleased": "This slot was released.",
+    "slotReleasedBody": "The hold expired or the booking was cancelled. Any deposit refund follows the cancellation policy — a full refund if cancelled at least {hours} hours before the appointment. You can book again anytime.",
+    "tryAgainBody": "Your card was declined. Your slot is held for a few more minutes.",
+    "tryAgainTitle": "Let's try that again.",
+    "tryDifferentCard": "Try a different card",
+    "waitingConfirmation": "Waiting on confirmation",
+    "when": "When"
+  },
+  "pay": {
+    "backToBraider": "Back to braider",
+    "balanceAtAppointment": "Balance at appointment",
+    "bookingWith": "Booking with",
+    "cancellationTerms": "By paying, you agree to the cancellation policy: a full deposit refund if you cancel at least {hours} hours before your appointment; the deposit is non-refundable after that.",
+    "cancelledBody": "If that was a mistake, you can book again from the braider’s page.",
+    "cancelledTitle": "This booking was cancelled",
+    "cantLoadBody": "Try again in a moment. If it keeps happening, book again from the braider’s page.",
+    "cantLoadTitle": "We can’t load this payment",
+    "cardError": "Something went wrong with your card.",
+    "cardSecured": "Card secured by Stripe — we never see your details.",
+    "charging": "Charging your deposit…",
+    "depositDueNow": "Deposit due now",
+    "findAnotherTime": "Find another time",
+    "freeCancellation": "Free cancellation up to {hours} hours before — full deposit back.",
+    "loadingCheckout": "Loading secure checkout…",
+    "payDeposit": "Pay {amount} deposit",
+    "payYourDeposit": "Pay your deposit",
+    "serviceTotal": "Service total",
+    "slotHeld": "Your slot is held while you finish — it only takes a minute.",
+    "tryAgain": "Try again"
+  },
+  "pricing": {
+    "badge": "Pricing",
+    "title": "Free while we're in <em>beta.</em>",
+    "subtitle": "No monthly fee. No cut of your services. You keep 100% of every deposit — we just route it straight to your Stripe account.",
+    "card": {
+      "badge": "Beta",
+      "title": "Everything, free",
+      "priceNote": "while in beta",
+      "body": "The full product, no limits we're hiding. We'll add paid plans down the road — with notice — but everything below is yours today."
+    },
+    "startFree": "Start free",
+    "included": [
+      "Your own branded booking page",
+      "Stripe deposits — you keep 100%",
+      "Weekly availability + day blocks",
+      "Per-service deposit amounts",
+      "Automatic 24h + 2h email reminders",
+      "Reschedule + cancel with a refund window you set",
+      "Client notes and booking history",
+      "Reviews from completed appointments"
+    ],
+    "stripeNote": "Stripe's standard processing fee (~2.9% + 30¢) applies to each deposit and goes to Stripe, not us.",
+    "faqLabel": "Questions braiders ask us",
+    "faqTitle": "The fine print, in plain words.",
+    "cta": {
+      "title": "One no-show is <em>one too many.</em>",
+      "body": "Most braiders we talk to lose 1–2 appointments a month to ghosting. Deposits up front stop that — and right now the whole thing is free."
+    },
+    "faqs": {
+      "cost": {
+        "q": "How much does BraidFlow cost?",
+        "a": "It's free while we're in beta. There's no monthly fee, and we take 0% of your deposits — you keep every dollar. Stripe charges its standard processing fee (~2.9% + 30¢) on the deposit; that goes to Stripe, not us."
+      },
+      "alwaysFree": {
+        "q": "Will it always be free?",
+        "a": "We'll introduce paid plans later as we add more. You'll get plenty of notice before anything changes, and we'll never switch a feature you're relying on to paid without telling you first."
+      },
+      "cut": {
+        "q": "Do you take a cut of my services?",
+        "a": "No. During the beta our commission is 0%. Deposits go straight to your connected Stripe account — we never touch the money beyond routing it to you."
+      },
+      "clientPay": {
+        "q": "Do my clients pay anything to use BraidFlow?",
+        "a": "No. They book and pay their deposit — the same flow they’d use on any salon site. They never see a BraidFlow fee."
+      },
+      "start": {
+        "q": "What do I need to start taking deposits?",
+        "a": "A Stripe account. You connect it from your dashboard in about two minutes (Stripe handles the details), and then clients can book. Until it’s connected, your booking page stays paused."
+      },
+      "noStripe": {
+        "q": "What if Stripe isn't available in my country?",
+        "a": "Right now BraidFlow runs on Stripe, so you need a country Stripe supports. If you're somewhere it doesn't, email us — we're tracking demand and will add alternatives based on it."
+      }
+    }
+  },
+  "directory": {
+    "clearSearch": "Clear search",
+    "countAvailable": "{count, plural, one {# braider} other {# braiders}} available",
+    "countForQuery": "{count, plural, one {# braider} other {# braiders}} for “{query}”",
+    "description": "Real stylists, real availability. Search your city, compare, and book in a minute.",
+    "emptyDescription": "We're onboarding the first stylists now. Check back soon.",
+    "emptyMatchDescription": "Try a different name or city, or clear the search to see everyone.",
+    "emptyMatchTitle": "No braiders match “{query}”",
+    "emptyTitle": "No braiders here yet",
+    "eyebrow": "The directory",
+    "fromPrice": "from {price}",
+    "new": "New",
+    "searchAriaLabel": "Search braiders by name or city",
+    "searchButton": "Search",
+    "searchPlaceholder": "Search by name or city",
+    "sortAriaLabel": "Sort braiders",
+    "title": "Find a braider",
+    "sortRating": "Top rated",
+    "sortPriceLowHigh": "Price: low to high",
+    "sortNewest": "Newest"
+  },
+  "profile": {
+    "bookHeading": "Book an appointment",
+    "bookSubtitle": "Pick a service and a time that works. Deposit holds your slot.",
+    "cancel": "Cancel",
+    "clientFallback": "Client",
+    "durationDeposit": "{duration} · deposit {deposit}",
+    "howWasAppointment": "How was your appointment?",
+    "leaveReview": "Leave a review",
+    "notBookingOnline": "{name} isn’t taking online bookings right now.",
+    "pickRating": "Pick a star rating.",
+    "postReview": "Post review",
+    "posting": "Posting…",
+    "reachInstagram": "Reach out on Instagram",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "reviewPlaceholder": "Share what stood out (optional).",
+    "reviewsHeading": "What clients say",
+    "seeAvailableTimes": "See available times",
+    "servicesHeading": "Services",
+    "starAria": "{count, plural, one {# star} other {# stars}}",
+    "starsAriaLabel": "Rated {rating} out of 5"
+  },
+  "connect": {
+    "connect": "Connect Stripe",
+    "continueSetup": "Continue setup",
+    "description": "Clients can’t book until you connect a Stripe account to receive deposits. It takes about two minutes, and you keep 100% of every deposit.",
+    "opening": "Opening Stripe…",
+    "title": "Connect Stripe to start taking bookings",
+    "verifyingDescription": "Your details are under review. Deposits stay paused until Stripe approves your account — this usually takes just a few minutes.",
+    "verifyingTitle": "Stripe is verifying your account"
+  },
+  "activation": {
+    "title": "Finish setting up your booking page",
+    "subtitle": "Three quick steps and clients can start booking and paying deposits.",
+    "addService": {
+      "title": "Add your first service",
+      "description": "List a style, its price, and the deposit that holds the slot.",
+      "action": "Add a service"
+    },
+    "setHours": {
+      "title": "Set your weekly hours",
+      "description": "Choose the days and times clients are allowed to book.",
+      "action": "Set hours"
+    },
+    "stripe": {
+      "title": "Connect Stripe to get paid",
+      "reviewDescription": "Your details are under review — deposits start once Stripe approves, usually within minutes.",
+      "description": "Deposits pay out straight to your account. Takes about two minutes.",
+      "opening": "Opening…",
+      "continue": "Continue",
+      "connect": "Connect Stripe"
     }
   }
 }

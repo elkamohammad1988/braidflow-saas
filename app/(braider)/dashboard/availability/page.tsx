@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
@@ -9,6 +10,7 @@ import { OverridesEditor } from './overrides-editor';
 export default async function AvailabilityPage() {
   const { user } = await requireBraider();
   const database = db();
+  const t = await getTranslations('dashboard');
 
   const [{ data: rules }, { data: overrides }, { data: braiderRow }] = await Promise.all([
     database
@@ -33,8 +35,8 @@ export default async function AvailabilityPage() {
   return (
     <div>
       <PageHeader
-        title="Availability"
-        description="The hours you take appointments each week. Block off specific dates separately."
+        title={t('availability.title')}
+        description={t('availability.description')}
       />
 
       <Card className="mt-8">

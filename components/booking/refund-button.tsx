@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { refundDepositAction } from '@/lib/bookings/refund';
 import { Spinner } from '@/components/ui/spinner';
 import { formatMoney, cn } from '@/lib/utils';
@@ -16,9 +17,10 @@ type Props = {
 export function RefundDepositButton({
   bookingId,
   depositCents,
-  label = 'Refund deposit',
+  label,
   className
 }: Props) {
+  const t = useTranslations('bookingActions');
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -47,7 +49,7 @@ export function RefundDepositButton({
           className
         )}
       >
-        {label}
+        {label ?? t('refundDeposit')}
       </button>
     );
   }
@@ -56,7 +58,7 @@ export function RefundDepositButton({
     <div className="motion-safe:animate-fade-in-up flex flex-col items-end gap-1">
       <div className="inline-flex items-center gap-3 text-sm">
         <span className="text-ink-muted">
-          Refund {formatMoney(depositCents)} to the client?
+          {t('refundConfirm', { amount: formatMoney(depositCents) })}
         </span>
         <button
           type="button"
@@ -65,7 +67,7 @@ export function RefundDepositButton({
           className="inline-flex items-center font-medium text-ink hover:text-ink/80 disabled:opacity-50"
         >
           {pending && <Spinner className="mr-1.5 h-3 w-3" />}
-          Yes, refund
+          {t('yesRefund')}
         </button>
         <button
           type="button"
@@ -73,7 +75,7 @@ export function RefundDepositButton({
           disabled={pending}
           className="text-ink-muted hover:text-ink disabled:opacity-50"
         >
-          Keep it
+          {t('keepIt')}
         </button>
       </div>
       {error && (

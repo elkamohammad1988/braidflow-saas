@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { MailCheck } from 'lucide-react';
 import { requestPasswordReset } from '@/lib/auth/password-reset';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export function ForgotPasswordForm() {
+  const t = useTranslations('auth');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Set once the request succeeds — flips to a generic "check your inbox"
@@ -38,30 +40,33 @@ export function ForgotPasswordForm() {
           <MailCheck className="h-6 w-6" strokeWidth={1.9} />
         </span>
         <div>
-          <h2 className="font-display text-xl text-ink">Check your inbox</h2>
+          <h2 className="font-display text-xl text-ink">{t('forgot.sent.title')}</h2>
           <p className="mt-1 text-sm text-ink-muted">
-            If an account exists for{' '}
-            <span className="font-medium text-ink">{sentTo}</span>, we&apos;ve sent a link to
-            reset your password. It expires in about an hour.
+            {t.rich('forgot.sent.body', {
+              address: sentTo,
+              email: (chunks) => <span className="font-medium text-ink">{chunks}</span>
+            })}
           </p>
         </div>
         <p className="text-sm text-ink-muted">
-          Didn&apos;t get it? Check spam, or{' '}
-          <button
-            type="button"
-            onClick={() => {
-              setSentTo(null);
-              setError(null);
-            }}
-            className="font-medium text-ink hover:underline underline-offset-4"
-          >
-            try again
-          </button>
-          .
+          {t.rich('forgot.sent.retry', {
+            retry: (chunks) => (
+              <button
+                type="button"
+                onClick={() => {
+                  setSentTo(null);
+                  setError(null);
+                }}
+                className="font-medium text-ink hover:underline underline-offset-4"
+              >
+                {chunks}
+              </button>
+            )
+          })}
         </p>
         <p className="text-sm text-ink-muted">
           <Link href="/login" className="font-medium text-ink hover:underline underline-offset-4">
-            Back to sign in
+            {t('forgot.backToSignIn')}
           </Link>
         </p>
       </div>
@@ -70,14 +75,14 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <Input name="email" type="email" label="Email" autoComplete="email" required />
+      <Input name="email" type="email" label={t('forgot.form.email')} autoComplete="email" required />
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}
         </p>
       )}
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? 'Sending link…' : 'Send reset link'}
+        {pending ? t('forgot.sendingLink') : t('forgot.sendResetLink')}
       </Button>
     </form>
   );

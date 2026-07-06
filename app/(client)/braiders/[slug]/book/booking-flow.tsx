@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Check, Lock, ShieldCheck } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { ServiceList, type Service } from '@/components/booking/service-list';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
@@ -56,6 +57,7 @@ export function BookingFlow({
   timeZone,
   isAuthenticated
 }: Props) {
+  const t = useTranslations('booking');
   const [serviceId, setServiceId] = useState<string | undefined>(services[0]?.id);
   const [selectedSlot, setSelectedSlot] = useState<Date | undefined>();
   const [notes, setNotes] = useState('');
@@ -117,12 +119,12 @@ export function BookingFlow({
       <div className="grid gap-8 pb-28 md:grid-cols-[1fr_340px] md:pb-0">
         <div className="space-y-9">
           <section>
-            <StepHeader n={1} label="Service" done={Boolean(serviceId)} />
+            <StepHeader n={1} label={t('stepService')} done={Boolean(serviceId)} />
             <ServiceList services={services} selectedId={serviceId} onSelect={onSelectService} />
           </section>
 
           <section>
-            <StepHeader n={2} label="Time" done={Boolean(selectedSlot)} />
+            <StepHeader n={2} label={t('stepTime')} done={Boolean(selectedSlot)} />
             <SlotPicker
               slotsByDay={hydratedDays}
               selected={selectedSlot}
@@ -134,44 +136,44 @@ export function BookingFlow({
           {!isAuthenticated && (
             <section>
               <div className="flex items-center justify-between">
-                <StepHeader n={detailsStep} label="Your details" done={detailsDone} />
+                <StepHeader n={detailsStep} label={t('stepDetails')} done={detailsDone} />
                 <Link
                   href={`/login?next=/braiders/${braiderSlug}/book`}
                   className="mb-3 text-xs font-medium text-ink-muted underline underline-offset-4 hover:text-ink"
                 >
-                  Have an account? Log in
+                  {t('haveAccountLogIn')}
                 </Link>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Input
-                  label="Your name"
+                  label={t('guestName')}
                   name="guest-name"
                   autoComplete="name"
-                  placeholder="Aisha Bello"
+                  placeholder={t('guestNamePlaceholder')}
                   maxLength={100}
                   value={guestName}
                   onChange={(e) => setGuestName(e.target.value)}
                 />
                 <Input
-                  label="Email"
+                  label={t('guestEmail')}
                   name="guest-email"
                   type="email"
                   inputMode="email"
                   autoComplete="email"
-                  placeholder="you@email.com"
+                  placeholder={t('guestEmailPlaceholder')}
                   maxLength={254}
-                  hint="Your confirmation lands here"
+                  hint={t('guestEmailHint')}
                   value={guestEmail}
                   onChange={(e) => setGuestEmail(e.target.value)}
                 />
                 <div className="sm:col-span-2">
                   <Input
-                    label="Phone (optional)"
+                    label={t('guestPhone')}
                     name="guest-phone"
                     type="tel"
                     inputMode="tel"
                     autoComplete="tel"
-                    placeholder="So your braider can reach you"
+                    placeholder={t('guestPhonePlaceholder')}
                     maxLength={30}
                     value={guestPhone}
                     onChange={(e) => setGuestPhone(e.target.value)}
@@ -183,9 +185,9 @@ export function BookingFlow({
 
           <section>
             <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">
-              Anything we should know{' '}
+              {t('anythingHeading')}{' '}
               <span className="font-normal normal-case tracking-normal text-ink-subtle">
-                — optional
+                {t('optional')}
               </span>
             </h2>
             <textarea
@@ -193,8 +195,8 @@ export function BookingFlow({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               maxLength={500}
-              aria-label="Notes for your braider"
-              placeholder="Hair texture, length, preferred parting…"
+              aria-label={t('notesAria')}
+              placeholder={t('notesPlaceholder')}
               className={cn(fieldSurface, 'min-h-[84px] w-full resize-y px-3.5 py-2.5 leading-relaxed')}
             />
           </section>
@@ -205,21 +207,24 @@ export function BookingFlow({
             <li className="flex items-start gap-2.5">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
               <span>
-                Free cancellation up to{' '}
-                <span className="text-ink">{CANCELLATION_REFUND_WINDOW_HOURS} hours</span> before —
-                full deposit back.
+                {t.rich('trustCancellation', {
+                  hours: CANCELLATION_REFUND_WINDOW_HOURS,
+                  strong: (chunks) => <span className="text-ink">{chunks}</span>
+                })}
               </span>
             </li>
             <li className="flex items-start gap-2.5">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
               <span>
-                Your deposit goes straight to{' '}
-                <span className="text-ink">{businessName}</span> — it counts toward your total.
+                {t.rich('trustDeposit', {
+                  name: businessName,
+                  strong: (chunks) => <span className="text-ink">{chunks}</span>
+                })}
               </span>
             </li>
             <li className="flex items-start gap-2.5">
               <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" strokeWidth={2} />
-              <span>Card secured by Stripe. We never see your card details.</span>
+              <span>{t('trustCard')}</span>
             </li>
           </ul>
 
@@ -233,26 +238,26 @@ export function BookingFlow({
         {/* Desktop summary rail */}
         <aside className="hidden md:block">
           <div className="sticky top-6 rounded-card border border-line bg-paper p-6 shadow-soft">
-            <p className="text-sm text-ink-muted">Your booking</p>
+            <p className="text-sm text-ink-muted">{t('yourBooking')}</p>
             <p className="mt-1 font-medium text-ink">
-              {selectedService?.name ?? 'Pick a service'}
+              {selectedService?.name ?? t('pickService')}
             </p>
-            <p className="mt-1 text-sm text-ink-muted">{whenLabel ?? 'Choose a time'}</p>
+            <p className="mt-1 text-sm text-ink-muted">{whenLabel ?? t('chooseTime')}</p>
 
             {selectedService && (
               <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm tabular-nums">
                 <div className="flex justify-between text-ink-muted">
-                  <dt>Service total</dt>
+                  <dt>{t('serviceTotal')}</dt>
                   <dd>{formatMoney(selectedService.price_cents)}</dd>
                 </div>
                 <div className="flex justify-between font-medium text-ink">
-                  <dt>Deposit due now</dt>
+                  <dt>{t('depositDueNow')}</dt>
                   <dd className="font-display text-base">
                     {formatMoney(selectedService.deposit_cents)}
                   </dd>
                 </div>
                 <div className="flex justify-between text-ink-muted">
-                  <dt>Balance at appointment</dt>
+                  <dt>{t('balanceAtAppointment')}</dt>
                   <dd>{formatMoney(selectedService.price_cents - selectedService.deposit_cents)}</dd>
                 </div>
               </dl>
@@ -265,12 +270,12 @@ export function BookingFlow({
             )}
 
             <Button onClick={submit} disabled={!ready || isPending} className="mt-6 w-full">
-              {isPending ? 'Reserving…' : 'Continue to deposit'}
+              {isPending ? t('reserving') : t('continueToDeposit')}
             </Button>
 
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-subtle">
               <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2} />
-              No charge until you confirm payment
+              {t('noChargeUntilConfirm')}
             </p>
           </div>
         </aside>
@@ -282,14 +287,14 @@ export function BookingFlow({
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="min-w-0">
             <p className="text-xs text-ink-muted">
-              {selectedService ? 'Deposit due now' : 'Pick a service & time'}
+              {selectedService ? t('depositDueNow') : t('pickServiceTime')}
             </p>
             <p className="font-display text-xl leading-tight text-ink">
               {selectedService ? formatMoney(selectedService.deposit_cents) : '—'}
             </p>
           </div>
           <Button onClick={submit} disabled={!ready || isPending} size="lg" className="shrink-0">
-            {isPending ? 'Reserving…' : 'Continue'}
+            {isPending ? t('reserving') : t('continue')}
           </Button>
         </div>
       </div>

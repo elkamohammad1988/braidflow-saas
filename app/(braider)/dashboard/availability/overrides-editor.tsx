@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -22,20 +23,21 @@ export function OverridesEditor({
   overrides: Override[];
   timeZone: string;
 }) {
+  const t = useTranslations('dashboard');
   const [adding, setAdding] = useState(false);
 
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-display text-xl text-ink">Time off</h2>
+        <h2 className="font-display text-xl text-ink">{t('availability.timeOff')}</h2>
         {!adding && (
           <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
-            Add block
+            {t('availability.addBlock')}
           </Button>
         )}
       </div>
       <p className="mb-4 text-sm text-ink-muted">
-        Going on vacation or stepping out for an afternoon? Block it off here so no one books it.
+        {t('availability.timeOffDescription')}
       </p>
 
       {adding && <AddOverrideForm onDone={() => setAdding(false)} />}
@@ -43,7 +45,7 @@ export function OverridesEditor({
       <ul className="mt-4 space-y-2">
         {overrides.length === 0 && !adding && (
           <li className="rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-6 text-center text-sm text-ink-muted">
-            Nothing blocked off right now.
+            {t('availability.nothingBlocked')}
           </li>
         )}
         {overrides.map((o) => (
@@ -55,6 +57,7 @@ export function OverridesEditor({
 }
 
 function OverrideRow({ override, timeZone }: { override: Override; timeZone: string }) {
+  const t = useTranslations('dashboard');
   const [pending, startTransition] = useTransition();
   // Format in the braider's zone so server and client render identical text
   // (raw date-fns `format` uses the runtime zone → hydration mismatch).
@@ -85,13 +88,14 @@ function OverrideRow({ override, timeZone }: { override: Override; timeZone: str
         onClick={() => startTransition(() => removeOverrideAction(override.id))}
         className="text-sm text-ink-muted hover:text-ink disabled:opacity-50"
       >
-        {pending ? <Spinner /> : 'Remove'}
+        {pending ? <Spinner /> : t('availability.remove')}
       </button>
     </li>
   );
 }
 
 function AddOverrideForm({ onDone }: { onDone: () => void }) {
+  const t = useTranslations('dashboard');
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [startTime, setStartTime] = useState('09:00');
@@ -106,7 +110,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
     const endsAt = new Date(`${date}T${endTime}:00`);
 
     if (Number.isNaN(+startsAt) || Number.isNaN(+endsAt)) {
-      setError('Pick a valid date and time.');
+      setError(t('availability.invalidDateTime'));
       return;
     }
 
@@ -125,7 +129,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
     <div className="rounded-card border border-line bg-paper p-5 shadow-card">
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="text-xs text-ink-muted">
-          Date
+          {t('availability.date')}
           <input
             type="date"
             value={date}
@@ -135,7 +139,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
           />
         </label>
         <label className="text-xs text-ink-muted">
-          From
+          {t('availability.from')}
           <input
             type="time"
             value={startTime}
@@ -144,7 +148,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
           />
         </label>
         <label className="text-xs text-ink-muted">
-          To
+          {t('availability.to')}
           <input
             type="time"
             value={endTime}
@@ -155,13 +159,13 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
       </div>
 
       <label className="mt-3 block text-xs text-ink-muted">
-        Note (optional)
+        {t('availability.noteOptional')}
         <input
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength={120}
-          placeholder="Birthday, family event, traveling…"
+          placeholder={t('availability.notePlaceholder')}
           className={cn(fieldSurface, 'mt-1 block h-10 w-full px-3.5')}
         />
       </label>
@@ -175,14 +179,14 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
       <div className="mt-4 flex gap-3">
         <Button size="sm" onClick={save} disabled={pending}>
           {pending && <Spinner className="mr-2" />}
-          Save block
+          {t('availability.saveBlock')}
         </Button>
         <button
           type="button"
           onClick={onDone}
           className="text-sm text-ink-muted hover:text-ink"
         >
-          Cancel
+          {t('availability.cancel')}
         </button>
       </div>
     </div>

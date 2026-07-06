@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import {
   Elements,
@@ -88,6 +89,7 @@ function CheckoutForm({
   depositCents: number;
   returnQuery: string;
 }) {
+  const t = useTranslations('pay');
   const stripe = useStripe();
   const elements = useElements();
   const [ready, setReady] = useState(false);
@@ -112,7 +114,7 @@ function CheckoutForm({
     // before this resolves; on async failures the user is redirected with
     // ?redirect_status=failed and the confirmation page handles it.
     if (stripeError) {
-      setError(stripeError.message ?? 'Something went wrong with your card.');
+      setError(stripeError.message ?? t('cardError'));
       setSubmitting(false);
     }
   }
@@ -123,7 +125,7 @@ function CheckoutForm({
         {!ready && (
           <div className="flex items-center justify-center py-8 text-ink-muted">
             <Spinner />
-            <span className="ml-2 text-sm">Loading secure checkout…</span>
+            <span className="ml-2 text-sm">{t('loadingCheckout')}</span>
           </div>
         )}
         <div className={ready ? 'block' : 'hidden'}>
@@ -152,17 +154,15 @@ function CheckoutForm({
         {submitting ? (
           <>
             <Spinner className="mr-2" />
-            Charging your deposit…
+            {t('charging')}
           </>
         ) : (
-          `Pay ${formatMoney(depositCents)} deposit`
+          t('payDeposit', { amount: formatMoney(depositCents) })
         )}
       </Button>
 
       <p className="mt-3 text-center text-xs text-ink-muted">
-        By paying, you agree to the cancellation policy: a full deposit refund if you cancel
-        at least {CANCELLATION_REFUND_WINDOW_HOURS} hours before your appointment; the deposit
-        is non-refundable after that.
+        {t('cancellationTerms', { hours: CANCELLATION_REFUND_WINDOW_HOURS })}
       </p>
     </form>
   );

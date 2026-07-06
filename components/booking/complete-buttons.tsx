@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   markBookingCompletedAction,
   markBookingNoShowAction
@@ -15,6 +16,7 @@ type Outcome = 'completed' | 'no_show';
 // Marking `completed` is what makes the booking review-eligible for the client
 // and counts it toward lifetime revenue; `no_show` records the missed visit.
 export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
+  const t = useTranslations('bookingActions');
   const router = useRouter();
   const [confirming, setConfirming] = useState<Outcome | null>(null);
   const [pending, startTransition] = useTransition();
@@ -28,7 +30,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           ? await markBookingCompletedAction(bookingId)
           : await markBookingNoShowAction(bookingId);
       if (result && 'error' in result) {
-        setError(result.error ?? 'Something went wrong.');
+        setError(result.error ?? t('genericError'));
         setConfirming(null);
         return;
       }
@@ -42,7 +44,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
       <div className="motion-safe:animate-fade-in-up flex flex-col items-end gap-1">
         <div className="inline-flex items-center gap-3 text-sm">
           <span className="text-ink-muted">
-            {isComplete ? 'Mark as completed?' : 'Mark as a no-show?'}
+            {isComplete ? t('markCompletedConfirm') : t('markNoShowConfirm')}
           </span>
           <button
             type="button"
@@ -56,7 +58,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
             )}
           >
             {pending && <Spinner className="mr-1.5 h-3 w-3" />}
-            Confirm
+            {t('confirm')}
           </button>
           <button
             type="button"
@@ -64,7 +66,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
             disabled={pending}
             className="text-ink-muted hover:text-ink disabled:opacity-50"
           >
-            Back
+            {t('back')}
           </button>
         </div>
         {error && (
@@ -84,7 +86,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           onClick={() => setConfirming('completed')}
           className="font-medium text-ink-muted hover:text-moss"
         >
-          Mark completed
+          {t('markCompleted')}
         </button>
         <span aria-hidden className="text-ink/20">·</span>
         <button
@@ -92,7 +94,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           onClick={() => setConfirming('no_show')}
           className="font-medium text-ink-muted hover:text-red-600"
         >
-          No-show
+          {t('noShow')}
         </button>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}

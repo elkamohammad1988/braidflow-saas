@@ -1,34 +1,36 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Logo } from './logo';
 
 const columns = [
   {
-    heading: 'Product',
+    key: 'product',
     links: [
-      { label: 'Find a braider', href: '/braiders' },
-      { label: 'Pricing', href: '/pricing' },
-      { label: 'For braiders', href: '/signup?role=braider' }
+      { key: 'findBraider', href: '/braiders' },
+      { key: 'pricing', href: '/pricing' },
+      { key: 'forBraiders', href: '/signup?role=braider' }
     ]
   },
   {
-    heading: 'Account',
+    key: 'account',
     links: [
-      { label: 'Log in', href: '/login' },
-      { label: 'Create account', href: '/signup' },
-      { label: 'My bookings', href: '/bookings' }
+      { key: 'login', href: '/login' },
+      { key: 'createAccount', href: '/signup' },
+      { key: 'myBookings', href: '/bookings' }
     ]
   },
   {
-    heading: 'Company',
+    key: 'company',
     links: [
-      { label: 'Contact', href: 'mailto:hello@braidflow.app' },
-      { label: 'Privacy', href: '/privacy' },
-      { label: 'Terms', href: '/terms' }
+      { key: 'contact', href: 'mailto:hello@braidflow.app' },
+      { key: 'privacy', href: '/privacy' },
+      { key: 'terms', href: '/terms' }
     ]
   }
 ];
 
 export function Footer() {
+  const t = useTranslations('footer');
   return (
     <footer className="relative overflow-hidden bg-night text-ivory/80">
       {/* woven hairline + faint gold aurora */}
@@ -40,21 +42,20 @@ export function Footer() {
           <div className="max-w-xs">
             <Logo tone="cream" />
             <p className="mt-4 text-sm leading-relaxed text-ivory/55">
-              The booking platform built for braiders. Take deposits, kill no-shows, and run your
-              week without the DMs.
+              {t('tagline')}
             </p>
           </div>
           {columns.map((col) => (
-            <div key={col.heading}>
-              <p className="label text-gold/70">{col.heading}</p>
+            <div key={col.key}>
+              <p className="label text-gold/70">{t(`columns.${col.key}.heading`)}</p>
               <ul className="mt-4 space-y-2.5 text-sm text-ivory/60">
                 {col.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.key}>
                     <Link
                       href={link.href}
                       className="transition-colors hover:text-gold-bright"
                     >
-                      {link.label}
+                      {t(`columns.${col.key}.links.${link.key}`)}
                     </Link>
                   </li>
                 ))}
@@ -64,10 +65,10 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-3 border-t border-onyx-line pt-6 text-xs text-ivory/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} BraidFlow. All rights reserved.</p>
+          <p>{t('copyright', { year: String(new Date().getFullYear()) })}</p>
           <p className="flex items-center gap-2 font-mono uppercase tracking-widest">
             <span className="h-1.5 w-1.5 rounded-full bg-moss-bright shadow-[0_0_8px_rgba(92,138,90,0.8)]" />
-            Payments secured by Stripe
+            {t('securedByStripe')}
           </p>
         </div>
       </div>

@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 const SORTS = [
-  { value: 'rating', label: 'Top rated' },
-  { value: 'price', label: 'Price: low to high' },
-  { value: 'newest', label: 'Newest' }
+  { value: 'rating', labelKey: 'sortRating' },
+  { value: 'price', labelKey: 'sortPriceLowHigh' },
+  { value: 'newest', labelKey: 'sortNewest' }
 ];
 
 const pillFocus =
@@ -22,6 +23,7 @@ export function BraiderSearch({
   defaultSort: string;
 }) {
   const router = useRouter();
+  const t = useTranslations('directory');
   const [query, setQuery] = useState(defaultQuery);
   const [sort, setSort] = useState(defaultSort);
 
@@ -51,14 +53,14 @@ export function BraiderSearch({
           name="q"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name or city"
-          aria-label="Search braiders by name or city"
+          placeholder={t('searchPlaceholder')}
+          aria-label={t('searchAriaLabel')}
           className={`h-12 w-full rounded-full border border-line-strong bg-paper pl-11 pr-4 text-sm text-ink shadow-card placeholder:text-ink-subtle transition-colors ${pillFocus}`}
         />
       </div>
       <div className="flex items-center gap-2">
         <label htmlFor="sort" className="sr-only">
-          Sort braiders
+          {t('sortAriaLabel')}
         </label>
         <select
           id="sort"
@@ -72,12 +74,12 @@ export function BraiderSearch({
         >
           {SORTS.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label}
+              {t(s.labelKey)}
             </option>
           ))}
         </select>
         <Button type="submit" size="lg" className="h-12 shrink-0 rounded-full px-6">
-          Search
+          {t('searchButton')}
         </Button>
       </div>
     </form>

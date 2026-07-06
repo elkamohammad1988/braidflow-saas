@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import { db } from '@/lib/db/server';
 import { Button } from '@/components/ui/button';
 import { BraiderReviews } from '@/components/braider/reviews';
@@ -44,6 +45,7 @@ export async function generateMetadata({
 }
 
 export default async function BraiderProfile({ params }: { params: { slug: string } }) {
+  const t = await getTranslations('profile');
   const database = db();
   const { data: braider, error } = await database
     .from('braiders')
@@ -164,7 +166,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                 <Star className="h-4 w-4 fill-gold text-gold" />
                 <span className="font-medium">{avgRating.toFixed(1)}</span>
                 <span className="text-ink-muted">
-                  · {reviewCount} review{reviewCount === 1 ? '' : 's'}
+                  · {t('reviewCount', { count: reviewCount })}
                 </span>
               </a>
             )}
@@ -196,7 +198,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           <section className="mt-12">
             <h2 className="label mb-4 flex items-center gap-2 text-clay-text">
               <span className="h-1 w-1 rounded-full bg-clay" />
-              Services
+              {t('servicesHeading')}
             </h2>
             <ul className="divide-y divide-line border-y border-line">
               {services.map((s: any) => (
@@ -210,7 +212,10 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                       <p className="mt-1 text-sm leading-relaxed text-ink-muted">{s.description}</p>
                     )}
                     <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
-                      {formatDuration(s.duration_minutes)} · deposit {formatMoney(s.deposit_cents)}
+                      {t('durationDeposit', {
+                        duration: formatDuration(s.duration_minutes),
+                        deposit: formatMoney(s.deposit_cents)
+                      })}
                     </p>
                   </div>
                   <p className="shrink-0 font-display text-xl font-medium text-ink">
@@ -227,21 +232,21 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
         <aside className="md:sticky md:top-24 md:self-start">
           <div className="relative overflow-hidden rounded-xl2 border border-line bg-paper p-6 shadow-lifted">
             <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_70%)]" />
-            <p className="relative font-display text-xl font-medium text-ink">Book an appointment</p>
+            <p className="relative font-display text-xl font-medium text-ink">{t('bookHeading')}</p>
             <p className="relative mt-1.5 text-sm leading-relaxed text-ink-muted">
-              Pick a service and a time that works. Deposit holds your slot.
+              {t('bookSubtitle')}
             </p>
             <div className="relative mt-5">
               {open ? (
                 <Link href={`/braiders/${braider.slug}/book`}>
                   <Button size="lg" className="w-full">
-                    See available times
+                    {t('seeAvailableTimes')}
                   </Button>
                 </Link>
               ) : (
                 <div className="rounded-xl border border-line bg-cream-deep/40 px-4 py-4 text-center">
                   <p className="text-sm text-ink-muted">
-                    {braider.business_name} isn&rsquo;t taking online bookings right now.
+                    {t('notBookingOnline', { name: braider.business_name })}
                   </p>
                   {braider.instagram_handle && (
                     <a
@@ -250,7 +255,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                       rel="noopener noreferrer"
                       className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
                     >
-                      Reach out on Instagram
+                      {t('reachInstagram')}
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
                   )}

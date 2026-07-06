@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { LegalShell, LegalSection } from '@/components/shared/legal';
 
 export const metadata: Metadata = {
@@ -9,147 +11,83 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' }
 };
 
-const LAST_UPDATED = 'June 13, 2026';
-
 export default function PrivacyPage() {
+  const t = useTranslations('legal');
+  const strong = (chunks: ReactNode) => <strong className="text-ink">{chunks}</strong>;
   return (
     <LegalShell
-      title="Privacy Policy"
-      updated={LAST_UPDATED}
-      intro="BraidFlow (“BraidFlow”, “we”, “us”) is a booking platform that connects clients with braiders and protective-style stylists. This policy explains what information we collect, why we collect it, and the choices you have. It applies to our website and services."
+      title={t('privacy.title')}
+      updated={t('privacy.updatedDate')}
+      intro={t('privacy.intro')}
     >
-      <LegalSection title="Information we collect">
+      <LegalSection title={t('privacy.collect.title')}>
         <ul>
-          <li>
-            <strong className="text-ink">Account information.</strong> When you sign up we
-            collect your name, email address, and whether you join as a client or a braider, plus
-            the password you set (stored only as a salted hash by our authentication provider).
-          </li>
-          <li>
-            <strong className="text-ink">Profile and business details.</strong> Braiders provide
-            information such as their display name, location, services, pricing, and availability so
-            clients can find and book them.
-          </li>
-          <li>
-            <strong className="text-ink">Booking information.</strong> When a booking is made we
-            collect the service, date and time, any notes you add, and the parties involved.
-          </li>
-          <li>
-            <strong className="text-ink">Payment information.</strong> Deposits are processed by
-            Stripe. Your full card number is sent directly to Stripe and is never stored on our
-            servers. We retain only non-sensitive payment metadata (such as amount, status, and
-            Stripe identifiers) needed to track bookings and refunds.
-          </li>
-          <li>
-            <strong className="text-ink">Technical data.</strong> Like most services, we and our
-            providers automatically receive basic technical information (such as IP address and
-            browser type) to keep the service secure, working, and free from abuse.
-          </li>
+          <li>{t.rich('privacy.collect.account', { s: strong })}</li>
+          <li>{t.rich('privacy.collect.profile', { s: strong })}</li>
+          <li>{t.rich('privacy.collect.booking', { s: strong })}</li>
+          <li>{t.rich('privacy.collect.payment', { s: strong })}</li>
+          <li>{t.rich('privacy.collect.technical', { s: strong })}</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="How we use information">
+      <LegalSection title={t('privacy.use.title')}>
         <ul>
-          <li>Create and manage your account and authenticate you.</li>
-          <li>Enable discovery, booking, deposits, reschedules, cancellations, and refunds.</li>
-          <li>Send transactional email — confirmations, reminders, and account notices.</li>
-          <li>Prevent fraud and abuse, enforce our Terms, and keep the platform secure.</li>
-          <li>Comply with legal obligations and resolve disputes.</li>
+          <li>{t('privacy.use.item1')}</li>
+          <li>{t('privacy.use.item2')}</li>
+          <li>{t('privacy.use.item3')}</li>
+          <li>{t('privacy.use.item4')}</li>
+          <li>{t('privacy.use.item5')}</li>
         </ul>
-        <p>
-          We do not sell your personal information, and we do not use it for third-party
-          advertising.
-        </p>
+        <p>{t('privacy.use.note')}</p>
       </LegalSection>
 
-      <LegalSection title="How we share information">
-        <p>We share information only as needed to run the service:</p>
+      <LegalSection title={t('privacy.share.title')}>
+        <p>{t('privacy.share.lead')}</p>
         <ul>
-          <li>
-            <strong className="text-ink">Between the parties to a booking.</strong> A braider can
-            see the name, contact details, and booking details of clients who book with them, and
-            vice-versa, so the appointment can happen.
-          </li>
-          <li>
-            <strong className="text-ink">Service providers.</strong> We rely on Stripe
-            (payments), Resend (transactional email), and Vercel (application hosting). They
-            process data on our behalf under their own terms and security commitments.
-          </li>
-          <li>
-            <strong className="text-ink">Legal and safety.</strong> We may disclose information if
-            required by law, or to protect the rights, property, or safety of our users or the
-            public.
-          </li>
+          <li>{t.rich('privacy.share.parties', { s: strong })}</li>
+          <li>{t.rich('privacy.share.providers', { s: strong })}</li>
+          <li>{t.rich('privacy.share.legal', { s: strong })}</li>
         </ul>
       </LegalSection>
 
-      <LegalSection title="Payments">
+      <LegalSection title={t('privacy.payments.title')}>
+        <p>{t('privacy.payments.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('privacy.cookies.title')}>
+        <p>{t('privacy.cookies.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('privacy.retention.title')}>
+        <p>{t('privacy.retention.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('privacy.security.title')}>
+        <p>{t('privacy.security.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('privacy.rights.title')}>
         <p>
-          Card payments are handled by Stripe, a PCI-DSS Level 1 certified payment processor. When
-          you pay a deposit, your card details are transmitted directly to Stripe over an encrypted
-          connection. BraidFlow does not see or store your full card number, CVC, or expiry. See
-          Stripe&apos;s own privacy policy for details on how it processes payment data.
+          {t.rich('privacy.rights.body', {
+            a: (chunks) => <a href="mailto:privacy@braidflow.app">{chunks}</a>
+          })}
         </p>
       </LegalSection>
 
-      <LegalSection title="Cookies and sessions">
-        <p>
-          We use cookies that are strictly necessary to sign you in and keep you signed in
-          securely. We do not use advertising or cross-site tracking cookies. If we add optional
-          analytics in the future, we will update this policy.
-        </p>
+      <LegalSection title={t('privacy.children.title')}>
+        <p>{t('privacy.children.body')}</p>
       </LegalSection>
 
-      <LegalSection title="Data retention">
-        <p>
-          We keep your information for as long as your account is active or as needed to provide
-          the service. Booking and payment records may be retained longer where required for tax,
-          accounting, dispute resolution, or legal compliance. You can ask us to delete your
-          account, after which we remove or anonymize personal data that we are not required to
-          keep.
-        </p>
+      <LegalSection title={t('privacy.changes.title')}>
+        <p>{t('privacy.changes.body')}</p>
       </LegalSection>
 
-      <LegalSection title="Security">
+      <LegalSection title={t('privacy.contact.title')}>
         <p>
-          Data is encrypted in transit. Access is enforced by server-side authorization checks so
-          that, for example, clients see only their own bookings and braiders see only their own
-          business data. Privileged operations run server-side with least privilege. No system is
-          perfectly secure, but we work to protect your information using industry-standard
-          safeguards.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Your rights">
-        <p>
-          Depending on where you live, you may have the right to access, correct, export, or delete
-          your personal information, and to object to or restrict certain processing. You can update
-          most details from your account, or contact us at{' '}
-          <a href="mailto:privacy@braidflow.app">privacy@braidflow.app</a> and we will respond within
-          a reasonable time.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Children">
-        <p>
-          BraidFlow is not directed to children under 16, and we do not knowingly collect personal
-          information from them. If you believe a child has provided us information, contact us and
-          we will delete it.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Changes to this policy">
-        <p>
-          We may update this policy from time to time. When we do, we will revise the “Last updated”
-          date above and, for material changes, provide a more prominent notice.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="Contact">
-        <p>
-          Questions about this policy? Email{' '}
-          <a href="mailto:privacy@braidflow.app">privacy@braidflow.app</a>. See also our{' '}
-          <Link href="/terms">Terms of Service</Link>.
+          {t.rich('privacy.contact.body', {
+            a: (chunks) => <a href="mailto:privacy@braidflow.app">{chunks}</a>,
+            terms: (chunks) => <Link href="/terms">{chunks}</Link>
+          })}
         </p>
       </LegalSection>
     </LegalShell>

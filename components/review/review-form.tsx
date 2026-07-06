@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -11,6 +12,7 @@ import { submitReviewAction } from '@/lib/reviews/actions';
 
 export function ReviewForm({ bookingId }: { bookingId: string }) {
   const router = useRouter();
+  const t = useTranslations('profile');
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -25,14 +27,14 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         onClick={() => setOpen(true)}
         className="mt-2 text-sm font-medium text-ink hover:underline underline-offset-4"
       >
-        Leave a review
+        {t('leaveReview')}
       </button>
     );
   }
 
   function submit() {
     if (rating < 1) {
-      setError('Pick a star rating.');
+      setError(t('pickRating'));
       return;
     }
     setError(null);
@@ -61,14 +63,14 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
       }}
       className="mt-3 rounded-card border border-line bg-cream/50 p-4 text-left"
     >
-      <p className="text-sm font-medium text-ink">How was your appointment?</p>
+      <p className="text-sm font-medium text-ink">{t('howWasAppointment')}</p>
 
       <div className="mt-2 flex gap-1.5" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
-            aria-label={`${star} star${star === 1 ? '' : 's'}`}
+            aria-label={t('starAria', { count: star })}
             aria-pressed={rating === star}
             onClick={() => setRating(star)}
             onMouseEnter={() => setHover(star)}
@@ -92,7 +94,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         onChange={(e) => setBody(e.target.value)}
         rows={3}
         maxLength={1000}
-        placeholder="Share what stood out (optional)."
+        placeholder={t('reviewPlaceholder')}
         className={cn(fieldSurface, 'mt-3 min-h-[80px] w-full resize-y px-3.5 py-2.5 leading-relaxed')}
       />
 
@@ -107,10 +109,10 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
           {pending ? (
             <>
               <Spinner className="mr-2" />
-              Posting…
+              {t('posting')}
             </>
           ) : (
-            'Post review'
+            t('postReview')
           )}
         </Button>
         <button
@@ -119,7 +121,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
           disabled={pending}
           className="text-sm text-ink-muted hover:text-ink disabled:opacity-50"
         >
-          Cancel
+          {t('cancel')}
         </button>
       </div>
     </form>
