@@ -17,12 +17,12 @@ export function DemoCheckout({
   bookingId,
   depositCents,
   token,
-  returnQuery = ''
+  snapshot
 }: {
   bookingId: string;
   depositCents: number;
   token?: string;
-  returnQuery?: string;
+  snapshot?: string;
 }) {
   const t = useTranslations('pay');
   const router = useRouter();
@@ -32,12 +32,17 @@ export function DemoCheckout({
   function onPay() {
     setError(null);
     startTransition(async () => {
-      const res = await confirmDemoDepositAction({ bookingId, token });
+      const res = await confirmDemoDepositAction({ bookingId, token, snapshot });
       if ('error' in res) {
         setError(t('cardError'));
         return;
       }
-      router.push(`/bookings/${bookingId}/confirmation${returnQuery}`);
+      // Carry the confirmed snapshot (+ guest token) so the confirmation page
+      // renders success even if it lands on a different serverless instance.
+      const params = new URLSearchParams();
+      if (token) params.set('t', token);
+      params.set('d', res.snapshot);
+      router.push(`/bookings/${bookingId}/confirmation?${params.toString()}`);
     });
   }
 

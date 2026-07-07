@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { Clock, Lock, Check } from 'lucide-react';
 import { dbAdmin } from '@/lib/db/server';
 import { getDepositClientSecret } from '@/lib/stripe/get-client-secret';
+import { ensureBookingFromSnapshot } from '@/lib/bookings/demo-snapshot';
 import { resolveBookingViewer } from '@/lib/bookings/access';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
@@ -18,10 +19,13 @@ export default async function PayPage({
   searchParams
 }: {
   params: { id: string };
-  searchParams: { t?: string };
+  searchParams: { t?: string; d?: string };
 }) {
   const t = await getTranslations('pay');
   const token = searchParams.t;
+  // Demo: rebuild the booking onto this instance if it was created on another
+  // (serverless instances don't share the in-memory store). No-op with real Stripe.
+  await ensureBookingFromSnapshot(params.id, searchParams.d);
   // Owner (session) or guest (token) — redirects to /login or 404s as appropriate.
   const { viewer } = await resolveBookingViewer(params.id, token);
 
@@ -115,7 +119,7 @@ export default async function PayPage({
             bookingId={booking.id}
             depositCents={booking.deposit_cents}
             token={token}
-            returnQuery={tokenQuery}
+            snapshot={searchParams.d}
           />
         ) : (
           <Checkout

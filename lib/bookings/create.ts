@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
 import { isStripeConfigured } from '@/lib/stripe/config';
+import { signBookingSnapshot } from './demo-snapshot';
 import { db, dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
@@ -216,6 +217,33 @@ export async function createBookingAction(input: CreateBookingInput) {
   });
 
   // Guests carry their capability token through to the pay page (and onward);
-  // authenticated clients are recognised by their session.
-  redirect(guestToken ? `/bookings/${booking.id}/pay?t=${guestToken}` : `/bookings/${booking.id}/pay`);
+  // authenticated clients are recognised by their session. In demo mode we also
+  // carry a signed snapshot so the pay/confirmation steps can self-heal the
+  // booking onto whichever serverless instance serves them (see demo-snapshot).
+  const query: string[] = [];
+  if (guestToken) query.push(`t=${guestToken}`);
+  if (!isStripeConfigured()) {
+    const snapshot = await signBookingSnapshot(
+      {
+        id: booking.id,
+        client_id: user?.id ?? null,
+        braider_id: service.braider_id,
+        service_id: service.id,
+        scheduled_at: parsed.data.scheduledAt,
+        duration_minutes: service.duration_minutes,
+        price_cents: service.price_cents,
+        deposit_cents: service.deposit_cents,
+        status: 'pending_payment',
+        client_notes: parsed.data.clientNotes ?? null,
+        guest_name: guest?.name ?? null,
+        guest_email: guest?.email ?? null,
+        guest_phone: guest?.phone ?? null,
+        guest_token: guestToken,
+        created_at: new Date().toISOString()
+      },
+      'pending'
+    );
+    query.push(`d=${encodeURIComponent(snapshot)}`);
+  }
+  redirect(`/bookings/${booking.id}/pay${query.length ? `?${query.join('&')}` : ''}`);
 }

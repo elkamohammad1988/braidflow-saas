@@ -5,6 +5,7 @@ import { SuccessCheck } from '@/components/motion/success-check';
 import { formatAppointment } from '@/lib/format-date';
 import { dbAdmin } from '@/lib/db/server';
 import { resolveBookingViewer } from '@/lib/bookings/access';
+import { ensureBookingFromSnapshot } from '@/lib/bookings/demo-snapshot';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CancelBookingButton } from '@/components/booking/cancel-button';
@@ -18,10 +19,13 @@ export default async function ConfirmationPage({
   searchParams
 }: {
   params: { id: string };
-  searchParams: { redirect_status?: string; t?: string };
+  searchParams: { redirect_status?: string; t?: string; d?: string };
 }) {
   const t = await getTranslations('confirmation');
   const token = searchParams.t;
+  // Demo: rebuild + confirm the booking onto this instance from the signed
+  // snapshot if it was created/confirmed on another. No-op with real Stripe.
+  await ensureBookingFromSnapshot(params.id, searchParams.d);
   const { viewer } = await resolveBookingViewer(params.id, token);
   const isGuest = viewer.kind === 'guest';
   const tokenQuery = isGuest && token ? `?t=${encodeURIComponent(token)}` : '';
