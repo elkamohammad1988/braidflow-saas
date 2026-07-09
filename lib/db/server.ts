@@ -8,20 +8,20 @@
 import { getSession } from '@/lib/auth/session';
 import { store } from './store';
 import { QueryBuilder } from './query';
-import type { TableName } from './store';
-import { BRAIDER_PERSONA, CLIENT_PERSONA } from '@/lib/auth/personas';
+import type { TableName, Tables } from '@/types/db';
+import { PERSONAS } from '@/lib/auth/personas';
 
 function emailForUser(id: string): string | null {
-  const persona = [BRAIDER_PERSONA, CLIENT_PERSONA].find((p) => p.id === id);
+  const persona = PERSONAS.find((p) => p.id === id);
   if (persona) return persona.email;
-  const profile = store().profiles.find((p) => p.id === id);
-  return profile?.email ?? null;
+  const email = store().profiles.find((p) => p.id === id)?.email;
+  return typeof email === 'string' ? email : null;
 }
 
 function makeClient() {
   return {
-    from(tableName: TableName) {
-      return new QueryBuilder(tableName);
+    from<T extends TableName>(tableName: T): QueryBuilder<Tables[T]> {
+      return new QueryBuilder<Tables[T]>(tableName);
     },
     auth: {
       async getUser() {

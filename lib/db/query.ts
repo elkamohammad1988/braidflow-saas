@@ -4,21 +4,25 @@
 // chainable, thenable builders off `from(table)` with select (embedded joins,
 // count/head), filters, ordering, limits, single/maybeSingle, and the
 // insert/update/delete/upsert mutations — resolving to `{ data, error, count }`.
-// It is intentionally small: only what this codebase calls is implemented.
+//
+// The builder is generic over the table's Row type (see types/db.ts), so every
+// `db().from(...)` result is fully typed for feature code. Internally the engine
+// is dynamic (it interprets column names at runtime), so it works on
+// `Record<string, unknown>` rows and casts only at the comparison boundary — no
+// `any`. The final projection is cast back to the caller's Row type.
 
-import { table as getTable, setTable, type TableName } from './store';
+import { table as getTable, setTable } from './store';
 import { findRelationship } from './relationships';
+import type { TableName, Tables } from '@/types/db';
 
 export type QueryError = (Error & { code?: string; details?: string | null }) | null;
-export type QueryResult<T = any> = { data: T; error: QueryError; count: number | null };
+export type QueryResult<T> = { data: T; error: QueryError; count: number | null };
 
-// `single()`/`maybeSingle()` resolve to a single row (or null); everything else
-// resolves to a row array. Typing the array case as `any[]` (not bare `any`)
-// means callers' `.map`/`.reduce`/`.filter` callbacks get a contextual param
-// type and don't trip `noImplicitAny`.
-type ArrayQueryResult = QueryResult<any[]>;
-type SingleQueryResult = QueryResult<any>;
-type SingleQueryBuilder = PromiseLike<SingleQueryResult>;
+// A row as the engine stores/manipulates it: an untyped bag of columns. Feature
+// code never sees this — the builder projects and casts to the table's Row type.
+type StoredRow = Record<string, unknown>;
+// Values the ordering/range operators can meaningfully compare.
+type Comparable = string | number;
 
 function makeError(message: string, code?: string): Error & { code?: string } {
   const err = new Error(message) as Error & { code?: string };
@@ -36,7 +40,7 @@ const UNIQUE_COLUMNS: Partial<Record<TableName, string[]>> = {
 };
 
 type Op = 'select' | 'insert' | 'update' | 'delete' | 'upsert';
-type Predicate = (row: any) => boolean;
+type Predicate = (row: StoredRow) => boolean;
 
 // --- select-string parsing ---------------------------------------------------
 
@@ -80,10 +84,10 @@ function parseSelect(select: string): Field[] {
   });
 }
 
-function projectRow(row: any, parentTable: string, fields: Field[]): any {
+function projectRow(row: StoredRow, parentTable: string, fields: Field[]): StoredRow {
   // No projection requested → return a shallow copy of the whole row.
   if (fields.length === 0) return { ...row };
-  const out: any = {};
+  const out: StoredRow = {};
   for (const field of fields) {
     if (field.kind === 'col') {
       out[field.name] = row[field.name];
@@ -91,7 +95,9 @@ function projectRow(row: any, parentTable: string, fields: Field[]): any {
     }
     const rel = findRelationship(parentTable, field.base);
     if (!rel) {
-      out[field.key] = rel && (rel as any).card === 'many' ? [] : null;
+      // Unregistered relation (a programming error — every embed the app uses is
+      // registered). Default to null; the cardinality is unknown without `rel`.
+      out[field.key] = null;
       continue;
     }
     const subFields = parseSelect(field.sub);
@@ -116,23 +122,23 @@ function parseOr(filter: string): Predicate {
     const value = rest.join('.');
     if (op === 'ilike') {
       const needle = value.replace(/\*/g, '').toLowerCase();
-      return (row: any) => String(row[col] ?? '').toLowerCase().includes(needle);
+      return (row) => String(row[col] ?? '').toLowerCase().includes(needle);
     }
-    if (op === 'eq') return (row: any) => String(row[col]) === value;
+    if (op === 'eq') return (row) => String(row[col]) === value;
     return () => false;
   });
-  return (row: any) => clauses.some((c) => c(row));
+  return (row) => clauses.some((c) => c(row));
 }
 
 // -----------------------------------------------------------------------------
 
-export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
+export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
   private op: Op = 'select';
   private selectStr: string | null = null;
   private hasReturning = false;
   private countExact = false;
   private headOnly = false;
-  private payload: any[] = [];
+  private payload: StoredRow[] = [];
   private conflictColumn: string | undefined;
   private predicates: Predicate[] = [];
   private orderings: { col: string; ascending: boolean }[] = [];
@@ -150,15 +156,15 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return this;
   }
 
-  insert(rows: any | any[]): this {
+  insert(rows: Partial<Row> | Partial<Row>[]): this {
     this.op = 'insert';
-    this.payload = Array.isArray(rows) ? rows : [rows];
+    this.payload = (Array.isArray(rows) ? rows : [rows]) as StoredRow[];
     return this;
   }
 
-  update(patch: any): this {
+  update(patch: Partial<Row>): this {
     this.op = 'update';
-    this.payload = [patch];
+    this.payload = [patch as StoredRow];
     return this;
   }
 
@@ -167,39 +173,39 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return this;
   }
 
-  upsert(rows: any | any[], options?: { onConflict?: string }): this {
+  upsert(rows: Partial<Row> | Partial<Row>[], options?: { onConflict?: string }): this {
     this.op = 'upsert';
-    this.payload = Array.isArray(rows) ? rows : [rows];
+    this.payload = (Array.isArray(rows) ? rows : [rows]) as StoredRow[];
     this.conflictColumn = options?.onConflict;
     return this;
   }
 
   // --- filters ---------------------------------------------------------------
-  eq(col: string, value: any): this {
+  eq(col: string, value: unknown): this {
     this.predicates.push((r) => r[col] === value);
     return this;
   }
-  neq(col: string, value: any): this {
+  neq(col: string, value: unknown): this {
     this.predicates.push((r) => r[col] !== value);
     return this;
   }
-  gt(col: string, value: any): this {
-    this.predicates.push((r) => r[col] > value);
+  gt(col: string, value: Comparable): this {
+    this.predicates.push((r) => (r[col] as Comparable) > value);
     return this;
   }
-  gte(col: string, value: any): this {
-    this.predicates.push((r) => r[col] >= value);
+  gte(col: string, value: Comparable): this {
+    this.predicates.push((r) => (r[col] as Comparable) >= value);
     return this;
   }
-  lt(col: string, value: any): this {
-    this.predicates.push((r) => r[col] < value);
+  lt(col: string, value: Comparable): this {
+    this.predicates.push((r) => (r[col] as Comparable) < value);
     return this;
   }
-  lte(col: string, value: any): this {
-    this.predicates.push((r) => r[col] <= value);
+  lte(col: string, value: Comparable): this {
+    this.predicates.push((r) => (r[col] as Comparable) <= value);
     return this;
   }
-  in(col: string, values: any[]): this {
+  in(col: string, values: readonly unknown[]): this {
     this.predicates.push((r) => values.includes(r[col]));
     return this;
   }
@@ -223,28 +229,28 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     this.limitCount = count;
     return this;
   }
-  single(): SingleQueryBuilder {
+  single(): PromiseLike<QueryResult<Row | null>> {
     this.cardinality = 'single';
-    return this as unknown as SingleQueryBuilder;
+    return this as unknown as PromiseLike<QueryResult<Row | null>>;
   }
-  maybeSingle(): SingleQueryBuilder {
+  maybeSingle(): PromiseLike<QueryResult<Row | null>> {
     this.cardinality = 'maybe';
-    return this as unknown as SingleQueryBuilder;
+    return this as unknown as PromiseLike<QueryResult<Row | null>>;
   }
 
   // --- thenable --------------------------------------------------------------
-  then<R1 = ArrayQueryResult, R2 = never>(
-    onfulfilled?: ((value: ArrayQueryResult) => R1 | PromiseLike<R1>) | null,
-    onrejected?: ((reason: any) => R2 | PromiseLike<R2>) | null
+  then<R1 = QueryResult<Row[]>, R2 = never>(
+    onfulfilled?: ((value: QueryResult<Row[]>) => R1 | PromiseLike<R1>) | null,
+    onrejected?: ((reason: unknown) => R2 | PromiseLike<R2>) | null
   ): Promise<R1 | R2> {
-    return Promise.resolve(this.run()).then(onfulfilled, onrejected);
+    return Promise.resolve(this.run() as QueryResult<Row[]>).then(onfulfilled, onrejected);
   }
   catch<R = never>(
-    onrejected?: ((reason: any) => R | PromiseLike<R>) | null
-  ): Promise<ArrayQueryResult | R> {
+    onrejected?: ((reason: unknown) => R | PromiseLike<R>) | null
+  ): Promise<QueryResult<Row[]> | R> {
     return this.then(undefined, onrejected);
   }
-  finally(onfinally?: (() => void) | null): Promise<ArrayQueryResult> {
+  finally(onfinally?: (() => void) | null): Promise<QueryResult<Row[]>> {
     return this.then(
       (v) => {
         onfinally?.();
@@ -257,11 +263,11 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     );
   }
 
-  private matches(row: any): boolean {
+  private matches(row: StoredRow): boolean {
     return this.predicates.every((p) => p(row));
   }
 
-  private shape(rows: any[]): QueryResult {
+  private shape(rows: StoredRow[]): QueryResult<unknown> {
     const fields = parseSelect(this.selectStr ?? '*');
     const projected = rows.map((r) => projectRow(r, this.tableName, fields));
     if (this.cardinality === 'array') {
@@ -279,7 +285,7 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return { data: projected[0], error: null, count: this.countExact ? rows.length : null };
   }
 
-  private run(): QueryResult {
+  private run(): QueryResult<unknown> {
     try {
       switch (this.op) {
         case 'select':
@@ -299,7 +305,7 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     }
   }
 
-  private runSelect(): QueryResult {
+  private runSelect(): QueryResult<unknown> {
     let rows = getTable(this.tableName).filter((r) => this.matches(r));
     const count = this.countExact ? rows.length : null;
     if (this.headOnly) return { data: null, error: null, count };
@@ -307,8 +313,8 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     if (this.orderings.length > 0) {
       rows = [...rows].sort((a, b) => {
         for (const { col, ascending } of this.orderings) {
-          const av = a[col];
-          const bv = b[col];
+          const av = a[col] as Comparable | null | undefined;
+          const bv = b[col] as Comparable | null | undefined;
           if (av == null && bv == null) continue;
           if (av == null) return ascending ? -1 : 1;
           if (bv == null) return ascending ? 1 : -1;
@@ -322,28 +328,28 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return this.shape(rows);
   }
 
-  private applyDefaults(raw: any): any {
+  private applyDefaults(raw: StoredRow): StoredRow {
     const row = { ...raw };
     if (row.id === undefined) row.id = crypto.randomUUID();
     if (row.created_at === undefined) row.created_at = new Date().toISOString();
     return row;
   }
 
-  private uniqueViolation(row: any, rows: any[]): boolean {
+  private uniqueViolation(row: StoredRow, rows: StoredRow[]): boolean {
     const uniques = UNIQUE_COLUMNS[this.tableName] ?? [];
     return uniques.some(
       (col) => row[col] != null && rows.some((existing) => existing[col] === row[col])
     );
   }
 
-  private returning(rows: any[]): QueryResult {
+  private returning(rows: StoredRow[]): QueryResult<unknown> {
     if (!this.hasReturning) return { data: null, error: null, count: null };
     return this.shape(rows);
   }
 
-  private runInsert(): QueryResult {
+  private runInsert(): QueryResult<unknown> {
     const rows = getTable(this.tableName);
-    const inserted: any[] = [];
+    const inserted: StoredRow[] = [];
     for (const raw of this.payload) {
       const row = this.applyDefaults(raw);
       if (this.uniqueViolation(row, rows)) {
@@ -355,22 +361,22 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return this.returning(inserted);
   }
 
-  private runUpdate(): QueryResult {
+  private runUpdate(): QueryResult<unknown> {
     const patch = this.payload[0] ?? {};
     const matched = getTable(this.tableName).filter((r) => this.matches(r));
     for (const row of matched) Object.assign(row, patch);
     return this.returning(matched);
   }
 
-  private runDelete(): QueryResult {
+  private runDelete(): QueryResult<unknown> {
     const kept = getTable(this.tableName).filter((r) => !this.matches(r));
     setTable(this.tableName, kept);
     return this.returning([]);
   }
 
-  private runUpsert(): QueryResult {
+  private runUpsert(): QueryResult<unknown> {
     const rows = getTable(this.tableName);
-    const affected: any[] = [];
+    const affected: StoredRow[] = [];
     for (const raw of this.payload) {
       const conflictCol = this.conflictColumn;
       const existing =
@@ -389,3 +395,6 @@ export class QueryBuilder implements PromiseLike<ArrayQueryResult> {
     return this.returning(affected);
   }
 }
+
+// Re-export for consumers that build a typed builder directly.
+export type { Tables };

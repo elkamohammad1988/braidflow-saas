@@ -6,6 +6,9 @@ import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Fail fast on misconfiguration at boot rather than mid-request.
+    const { assertRuntimeEnv } = await import('./lib/env');
+    assertRuntimeEnv();
     await import('./sentry.server.config');
   }
   if (process.env.NEXT_RUNTIME === 'edge') {

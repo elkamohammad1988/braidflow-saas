@@ -127,6 +127,14 @@ interface, the store can be replaced with a real Postgres/Supabase backend witho
 touching a single page or action. That's what lets the whole app **build and deploy
 with zero configuration** — no database, no auth provider, nothing to wire up.
 
+Every row is **fully typed** end to end: the schema lives in `types/db.ts`, and the
+query builder is generic over it, so `db().from('bookings').select(…)` returns typed
+rows (no `any`). The production Postgres schema that store emulates — tables, enums,
+foreign keys, indexes, **Row-Level Security**, and the `EXCLUDE USING gist` overlap
+constraint the booking code's `23P01` handler expects — ships in
+[`supabase/migrations`](supabase/migrations). Apply it and point `db()`/`dbAdmin()` at
+a real client to go production-backed with no feature-code changes.
+
 - **Auth** — a signed httpOnly cookie (Web Crypto **HMAC-SHA256**). The exact same
   verification runs in Edge middleware and in Node server actions, so there's one code
   path for "who is this request."
@@ -178,10 +186,14 @@ braidflow/
 │   ├── auth/               # signed-cookie sessions, personas, server actions
 │   ├── bookings/ · availability/ · services/ · reviews/   # domain logic
 │   ├── braider/ · payments/ · stripe/   # Connect, checkout, payouts
+│   ├── crypto/             # shared edge-safe HMAC signing (domain-separated)
 │   ├── email/ · cron/ · audit/ · monitoring.ts
 │   └── timezones.ts · format-date.ts · env.ts · utils.ts
+├── types/db.ts             # database schema types (source of truth for rows)
+├── supabase/migrations/    # production Postgres schema + RLS (0001, 0002)
 ├── marketing/              # screenshots, demo package, case study, listings
-├── test/ · vitest.config.ts
+├── Dockerfile · .dockerignore     # containerized standalone build
+├── app/api/health/         # liveness/readiness probe
 └── middleware.ts · next.config.mjs · vercel.json · tailwind.config.ts
 ```
 
@@ -237,6 +249,17 @@ monitoring.
 
 `vercel.json` registers two cron jobs (reminders, and releasing abandoned holds). The
 live demo is deployed exactly this way at **[braidflow.vercel.app](https://braidflow.vercel.app)**.
+
+**Docker.** For a container platform, the repo builds a lean non-root image on Next's
+standalone output, with a built-in `HEALTHCHECK` hitting `/api/health`:
+
+```bash
+docker build -t braidflow .
+docker run -p 3000:3000 braidflow
+```
+
+Environment is validated at boot (`lib/env.ts`, via `instrumentation.ts`), so a
+misconfigured deploy fails fast with a readable error instead of at request time.
 
 Full notes: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 

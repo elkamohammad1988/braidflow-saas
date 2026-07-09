@@ -13,26 +13,43 @@
 
 import { TZDate } from '@date-fns/tz';
 import { addDays, startOfWeek } from 'date-fns';
-import { BRAIDER_PERSONA, CLIENT_PERSONA } from '@/lib/auth/personas';
+import { BRAIDER_PERSONA, CLIENT_PERSONA, NEW_BRAIDER_PERSONA } from '@/lib/auth/personas';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { BRAID_PHOTOS } from '@/lib/media';
+import type {
+  ProfileRow,
+  BraiderRow,
+  ServiceRow,
+  AvailabilityRuleRow,
+  AvailabilityOverrideRow,
+  BookingRow,
+  PaymentRow,
+  ReviewRow,
+  AuditLogRow,
+  StripeWebhookEventRow
+} from '@/types/db';
 
+// Fully-typed fixture store: every seeded row is validated against its schema
+// type at construction. The query engine bridges this to its dynamic
+// `Record<string, unknown>` view in lib/db/store.ts.
 export type Store = {
-  profiles: any[];
-  braiders: any[];
-  services: any[];
-  availability_rules: any[];
-  availability_overrides: any[];
-  bookings: any[];
-  payments: any[];
-  reviews: any[];
-  audit_logs: any[];
-  stripe_webhook_events: any[];
+  profiles: ProfileRow[];
+  braiders: BraiderRow[];
+  services: ServiceRow[];
+  availability_rules: AvailabilityRuleRow[];
+  availability_overrides: AvailabilityOverrideRow[];
+  bookings: BookingRow[];
+  payments: PaymentRow[];
+  reviews: ReviewRow[];
+  audit_logs: AuditLogRow[];
+  stripe_webhook_events: StripeWebhookEventRow[];
 };
 
 // --- Stable ids --------------------------------------------------------------
 const AMARA = BRAIDER_PERSONA.id;
 const ZOE = CLIENT_PERSONA.id;
+// The fresh studio a braider sign-up lands in — deliberately empty (see below).
+const NEW_STUDIO = NEW_BRAIDER_PERSONA.id;
 
 const NIA = '00000000-0000-4000-8000-000000000011';
 const IMANI = '00000000-0000-4000-8000-000000000012';
@@ -89,7 +106,7 @@ export function seed(): Store {
     return d.toISOString();
   };
 
-  const profiles = [
+  const profiles: ProfileRow[] = [
     { id: AMARA, role: 'braider', full_name: 'Amara Johnson', phone: '(404) 555-0148', email: BRAIDER_PERSONA.email, avatar_url: null, created_at: daysAgo(320) },
     { id: ZOE, role: 'client', full_name: 'Zoe Adams', phone: '(404) 555-0111', email: CLIENT_PERSONA.email, avatar_url: null, created_at: daysAgo(90) },
     { id: NIA, role: 'client', full_name: 'Nia Williams', phone: '(678) 555-0192', email: 'nia@example.com', avatar_url: null, created_at: daysAgo(140) },
@@ -99,10 +116,14 @@ export function seed(): Store {
     // Profiles for the other directory braiders (own their braider row).
     { id: BRAIDER_KEKELI, role: 'braider', full_name: 'Kekeli Mensah', phone: null, email: 'kekeli@example.com', avatar_url: null, created_at: daysAgo(200) },
     { id: BRAIDER_CROWN, role: 'braider', full_name: 'Renee Carter', phone: null, email: 'renee@example.com', avatar_url: null, created_at: daysAgo(180) },
-    { id: BRAIDER_SABLE, role: 'braider', full_name: 'Adaeze Okafor', phone: null, email: 'adaeze@example.com', avatar_url: null, created_at: daysAgo(150) }
+    { id: BRAIDER_SABLE, role: 'braider', full_name: 'Adaeze Okafor', phone: null, email: 'adaeze@example.com', avatar_url: null, created_at: daysAgo(150) },
+    // The fresh-studio persona a braider sign-up lands in (empty by design).
+    { id: NEW_STUDIO, role: 'braider', full_name: 'Your Studio', phone: null, email: NEW_BRAIDER_PERSONA.email, avatar_url: null, created_at: daysAgo(0) }
   ];
 
-  const braider = (over: Record<string, any>): Record<string, any> => ({
+  const braider = (
+    over: Partial<BraiderRow> & Pick<BraiderRow, 'id' | 'slug' | 'business_name'>
+  ): BraiderRow => ({
     bio: null,
     city: null,
     hero_image_url: null,
@@ -158,10 +179,29 @@ export function seed(): Store {
       hero_image_url: BRAID_PHOTOS.longBeaded,
       instagram_handle: 'sableandgold',
       timezone: 'America/Chicago'
+    }),
+    // The fresh studio a braider sign-up lands in: no services, no hours, no
+    // Stripe — so its dashboard shows the activation checklist, the Connect
+    // prompt and every empty state. Kept out of the public directory
+    // (accepting_bookings: false) until it's actually set up.
+    braider({
+      id: NEW_STUDIO,
+      slug: 'your-studio',
+      business_name: 'Your Studio',
+      accepting_bookings: false,
+      stripe_account_id: null,
+      charges_enabled: false,
+      payouts_enabled: false,
+      stripe_onboarding_complete: false,
+      onboarding_completed_at: null,
+      created_at: daysAgo(0)
     })
   ];
 
-  const service = (over: Record<string, any>): Record<string, any> => ({
+  const service = (
+    over: Partial<ServiceRow> &
+      Pick<ServiceRow, 'id' | 'braider_id' | 'name' | 'duration_minutes' | 'price_cents' | 'deposit_cents'>
+  ): ServiceRow => ({
     description: null,
     is_active: true,
     created_at: daysAgo(280),
@@ -193,7 +233,7 @@ export function seed(): Store {
   }));
 
   // A clean, future "time off" block (a weekend away), in the braider's zone.
-  const availability_overrides = [
+  const availability_overrides: AvailabilityOverrideRow[] = [
     {
       id: 'd0000000-0000-4000-8000-000000000001',
       braider_id: AMARA,
@@ -206,7 +246,13 @@ export function seed(): Store {
 
   // --- Bookings --------------------------------------------------------------
   let bookingSeq = 0;
-  const booking = (over: Record<string, any>): Record<string, any> => {
+  const booking = (
+    over: Partial<BookingRow> &
+      Pick<
+        BookingRow,
+        'service_id' | 'scheduled_at' | 'duration_minutes' | 'price_cents' | 'deposit_cents' | 'status'
+      >
+  ): BookingRow => {
     bookingSeq += 1;
     return {
       id: `e0000000-0000-4000-8000-0000000000${String(bookingSeq).padStart(2, '0')}`,
@@ -260,14 +306,14 @@ export function seed(): Store {
   //   • pending_payment                 → deposit pending (not yet collected)
   //   • cancelled                       → deposit succeeded, then refunded
   let paymentSeq = 0;
-  const payments = bookings.flatMap((b) => {
+  const payments: PaymentRow[] = bookings.flatMap((b) => {
     paymentSeq += 1;
     const collected =
       b.status === 'confirmed' ||
       b.status === 'completed' ||
       b.status === 'no_show' ||
       b.status === 'cancelled';
-    const deposit = {
+    const deposit: PaymentRow = {
       id: `f0000000-0000-4000-8000-0000000000${String(paymentSeq).padStart(2, '0')}`,
       booking_id: b.id,
       kind: 'deposit',
@@ -280,7 +326,7 @@ export function seed(): Store {
     };
     if (b.status !== 'cancelled') return [deposit];
     paymentSeq += 1;
-    const refund = {
+    const refund: PaymentRow = {
       id: `f0000000-0000-4000-8000-0000000000${String(paymentSeq).padStart(2, '0')}`,
       booking_id: b.id,
       kind: 'refund',
@@ -308,7 +354,7 @@ export function seed(): Store {
     .sort((a, b) => (a.scheduled_at < b.scheduled_at ? 1 : -1));
   const reviewedClients = new Set<string>();
   let reviewSeq = 0;
-  const reviews = completedForReview
+  const reviews: ReviewRow[] = completedForReview
     .filter((b) => {
       if (reviewedClients.has(b.client_id as string)) return false;
       reviewedClients.add(b.client_id as string);
