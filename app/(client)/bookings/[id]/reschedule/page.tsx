@@ -108,7 +108,7 @@ export default async function ReschedulePage({
   const serviceName = booking.services?.name ?? '';
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
+    <div className="mx-auto max-w-3xl px-6 py-8">
       <Link
         href={returnTo}
         className="inline-flex items-center text-sm text-ink-muted hover:text-ink"
@@ -126,7 +126,7 @@ export default async function ReschedulePage({
         </p>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-8">
         <RescheduleFlow
           bookingId={booking.id}
           currentScheduledAt={booking.scheduled_at}
@@ -139,7 +139,7 @@ export default async function ReschedulePage({
         />
       </div>
 
-      <div className="mt-10 rounded-card border border-line bg-paper/60 px-5 py-4 text-sm text-ink-muted">
+      <div className="mt-8 rounded-card border border-line bg-paper/60 px-5 py-4 text-sm text-ink-muted">
         {t('cantFindTime')}{' '}
         <Link
           href={`/braiders/${booking.braiders?.slug ?? ''}`}

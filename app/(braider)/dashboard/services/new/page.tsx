@@ -12,7 +12,7 @@ export default function NewServicePage() {
         title={t('services.newTitle')}
         description={t('services.newDescription')}
       />
-      <div className="mt-8 max-w-xl">
+      <div className="mt-6 max-w-xl">
         <Card>
           <CardBody>
             <ServiceForm />

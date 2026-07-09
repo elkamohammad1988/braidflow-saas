@@ -23,7 +23,7 @@ export default async function EditServicePage({ params }: { params: { id: string
   return (
     <div>
       <PageHeader eyebrow={t('services.eyebrow')} title={service.name} description={t('services.editDescription')} />
-      <div className="mt-8 max-w-xl">
+      <div className="mt-6 max-w-xl">
         <Card>
           <CardBody>
             <ServiceForm

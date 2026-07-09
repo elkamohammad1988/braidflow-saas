@@ -97,7 +97,10 @@ export async function rescheduleBookingAction(
 
   const previousScheduledAt = booking.scheduled_at;
 
-  const { error } = await admin
+  // Guarded transition: only move a row still in the status we read, mirroring
+  // cancel/complete. Without the status guard a concurrent webhook-confirm or
+  // cron-expire between the read above and this write would be silently clobbered.
+  const { data: moved, error } = await admin
     .from('bookings')
     .update({
       scheduled_at: newTime.toISOString(),
@@ -105,13 +108,18 @@ export async function rescheduleBookingAction(
       reminder_sent_at: null,
       final_reminder_sent_at: null
     })
-    .eq('id', bookingId);
+    .eq('id', bookingId)
+    .eq('status', booking.status)
+    .select('id');
 
   if (error) {
     if (error.code === '23P01') {
       return { error: 'Someone just grabbed that slot. Pick another time.' };
     }
     return { error: 'Could not reschedule that booking.' };
+  }
+  if (!moved || moved.length === 0) {
+    return { error: 'That booking was just updated. Refresh and try again.' };
   }
 
   await recordAuditLog({

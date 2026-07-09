@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
@@ -13,12 +13,17 @@ type Props = {
 export function CopyButton({ value, className, label }: Props) {
   const t = useTranslations('common');
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Clear the pending "copied → idle" timer if the button unmounts first.
+  useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   async function onClick() {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
+      clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setCopied(false), 1400);
     } catch {
       // clipboard blocked — leave the button silent
     }

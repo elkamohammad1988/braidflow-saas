@@ -19,6 +19,11 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
       {label && (
         <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-ink">
           {label}
+          {rest.required && (
+            <span aria-hidden="true" className="ms-0.5 text-clay-text">
+              *
+            </span>
+          )}
         </label>
       )}
       <input
@@ -35,7 +40,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
           role={error ? 'alert' : undefined}
           className={cn(
             'mt-1.5 block text-xs',
-            error ? 'text-red-600 dark:text-red-400' : 'text-ink-muted'
+            error ? 'text-red-700 dark:text-red-400' : 'text-ink-muted'
           )}
         >
           {error ?? hint}

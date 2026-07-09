@@ -18,9 +18,12 @@ import 'server-only';
 
 import { dbAdmin } from '@/lib/db/server';
 import { isStripeConfigured } from '@/lib/stripe/config';
+import { base64urlEncode, base64urlDecode, hmacSign, safeEqual } from '@/lib/crypto/signing';
+import type { BookingStatus } from '@/types/db';
 
-const SECRET =
-  process.env.AUTH_SECRET || 'braidflow-demo-signing-secret-set-AUTH_SECRET-to-override';
+// Domain-separation label — a snapshot signature is never valid as a session
+// cookie (see lib/auth/session-token) and vice-versa, though both share a key.
+const CONTEXT = 'snapshot';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -34,7 +37,7 @@ export type BookingRow = {
   duration_minutes: number;
   price_cents: number;
   deposit_cents: number;
-  status: string;
+  status: BookingStatus;
   client_notes: string | null;
   guest_name: string | null;
   guest_email: string | null;
@@ -45,39 +48,6 @@ export type BookingRow = {
 
 type Snapshot = { b: BookingRow; ps: 'pending' | 'succeeded'; exp: number };
 
-function base64urlEncode(bytes: Uint8Array): string {
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function base64urlDecode(value: string): Uint8Array {
-  const padded = value.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((value.length + 3) % 4);
-  const binary = atob(padded);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
-
-async function sign(data: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(SECRET),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
-  return base64urlEncode(new Uint8Array(signature));
-}
-
-function safeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
-}
-
 // Sign a booking snapshot for the given deposit-payment status. Returns a
 // URL-safe `<body>.<sig>` token (valid for a day — a demo hold never lives long).
 export async function signBookingSnapshot(
@@ -86,7 +56,7 @@ export async function signBookingSnapshot(
 ): Promise<string> {
   const snap: Snapshot = { b: booking, ps: paymentStatus, exp: Math.floor(Date.now() / 1000) + 86400 };
   const body = base64urlEncode(encoder.encode(JSON.stringify(snap)));
-  return `${body}.${await sign(body)}`;
+  return `${body}.${await hmacSign(CONTEXT, body)}`;
 }
 
 async function readSnapshot(token: string | undefined | null): Promise<Snapshot | null> {
@@ -94,7 +64,7 @@ async function readSnapshot(token: string | undefined | null): Promise<Snapshot 
   const dot = token.lastIndexOf('.');
   if (dot < 1) return null;
   const body = token.slice(0, dot);
-  if (!safeEqual(await sign(body), token.slice(dot + 1))) return null;
+  if (!safeEqual(await hmacSign(CONTEXT, body), token.slice(dot + 1))) return null;
   try {
     const snap = JSON.parse(decoder.decode(base64urlDecode(body))) as Snapshot;
     if (!snap.b?.id) return null;

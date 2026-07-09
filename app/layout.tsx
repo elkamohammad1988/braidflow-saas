@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Fraunces, Space_Mono } from 'next/font/google';
 import { JsonLd } from '@/components/shared/json-ld';
+import { RouteAnnouncer } from '@/components/shared/route-announcer';
 import { DemoBadge } from '@/components/demo/demo-badge';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -45,20 +46,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'BraidFlow' }],
   creator: 'BraidFlow',
+  // No title/description here on purpose: leaving them unset lets each route's
+  // own `title`/`description` flow into its OpenGraph/Twitter tags (a child that
+  // sets only top-level title does NOT override an explicit parent og:title). The
+  // home page, which sets no metadata of its own, inherits the defaults above.
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    siteName: 'BraidFlow',
-    title: 'BraidFlow — booking for braiders',
-    description:
-      'Take deposits, manage your schedule, and stop chasing down DMs. Built for braiders.'
+    siteName: 'BraidFlow'
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'BraidFlow — booking for braiders',
-    description:
-      'Take deposits, manage your schedule, and stop chasing down DMs. Built for braiders.'
+    card: 'summary_large_image'
   },
   robots: {
     index: true,
@@ -134,6 +133,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
+            <RouteAnnouncer />
             {isDemoMode() && <DemoBadge />}
           </NextIntlClientProvider>
         </ThemeProvider>

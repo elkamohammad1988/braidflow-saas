@@ -15,7 +15,7 @@ export default function LoginPage() {
     <div>
       <h1 className="font-display text-3xl text-ink">{t('login.title')}</h1>
       <p className="mt-1 text-sm text-ink-muted">{t('login.subtitle')}</p>
-      <div className="mt-8">
+      <div className="mt-6">
         <Suspense>
           <LoginForm />
         </Suspense>

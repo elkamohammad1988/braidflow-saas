@@ -84,7 +84,7 @@ export default async function ClientsPage() {
     <div>
       <PageHeader title={t('clients.title')} description={t('clients.description')} />
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-6 space-y-3">
         {clients.length === 0 ? (
           <EmptyState
             icon={Users}
@@ -95,7 +95,7 @@ export default async function ClientsPage() {
           clients.map((c) => (
             <Card key={c.id} className="transition-colors duration-300 hover:border-clay/25">
               <CardBody className="flex items-center gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay-text">
                   {initials(c.name) || '—'}
                 </span>
                 <div className="min-w-0 flex-1">

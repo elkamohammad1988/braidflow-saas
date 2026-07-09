@@ -22,8 +22,12 @@ export function ThemeToggle({ className }: { className?: string }) {
   useEffect(() => setMounted(true), []);
 
   return (
+    // A toggle-button group (not a radiogroup): every option is a tab stop with
+    // an honest `aria-pressed` state, matching the signup role toggle. A true
+    // radiogroup would promise roving tabindex + arrow-key selection we don't
+    // implement, so its ARIA contract would be broken.
     <div
-      role="radiogroup"
+      role="group"
       aria-label={t('label')}
       className={cn(
         'inline-flex items-center gap-0.5 rounded-full border border-line bg-paper p-0.5 shadow-card',
@@ -37,13 +41,15 @@ export function ThemeToggle({ className }: { className?: string }) {
           <button
             key={value}
             type="button"
-            role="radio"
-            aria-checked={active}
+            aria-pressed={active}
             aria-label={label}
             title={label}
             onClick={() => setTheme(value)}
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-full transition-colors duration-200',
+              // 28px visual, but a 40px pointer target via hit-slop so it clears
+              // the touch-target minimum in the mobile menu without changing the pill.
+              'relative flex h-7 w-7 items-center justify-center rounded-full transition-colors duration-200',
+              'before:absolute before:-inset-1.5 before:content-[""]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/50',
               active
                 ? 'bg-ink text-cream shadow-sm'

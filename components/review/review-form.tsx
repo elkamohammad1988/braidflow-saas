@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -19,6 +19,13 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
   const [body, setBody] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const firstStarRef = useRef<HTMLButtonElement>(null);
+
+  // When the form expands, the trigger button unmounts and focus would fall to
+  // <body>. Move it into the form so keyboard/SR users land on the rating control.
+  useEffect(() => {
+    if (open) firstStarRef.current?.focus();
+  }, [open]);
 
   if (!open) {
     return (
@@ -69,6 +76,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
+            ref={star === 1 ? firstStarRef : undefined}
             type="button"
             aria-label={t('starAria', { count: star })}
             aria-pressed={rating === star}
@@ -99,7 +107,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
       />
 
       {error && (
-        <p role="alert" className="mt-2 text-sm text-red-600">
+        <p role="alert" className="mt-2 text-sm text-red-700">
           {error}
         </p>
       )}

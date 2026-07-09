@@ -35,7 +35,7 @@ export default async function ServicesPage() {
         }
       />
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-6 space-y-3">
         {(!services || services.length === 0) ? (
           <EmptyState
             icon={Scissors}

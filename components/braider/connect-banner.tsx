@@ -35,9 +35,9 @@ export function ConnectBanner({ onboardingComplete }: { onboardingComplete: bool
   }
 
   return (
-    <div className="motion-safe:animate-fade-in mb-8 rounded-card border border-clay/30 bg-clay/5 p-5">
+    <div className="motion-safe:animate-fade-in mb-6 rounded-card border border-clay/30 bg-clay/5 p-5">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-clay/15 text-clay">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-clay/15 text-clay-text">
           <AlertTriangle className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">

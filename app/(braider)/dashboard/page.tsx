@@ -142,7 +142,7 @@ export default async function DashboardOverview({
       )}
       {searchParams.connect === 'pending' && (
         <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-clay/30 bg-clay/5 p-4">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-clay" />
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-clay-text" />
           <p className="text-sm text-ink">
             <span className="font-medium">{t('overview.connectPending.title')}</span>{' '}
             {t('overview.connectPending.body')}
@@ -161,7 +161,7 @@ export default async function DashboardOverview({
         </div>
       )}
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           icon={CalendarCheck}
           tone="ink"
@@ -192,7 +192,7 @@ export default async function DashboardOverview({
         />
       </div>
 
-      <section className="mt-12">
+      <section className="mt-8">
         <div className="mb-4 flex items-end justify-between">
           <div>
             <h2 className="font-display text-xl tracking-tight text-ink">{t('overview.upNext.title')}</h2>
@@ -215,7 +215,7 @@ export default async function DashboardOverview({
                 href="/dashboard/appointments"
                 className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-ink/[0.04] focus-visible:[outline-offset:-2px]"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay-text">
                   {initials(b.profiles?.full_name ?? b.guest_name ?? '') || '—'}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -255,7 +255,7 @@ export default async function DashboardOverview({
 const statTones: Record<'ink' | 'moss' | 'clay', string> = {
   ink: 'bg-ink/[0.06] text-ink ring-1 ring-ink/[0.06]',
   moss: 'bg-moss/10 text-moss ring-1 ring-moss/15',
-  clay: 'bg-clay/15 text-clay ring-1 ring-clay/20'
+  clay: 'bg-clay/15 text-clay-text ring-1 ring-clay/20'
 };
 
 function Stat({

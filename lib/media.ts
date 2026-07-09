@@ -34,10 +34,35 @@ export const STUDIO_PHOTOS = {
 export const WARM_BLUR =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjEwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNlN2Q4YmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjOTlhNWYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSIxMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==';
 
-// A small, ordered set of craft shots for the profile "recent work" gallery.
-export const GALLERY_PHOTOS: string[] = [
+// The full pool of craft + studio shots the profile "recent work" gallery draws
+// from.
+const GALLERY_POOL: string[] = [
   BRAID_PHOTOS.feedInClose,
   BRAID_PHOTOS.sectionsClose,
   BRAID_PHOTOS.boxBraidsTop,
-  STUDIO_PHOTOS.brightStation
+  BRAID_PHOTOS.triangleParts,
+  BRAID_PHOTOS.longBeaded,
+  STUDIO_PHOTOS.brightStation,
+  STUDIO_PHOTOS.serviceInAction,
+  STUDIO_PHOTOS.warmInterior
 ];
+
+// A per-braider "recent work" gallery. Seed a tiny LCG from the braider's slug
+// and Fisher-Yates the shared pool, so each studio gets its own ordering instead
+// of every profile showing the identical three photos. Deterministic (the "random"
+// stream is fully seeded) so a studio's gallery never changes across renders or
+// cold starts, and client-safe (plain arithmetic, no Buffer/crypto). With 8!
+// orderings, distinct studios effectively never share a gallery.
+export function galleryForBraider(key: string, count = 3): string[] {
+  let seed = 0;
+  for (let i = 0; i < key.length; i++) seed = (seed * 31 + key.charCodeAt(i)) | 0;
+  seed = ((seed % 2147483647) + 2147483647) % 2147483647 || 1;
+  const next = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+
+  const pool = [...GALLERY_POOL];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(next() * (i + 1));
+    [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+  }
+  return pool.slice(0, count);
+}

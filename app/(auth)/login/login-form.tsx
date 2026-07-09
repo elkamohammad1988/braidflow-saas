@@ -13,9 +13,11 @@ export function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
   // Only honour a same-origin relative path — never an attacker-supplied absolute
-  // or protocol-relative URL (open-redirect / phishing guard).
+  // or protocol-relative URL (open-redirect / phishing guard). Reject a leading
+  // slash followed by another slash OR a backslash, since some browsers normalize
+  // `/\evil.com` to `//evil.com`.
   const nextParam = search.get('next');
-  const next = nextParam && /^\/(?!\/)/.test(nextParam) ? nextParam : null;
+  const next = nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : null;
   const [pending, setPending] = useState(false);
   // Surface a failed email verification / expired recovery link — /auth/callback
   // redirects here with ?error=verification when it can't establish a session.
@@ -62,7 +64,7 @@ export function LoginForm() {
         </Link>
       </div>
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-700">
           {error}
         </p>
       )}

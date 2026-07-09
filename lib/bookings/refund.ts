@@ -3,6 +3,7 @@
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { stripe } from '@/lib/stripe/client';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { db, dbAdmin } from '@/lib/db/server';
 import { notifyDepositRefunded } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
@@ -12,10 +13,45 @@ type Result = { ok: true } | { error: string };
 
 type Admin = ReturnType<typeof dbAdmin>;
 
+type RefundStatus = 'succeeded' | 'pending' | 'failed';
+
 export type DepositRefundOutcome =
   | { status: 'succeeded' | 'pending'; amountCents: number }
   | { skipped: 'no_succeeded_deposit' | 'already_refunded' | 'missing_reference' }
   | { error: string };
+
+/**
+ * Record the refund locally — the `payments` row and the audit trail — idempotently
+ * on the unique `stripe_refund_id`. Shared by the real-Stripe and demo paths so both
+ * leave an identical trail and an idempotent retry never duplicates a row.
+ */
+async function persistRefund(
+  admin: Admin,
+  bookingId: string,
+  actorId: string | null,
+  refundId: string,
+  amountCents: number,
+  status: RefundStatus
+): Promise<void> {
+  await admin.from('payments').upsert(
+    {
+      booking_id: bookingId,
+      kind: 'refund',
+      amount_cents: amountCents,
+      status,
+      stripe_refund_id: refundId
+    },
+    { onConflict: 'stripe_refund_id' }
+  );
+
+  await recordAuditLog({
+    actorId,
+    action: 'booking.refunded',
+    entityType: 'booking',
+    entityId: bookingId,
+    metadata: { amount_cents: amountCents, stripe_refund_id: refundId, status }
+  });
+}
 
 /**
  * Refund a booking's *charged* deposit. Pure money operation — the CALLER is
@@ -25,7 +61,9 @@ export type DepositRefundOutcome =
  * on a booking with no charged deposit (it no-ops via `skipped`).
  *
  * Shared by the braider's manual "Refund deposit" action and the automatic
- * refund-on-cancellation path so both behave identically.
+ * refund-on-cancellation path so both behave identically. In the keyless demo it
+ * simulates a successful refund (mirroring the demo deposit path) so the entire
+ * cancel → refund flow works out of the box, with no real charge and no Stripe call.
  */
 export async function issueDepositRefund(
   admin: Admin,
@@ -34,7 +72,7 @@ export async function issueDepositRefund(
 ): Promise<DepositRefundOutcome> {
   const { data: payments } = await admin
     .from('payments')
-    .select('id, kind, status, stripe_payment_intent_id')
+    .select('id, kind, status, amount_cents, stripe_payment_intent_id')
     .eq('booking_id', bookingId);
 
   const deposit = payments?.find((p) => p.kind === 'deposit');
@@ -45,6 +83,21 @@ export async function issueDepositRefund(
   // A non-failed refund already exists — don't double-refund.
   if (existingRefund && existingRefund.status !== 'failed') return { skipped: 'already_refunded' };
   if (!deposit.stripe_payment_intent_id) return { skipped: 'missing_reference' };
+
+  const amountCents = deposit.amount_cents ?? 0;
+
+  // Demo mode (no Stripe keys): simulate a fully successful refund. This mirrors
+  // the demo deposit path (lib/bookings/confirm-demo.ts) — no external call, no
+  // money moved — so the braider's "Refund deposit" action and the automatic
+  // refund-on-cancellation both complete cleanly instead of throwing on the
+  // unconfigured Stripe client. The stable `re_demo_<booking>` id keeps the
+  // upsert idempotent and never collides with the seed's sequence-based ids.
+  if (!isStripeConfigured()) {
+    const refundId = `re_demo_${bookingId}`;
+    await persistRefund(admin, bookingId, actorId, refundId, amountCents, 'succeeded');
+    await notifyDepositRefunded(bookingId, amountCents);
+    return { status: 'succeeded', amountCents };
+  }
 
   // A stable key dedupes accidental double-clicks of the SAME attempt. But after
   // a genuinely failed refund, reusing it would make Stripe return the same
@@ -74,39 +127,14 @@ export async function issueDepositRefund(
     return { error: 'We couldn\'t process the refund. Try again or contact support.' };
   }
 
-  const initialStatus =
+  const initialStatus: RefundStatus =
     refund.status === 'succeeded'
       ? 'succeeded'
       : refund.status === 'failed' || refund.status === 'canceled'
       ? 'failed'
       : 'pending';
 
-  // Upsert on the unique stripe_refund_id so an idempotent retry doesn't
-  // create a duplicate row.
-  await admin
-    .from('payments')
-    .upsert(
-      {
-        booking_id: bookingId,
-        kind: 'refund',
-        amount_cents: refund.amount,
-        status: initialStatus,
-        stripe_refund_id: refund.id
-      },
-      { onConflict: 'stripe_refund_id' }
-    );
-
-  await recordAuditLog({
-    actorId,
-    action: 'booking.refunded',
-    entityType: 'booking',
-    entityId: bookingId,
-    metadata: {
-      amount_cents: refund.amount,
-      stripe_refund_id: refund.id,
-      status: initialStatus
-    }
-  });
+  await persistRefund(admin, bookingId, actorId, refund.id, refund.amount, initialStatus);
 
   if (initialStatus === 'failed') {
     return { error: 'Stripe rejected the refund. Try again or contact support.' };

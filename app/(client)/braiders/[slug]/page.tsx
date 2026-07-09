@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { WARM_BLUR, GALLERY_PHOTOS } from '@/lib/media';
+import { WARM_BLUR, galleryForBraider } from '@/lib/media';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
@@ -11,6 +11,11 @@ import { BraiderReviews } from '@/components/braider/reviews';
 import { JsonLd } from '@/components/shared/json-ld';
 import { formatDuration, formatMoney } from '@/lib/utils';
 
+// Intent: ISR this public profile every 60s. Note it is currently INERT — the
+// app resolves locale from a cookie in the root layout (i18n/request.ts reads
+// cookies()), which opts the whole tree into dynamic rendering, so this route is
+// served fresh per request regardless. Kept so ISR activates automatically if the
+// app ever moves to URL-based locales (which would make these pages static-eligible).
 export const revalidate = 60;
 
 export async function generateMetadata({
@@ -59,7 +64,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   if (error) throw error;
   if (!braider) notFound();
 
-  const services = (braider.services ?? []).filter((s: any) => s.is_active);
+  const services = (braider.services ?? []).filter((s) => s.is_active);
   // Bookable only when accepting AND Stripe can take charges for them.
   const open = braider.accepting_bookings && braider.charges_enabled;
 
@@ -73,7 +78,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
     ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
     : 0;
 
-  const prices = services.map((s: any) => s.price_cents);
+  const prices = services.map((s) => s.price_cents);
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://braidflow.app';
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -117,11 +122,11 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
+    <div className="mx-auto max-w-5xl px-6 py-10">
       <JsonLd data={jsonLd} />
-      <div className="grid gap-10 md:grid-cols-[1fr_340px]">
+      <div className="grid gap-8 md:grid-cols-[1fr_340px]">
         <div>
-          <div className="relative mb-7 aspect-[16/10] overflow-hidden rounded-xl2 shadow-lifted ring-1 ring-line">
+          <div className="relative mb-6 aspect-[16/10] overflow-hidden rounded-xl2 shadow-lifted ring-1 ring-line">
             {braider.hero_image_url ? (
               <>
                 <Image
@@ -204,7 +209,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
               {t('workHeading')}
             </h2>
             <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-              {GALLERY_PHOTOS.slice(0, 3).map((src, i) => (
+              {galleryForBraider(params.slug).slice(0, 3).map((src, i) => (
                 <div
                   key={i}
                   className="group relative aspect-square overflow-hidden rounded-xl ring-1 ring-line"
@@ -223,13 +228,13 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
             </div>
           </section>
 
-          <section className="mt-12">
+          <section className="mt-10">
             <h2 className="label mb-4 flex items-center gap-2 text-clay-text">
               <span className="h-1 w-1 rounded-full bg-clay" />
               {t('servicesHeading')}
             </h2>
             <ul className="divide-y divide-line border-y border-line">
-              {services.map((s: any) => (
+              {services.map((s) => (
                 <li
                   key={s.id}
                   className="group flex items-start justify-between gap-4 py-5 transition-colors"

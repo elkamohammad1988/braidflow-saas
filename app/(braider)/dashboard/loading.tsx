@@ -6,12 +6,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function Loading() {
   return (
     <div>
-      <div className="border-b border-line pb-7">
+      <div className="border-b border-line pb-6">
         <Skeleton className="h-3 w-20" />
         <Skeleton className="mt-2.5 h-9 w-52" />
         <Skeleton className="mt-2.5 h-4 w-64" />
       </div>
-      <div className="mt-8 space-y-3">
+      <div className="mt-6 space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="rounded-card border border-line bg-paper p-5 shadow-card">
             <Skeleton className="h-4 w-1/3" />

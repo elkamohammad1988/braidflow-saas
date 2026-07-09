@@ -19,7 +19,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="rounded-card border border-line bg-paper p-10 text-center shadow-soft">
+    <div className="rounded-card border border-line bg-paper p-6 text-center shadow-soft">
       <h1 className="font-display text-2xl text-ink">{t('error.title')}</h1>
       <p className="mt-2 text-sm text-ink-muted">{t('error.description')}</p>
       {error.digest && (

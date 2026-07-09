@@ -45,6 +45,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
             <Link
               key={l.href}
               href={l.href}
+              aria-current={active ? 'page' : undefined}
               className={cn(
                 'inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-all duration-200 ease-spring',
                 active
@@ -71,6 +72,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
             <li key={l.href}>
               <Link
                 href={l.href}
+                aria-current={active ? 'page' : undefined}
                 className={cn(
                   'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 ease-spring',
                   active

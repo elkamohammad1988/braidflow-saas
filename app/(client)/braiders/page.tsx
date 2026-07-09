@@ -70,8 +70,8 @@ export default async function BraidersIndex({
 
   const enriched = rows.map((b) => {
     const activePrices = (b.services ?? [])
-      .filter((s: any) => s.is_active)
-      .map((s: any) => s.price_cents);
+      .filter((s) => s.is_active)
+      .map((s) => s.price_cents);
     const agg = ratings.get(b.id);
     return {
       slug: b.slug,
@@ -108,14 +108,14 @@ export default async function BraidersIndex({
   const hasQuery = q.length > 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
+    <div className="mx-auto max-w-6xl px-6 py-10">
       <PageHeader
         eyebrow={t('eyebrow')}
         title={t('title')}
         description={t('description')}
       />
 
-      <div className="mt-7">
+      <div className="mt-6">
         <BraiderSearch defaultQuery={q} defaultSort={sort} />
       </div>
 

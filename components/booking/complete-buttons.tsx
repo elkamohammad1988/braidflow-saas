@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -21,6 +21,18 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
   const [confirming, setConfirming] = useState<Outcome | null>(null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  // Focus follows the interaction: into the confirm button on open, back to the
+  // trigger on dismiss — so keyboard users aren't dropped to <body>.
+  useEffect(() => {
+    const isConfirming = confirming !== null;
+    if (isConfirming && !wasConfirming.current) confirmRef.current?.focus();
+    else if (!isConfirming && wasConfirming.current) triggerRef.current?.focus();
+    wasConfirming.current = isConfirming;
+  }, [confirming]);
 
   function run(outcome: Outcome) {
     setError(null);
@@ -30,8 +42,8 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           ? await markBookingCompletedAction(bookingId)
           : await markBookingNoShowAction(bookingId);
       if (result && 'error' in result) {
+        // Stay in confirm mode so the announced error stays visible to retry.
         setError(result.error ?? t('genericError'));
-        setConfirming(null);
         return;
       }
       router.refresh();
@@ -47,6 +59,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
             {isComplete ? t('markCompletedConfirm') : t('markNoShowConfirm')}
           </span>
           <button
+            ref={confirmRef}
             type="button"
             onClick={() => run(confirming)}
             disabled={pending}
@@ -54,7 +67,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
               'inline-flex items-center font-medium disabled:opacity-50',
               isComplete
                 ? 'text-moss hover:text-moss/80'
-                : 'text-red-600 hover:text-red-700'
+                : 'text-red-700 hover:text-red-700'
             )}
           >
             {pending && <Spinner className="me-1.5 h-3 w-3" />}
@@ -70,7 +83,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           </button>
         </div>
         {error && (
-          <p role="alert" className="text-xs text-red-600">
+          <p role="alert" className="text-xs text-red-700">
             {error}
           </p>
         )}
@@ -82,6 +95,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
     <div className="flex flex-col items-end gap-1">
       <div className="inline-flex items-center gap-3 text-sm">
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setConfirming('completed')}
           className="font-medium text-ink-muted hover:text-moss"
@@ -92,12 +106,16 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
         <button
           type="button"
           onClick={() => setConfirming('no_show')}
-          className="font-medium text-ink-muted hover:text-red-600"
+          className="font-medium text-ink-muted hover:text-red-700"
         >
           {t('noShow')}
         </button>
       </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="text-xs text-red-700">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -8,13 +8,14 @@
     "viewSite": "View site",
     "language": "Language",
     "theme": "Theme",
+    "menu": "Menu",
     "copied": "Copied",
     "copy": "Copy",
     "skipToContent": "Skip to content",
     "demoBadge": {
       "label": "Demo Mode",
       "title": "You're exploring an interactive demo",
-      "description": "Every screen — bookings, clients, calendar and deposits — runs on realistic sample data, with no account or setup required. Feel free to click around.",
+      "description": "Every screen runs on realistic sample data — no account, no real payments or emails, and nothing to set up. Changes are for exploring and may reset. Click around freely.",
       "dismiss": "Dismiss demo badge"
     }
   },
@@ -22,7 +23,9 @@
     "findBraider": "Find a braider",
     "pricing": "Pricing",
     "forBraiders": "For braiders",
-    "imBraider": "I'm a braider"
+    "imBraider": "I'm a braider",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "theme": {
     "label": "Color theme",
@@ -115,7 +118,8 @@
           "name": "Kemi A.",
           "role": "Goddess locs · Houston"
         }
-      }
+      },
+      "disclaimer": "Illustrative scenarios drawn from the problems braiders describe — not verified customer reviews. BraidFlow is a newly launched product."
     },
     "comparison": {
       "label": "The honest version",
@@ -537,7 +541,7 @@
       },
       "testimonial": {
         "quote": "Setup took 15 minutes. The link in my bio finally does the work instead of me.",
-        "author": "Kemi A. · Goddess locs, Houston"
+        "author": "Illustrative scenario — BraidFlow is newly launched"
       }
     },
     "login": {
@@ -596,6 +600,10 @@
         "title": "Check your inbox",
         "body": "If an account exists for <email>{address}</email>, we've sent a link to reset your password. It expires in about an hour.",
         "retry": "Didn't get it? Check spam, or <retry>try again</retry>."
+      },
+      "demo": {
+        "title": "No reset needed in the demo",
+        "body": "This live demo accepts any email and password (8 characters or more), so there's no password to reset. Just head back and sign in."
       }
     },
     "reset": {
@@ -610,7 +618,16 @@
       "saving": "Saving…",
       "errors": {
         "mismatch": "Those passwords don't match."
+      },
+      "demo": {
+        "body": "This is a live demo — reset links aren't emailed and sign-in accepts any email and password. Head back to sign in to continue."
       }
+    },
+    "demo": {
+      "title": "Demo access",
+      "body": "Sign in with any email and password (8+ characters). No real account is created — you're exploring shared sample data.",
+      "busyStudio": "Busy studio: sign in as <code>amara@braidflow.app</code>",
+      "freshStudio": "Fresh studio: sign up as a braider to start from an empty workspace."
     }
   },
   "errors": {

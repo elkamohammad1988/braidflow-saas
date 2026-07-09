@@ -129,7 +129,7 @@ export default async function AppointmentsPage() {
     <div>
       <PageHeader title={t('appointments.title')} description={t('appointments.description')} />
 
-      <div className="mt-8">
+      <div className="mt-6">
         {!appointments || appointments.length === 0 ? (
           <EmptyState
             icon={CalendarPlus}

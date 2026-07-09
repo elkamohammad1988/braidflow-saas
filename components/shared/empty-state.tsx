@@ -9,7 +9,7 @@ type Props = {
 
 export function EmptyState({ title, description, action, icon: Icon }: Props) {
   return (
-    <div className="relative overflow-hidden rounded-xl2 border border-dashed border-line-strong bg-cream/40 px-6 py-16 text-center">
+    <div className="relative overflow-hidden rounded-xl2 border border-dashed border-line-strong bg-cream/40 px-6 py-12 text-center">
       {/* faint woven strands drifting behind the mark */}
       <svg
         aria-hidden

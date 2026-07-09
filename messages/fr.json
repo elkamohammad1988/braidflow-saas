@@ -8,13 +8,14 @@
     "viewSite": "Voir le site",
     "language": "Langue",
     "theme": "Thème",
+    "menu": "Menu",
     "copied": "Copié",
     "copy": "Copier",
     "skipToContent": "Aller au contenu",
     "demoBadge": {
       "label": "Mode démo",
       "title": "Vous explorez une démo interactive",
-      "description": "Chaque écran — réservations, clientes, calendrier et acomptes — fonctionne avec des données d’exemple réalistes, sans compte ni configuration. N’hésitez pas à cliquer partout.",
+      "description": "Chaque écran fonctionne avec des données d'exemple réalistes — sans compte, sans paiement ni e-mail réel, et sans configuration. Les modifications servent à explorer et peuvent être réinitialisées. Explorez librement.",
       "dismiss": "Masquer le badge de démo"
     }
   },
@@ -22,7 +23,9 @@
     "findBraider": "Trouver une tresseuse",
     "pricing": "Tarifs",
     "forBraiders": "Pour les tresseuses",
-    "imBraider": "Je suis tresseuse"
+    "imBraider": "Je suis tresseuse",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "theme": {
     "label": "Thème de couleur",
@@ -115,7 +118,8 @@
           "name": "Kemi A.",
           "role": "Goddess locs · Houston"
         }
-      }
+      },
+      "disclaimer": "Scénarios illustratifs inspirés des problèmes que décrivent les tresseuses — et non des avis clients vérifiés. BraidFlow est un produit récemment lancé."
     },
     "comparison": {
       "label": "La version honnête",
@@ -537,7 +541,7 @@
       },
       "testimonial": {
         "quote": "La configuration a pris 15 minutes. Le lien dans ma bio fait enfin le travail à ma place.",
-        "author": "Kemi A. · Goddess locs, Houston"
+        "author": "Exemple illustratif — BraidFlow vient d'être lancé"
       }
     },
     "login": {
@@ -596,6 +600,10 @@
         "title": "Vérifiez votre boîte de réception",
         "body": "Si un compte existe pour <email>{address}</email>, nous avons envoyé un lien pour réinitialiser votre mot de passe. Il expire dans environ une heure.",
         "retry": "Vous ne l’avez pas reçu ? Vérifiez vos spams, ou <retry>réessayez</retry>."
+      },
+      "demo": {
+        "title": "Aucune réinitialisation dans la démo",
+        "body": "Cette démo accepte n'importe quel e-mail et mot de passe (8 caractères ou plus) ; il n'y a donc aucun mot de passe à réinitialiser. Revenez simplement à la connexion."
       }
     },
     "reset": {
@@ -610,7 +618,16 @@
       "saving": "Enregistrement…",
       "errors": {
         "mismatch": "Ces mots de passe ne correspondent pas."
+      },
+      "demo": {
+        "body": "Ceci est une démo — les liens de réinitialisation ne sont pas envoyés et la connexion accepte n'importe quel e-mail et mot de passe. Revenez à la connexion pour continuer."
       }
+    },
+    "demo": {
+      "title": "Accès démo",
+      "body": "Connectez-vous avec n'importe quel e-mail et mot de passe (8 caractères ou plus). Aucun compte réel n'est créé — vous explorez des données d'exemple partagées.",
+      "busyStudio": "Studio actif : connectez-vous avec <code>amara@braidflow.app</code>",
+      "freshStudio": "Nouveau studio : inscrivez-vous comme tresseuse pour partir d'un espace vide."
     }
   },
   "errors": {

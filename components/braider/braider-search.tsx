@@ -46,7 +46,7 @@ export function BraiderSearch({
       <div className="relative flex-1">
         <Search
           aria-hidden
-          className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-clay"
+          className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-clay-text"
         />
         <input
           type="search"

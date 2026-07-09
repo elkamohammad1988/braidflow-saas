@@ -37,16 +37,32 @@ export const CLIENT_PERSONA: Persona = {
   full_name: 'Zoe Adams'
 };
 
-// Map a sign-in to a persona. Any credentials are accepted:
-//   - an explicit role (from the signup toggle) wins;
-//   - otherwise a known persona email maps to that persona;
-//   - anything else defaults to the client experience.
-export function resolveIdentity(email: string, roleHint?: Role): Persona {
-  if (roleHint === 'braider') return BRAIDER_PERSONA;
-  if (roleHint === 'client') return CLIENT_PERSONA;
+// A *fresh* braider studio — seeded with an empty braider row and nothing else
+// (no services, hours, bookings or Stripe). Braider sign-ups land here so a
+// visitor can experience the real first-run: the activation checklist, the
+// Connect-Stripe prompt and every empty state — the exact journey the populated
+// Amara persona can't show. Its data is seeded (deterministic) so the empty
+// studio is the same on every cold start.
+export const NEW_BRAIDER_PERSONA: Persona = {
+  id: '00000000-0000-4000-8000-000000000005',
+  email: 'newstudio@braidflow.app',
+  role: 'braider',
+  full_name: 'Your Studio'
+};
 
+export const PERSONAS: Persona[] = [BRAIDER_PERSONA, CLIENT_PERSONA, NEW_BRAIDER_PERSONA];
+
+// Map a sign-in to a persona. Any credentials are accepted:
+//   - a known persona email always maps to that persona (so the documented
+//     amara@braidflow.app login lands in the busy studio);
+//   - otherwise the signup role toggle decides: a braider gets a fresh, empty
+//     studio to onboard; a client gets the populated client experience.
+export function resolveIdentity(email: string, roleHint?: Role): Persona {
   const normalized = email.trim().toLowerCase();
-  if (normalized === BRAIDER_PERSONA.email) return BRAIDER_PERSONA;
-  if (normalized === CLIENT_PERSONA.email) return CLIENT_PERSONA;
+  const known = PERSONAS.find((p) => p.email === normalized);
+  if (known) return known;
+
+  if (roleHint === 'braider') return NEW_BRAIDER_PERSONA;
+  if (roleHint === 'client') return CLIENT_PERSONA;
   return CLIENT_PERSONA;
 }

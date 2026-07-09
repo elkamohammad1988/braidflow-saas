@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { refundDepositAction } from '@/lib/bookings/refund';
@@ -25,14 +25,25 @@ export function RefundDepositButton({
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  // Focus follows the interaction: into the confirm button on open, back to the
+  // trigger on dismiss — so keyboard users aren't dropped to <body>.
+  useEffect(() => {
+    if (confirming && !wasConfirming.current) confirmRef.current?.focus();
+    else if (!confirming && wasConfirming.current) triggerRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
 
   function run() {
     setError(null);
     startTransition(async () => {
       const result = await refundDepositAction(bookingId);
       if (result && 'error' in result) {
+        // Stay in confirm mode so the (announced) error stays visible to retry.
         setError(result.error);
-        setConfirming(false);
         return;
       }
       router.refresh();
@@ -42,6 +53,7 @@ export function RefundDepositButton({
   if (!confirming) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setConfirming(true)}
         className={cn(
@@ -61,6 +73,7 @@ export function RefundDepositButton({
           {t('refundConfirm', { amount: formatMoney(depositCents) })}
         </span>
         <button
+          ref={confirmRef}
           type="button"
           onClick={run}
           disabled={pending}
@@ -79,7 +92,7 @@ export function RefundDepositButton({
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-xs text-red-600">
+        <p role="alert" className="text-xs text-red-700">
           {error}
         </p>
       )}

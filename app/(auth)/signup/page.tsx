@@ -24,7 +24,7 @@ export default function SignupPage({ searchParams }: { searchParams: SearchParam
           ? t('signup.subtitle.braider')
           : t('signup.subtitle.client')}
       </p>
-      <div className="mt-8">
+      <div className="mt-6">
         <SignupForm defaultRole={role} />
       </div>
       <p className="mt-6 text-sm text-ink-muted">

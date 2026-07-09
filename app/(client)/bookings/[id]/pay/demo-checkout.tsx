@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { CreditCard, Lock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { Alert } from '@/components/ui/alert';
 import { formatMoney } from '@/lib/utils';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { confirmDemoDepositAction } from '@/lib/bookings/confirm-demo';
@@ -51,7 +52,7 @@ export function DemoCheckout({
       <div className="rounded-card border border-line bg-paper p-6 shadow-soft">
         {/* Test-mode banner */}
         <div className="flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/[0.08] px-3.5 py-2.5 text-sm text-clay-text">
-          <Sparkles className="h-4 w-4 shrink-0 text-clay" strokeWidth={2} />
+          <Sparkles className="h-4 w-4 shrink-0 text-clay-text" strokeWidth={2} />
           <span>
             <span className="font-semibold">{t('testMode')}</span> — {t('demoNote')}
           </span>
@@ -68,12 +69,9 @@ export function DemoCheckout({
       </div>
 
       {error && (
-        <p
-          role="alert"
-          className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
+        <Alert tone="danger" className="mt-4">
           {error}
-        </p>
+        </Alert>
       )}
 
       <Button type="button" size="lg" onClick={onPay} disabled={pending} className="mt-5 w-full">

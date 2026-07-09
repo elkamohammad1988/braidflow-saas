@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { stripe } from '@/lib/stripe/client';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { db, dbAdmin } from '@/lib/db/server';
 import { notifyCancellation } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
@@ -66,7 +67,7 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
   //   - UNPAID hold → cancel its PaymentIntent so a late payment can't land
   //     against a now-cancelled booking. If Stripe rejects the cancel the client
   //     just paid — re-apply the policy to that now-charged deposit.
-  const deposit = (booking.payments ?? []).find((p: any) => p.kind === 'deposit');
+  const deposit = (booking.payments ?? []).find((p) => p.kind === 'deposit');
   const cancelledBy = isClient ? 'client' : 'braider';
   const decision = decideDepositRefund({
     cancelledBy,
@@ -91,16 +92,24 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
   if (deposit?.status === 'succeeded') {
     await settleChargedDeposit(decision);
   } else if (deposit?.status === 'pending' && deposit.stripe_payment_intent_id) {
-    try {
-      await stripe.paymentIntents.cancel(deposit.stripe_payment_intent_id);
+    if (!isStripeConfigured()) {
+      // Demo mode: the hold's PaymentIntent is a synthesized `pi_demo_*` id with
+      // no real Stripe object to cancel. Just release the hold locally so the
+      // cancellation completes cleanly instead of throwing on the unconfigured
+      // Stripe client.
       await admin.from('payments').update({ status: 'failed' }).eq('id', deposit.id);
-    } catch (err) {
-      // Stripe rejects the cancel when the intent already succeeded — i.e. the
-      // client paid in the race window. The deposit is now charged, so apply the
-      // refund policy to it.
-      console.error('[cancel] PI cancel failed, settling charged deposit', bookingId, err);
-      await settleChargedDeposit(decision);
-      captureException(err, { bookingId, stage: 'cancel.settle' });
+    } else {
+      try {
+        await stripe.paymentIntents.cancel(deposit.stripe_payment_intent_id);
+        await admin.from('payments').update({ status: 'failed' }).eq('id', deposit.id);
+      } catch (err) {
+        // Stripe rejects the cancel when the intent already succeeded — i.e. the
+        // client paid in the race window. The deposit is now charged, so apply the
+        // refund policy to it.
+        console.error('[cancel] PI cancel failed, settling charged deposit', bookingId, err);
+        await settleChargedDeposit(decision);
+        captureException(err, { bookingId, stage: 'cancel.settle' });
+      }
     }
   }
   // -------------------------------------------------------------------------

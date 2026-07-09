@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import {
   Elements,
@@ -11,6 +12,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { Alert } from '@/components/ui/alert';
 import { formatMoney } from '@/lib/utils';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 
@@ -21,8 +23,10 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   : null;
 
 // Tuned to the atelier palette so Stripe's fields feel like part of the page,
-// not a cold white iframe dropped into warm paper.
-const appearance: Appearance = {
+// not a cold iframe dropped into warm paper. Two registers — light-paper and
+// warm-midnight — so the card form matches the page instead of glowing white on
+// the dark stage (the single most important conversion moment).
+const lightAppearance: Appearance = {
   theme: 'stripe',
   variables: {
     colorPrimary: '#c78a3a',
@@ -65,6 +69,49 @@ const appearance: Appearance = {
   }
 };
 
+const darkAppearance: Appearance = {
+  theme: 'night',
+  variables: {
+    colorPrimary: '#e0a33f',
+    colorText: '#f0e9de',
+    colorTextSecondary: '#b4a898',
+    colorBackground: '#211912',
+    colorDanger: '#f87171',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    fontSizeBase: '15px',
+    borderRadius: '12px',
+    spacingUnit: '4px'
+  },
+  rules: {
+    '.Input': {
+      border: '1px solid rgba(245,238,227,0.17)',
+      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.25)',
+      padding: '11px 14px'
+    },
+    '.Input:focus': {
+      border: '1px solid rgba(224,163,63,0.6)',
+      boxShadow: '0 0 0 4px rgba(224,163,63,0.18)'
+    },
+    '.Label': {
+      fontWeight: '500',
+      fontSize: '13px',
+      color: '#b4a898',
+      marginBottom: '6px'
+    },
+    '.Tab': {
+      border: '1px solid rgba(245,238,227,0.17)',
+      boxShadow: 'none'
+    },
+    '.Tab:hover': {
+      borderColor: 'rgba(224,163,63,0.5)'
+    },
+    '.Tab--selected': {
+      borderColor: '#e0a33f',
+      boxShadow: '0 0 0 1px #e0a33f'
+    }
+  }
+};
+
 type Props = {
   clientSecret: string;
   bookingId: string;
@@ -75,7 +122,17 @@ type Props = {
 };
 
 export function Checkout({ clientSecret, bookingId, depositCents, returnQuery = '' }: Props) {
-  const options = useMemo(() => ({ clientSecret, appearance }), [clientSecret]);
+  // `resolvedTheme` collapses "system" to light|dark; undefined until mounted, so
+  // default to light. react-stripe-js applies the new appearance via
+  // elements.update() when this memo changes, so the fields recolour in place.
+  const { resolvedTheme } = useTheme();
+  const options = useMemo(
+    () => ({
+      clientSecret,
+      appearance: resolvedTheme === 'dark' ? darkAppearance : lightAppearance
+    }),
+    [clientSecret, resolvedTheme]
+  );
 
   return (
     <Elements stripe={stripePromise} options={options}>
@@ -141,12 +198,9 @@ function CheckoutForm({
       </div>
 
       {error && (
-        <p
-          role="alert"
-          className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
+        <Alert tone="danger" className="mt-4">
           {error}
-        </p>
+        </Alert>
       )}
 
       <Button

@@ -30,7 +30,7 @@ export default function PricingPage() {
   const t = useTranslations('pricing');
   return (
     <>
-      <section className="relative mx-auto max-w-5xl px-6 pb-12 pt-24 text-center md:pb-16 md:pt-32">
+      <section className="relative mx-auto max-w-5xl px-6 pb-10 pt-20 text-center md:pb-12 md:pt-24">
         <Reveal>
           <span className="label inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-2 text-clay-text shadow-card">
             <span className="h-1 w-1 rounded-full bg-clay" />
@@ -40,7 +40,7 @@ export default function PricingPage() {
         <Reveal delay={90}>
           <h1 className="mx-auto mt-6 max-w-3xl font-display text-[3.25rem] font-medium leading-[1.02] tracking-[-0.035em] text-ink md:text-[5rem]">
             {t.rich('title', {
-              em: (chunks) => <span className="italic text-clay">{chunks}</span>
+              em: (chunks) => <span className="italic text-clay-text">{chunks}</span>
             })}
           </h1>
         </Reveal>
@@ -51,9 +51,9 @@ export default function PricingPage() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-2xl px-6 pb-24">
+      <section className="mx-auto max-w-2xl px-6 pb-20">
         <Reveal>
-          <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-8 text-ivory shadow-lifted md:p-11">
+          <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-6 text-ivory shadow-lifted md:p-8">
             <AtelierBackdrop className="absolute inset-0 opacity-70" />
             <div className="relative">
               <p className="absolute -top-3 start-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
@@ -70,7 +70,7 @@ export default function PricingPage() {
                 {t('card.body')}
               </p>
 
-              <Magnetic strength={0.35} className="mt-7 w-full">
+              <Magnetic strength={0.35} className="mt-6 w-full">
                 <Link href="/signup?role=braider" className="w-full">
                   <Button size="lg" className="w-full">
                     {t('startFree')}
@@ -79,8 +79,8 @@ export default function PricingPage() {
                 </Link>
               </Magnetic>
 
-              <div className="mt-9 border-t border-onyx-line pt-7">
-                <ul className="grid gap-3.5 text-sm sm:grid-cols-2">
+              <div className="mt-8 border-t border-onyx-line pt-6">
+                <ul className="grid gap-3 text-sm sm:grid-cols-2">
                   {(t.raw('included') as string[]).map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold-bright ring-1 ring-gold/25">
@@ -101,17 +101,17 @@ export default function PricingPage() {
       </section>
 
       <section className="border-y border-line bg-cream-deep/40">
-        <div className="mx-auto max-w-3xl px-6 py-24">
+        <div className="mx-auto max-w-3xl px-6 py-20">
           <Reveal>
-            <p className="label text-clay">{t('faqLabel')}</p>
-            <p className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
+            <p className="label text-clay-text">{t('faqLabel')}</p>
+            <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
               {t('faqTitle')}
-            </p>
+            </h2>
           </Reveal>
-          <dl className="mt-12 divide-y divide-line">
+          <dl className="mt-8 divide-y divide-line">
             {faqs.map((item, i) => (
               <Reveal as="div" key={item.key} delay={i * 60}>
-                <div className="py-6">
+                <div className="py-5">
                   <dt className="font-display text-lg font-medium text-ink">
                     {t(`faqs.${item.key}.q`)}
                   </dt>
@@ -127,13 +127,13 @@ export default function PricingPage() {
 
       <section className="relative overflow-hidden bg-night text-ivory">
         <AtelierBackdrop className="absolute inset-0 opacity-90" />
-        <div className="relative mx-auto max-w-4xl px-6 py-28 text-center md:py-36">
+        <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-24">
           <Reveal>
-            <p className="mx-auto max-w-2xl font-display text-[2.75rem] font-medium leading-[1.04] tracking-[-0.035em] md:text-[4rem]">
+            <h2 className="mx-auto max-w-2xl font-display text-[2.75rem] font-medium leading-[1.04] tracking-[-0.035em] md:text-[4rem]">
               {t.rich('cta.title', {
                 em: (chunks) => <span className="italic text-gilt">{chunks}</span>
               })}
-            </p>
+            </h2>
           </Reveal>
           <Reveal delay={110}>
             <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-ivory/65">
@@ -141,7 +141,7 @@ export default function PricingPage() {
             </p>
           </Reveal>
           <Reveal delay={200}>
-            <div className="mt-10 flex justify-center">
+            <div className="mt-8 flex justify-center">
               <Magnetic strength={0.5}>
                 <Link href="/signup?role=braider">
                   <Button size="lg">

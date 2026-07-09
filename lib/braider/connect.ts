@@ -4,6 +4,7 @@ import { dbAdmin } from '@/lib/db/server';
 import { requireBraider } from '@/lib/auth/session';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { createExpressAccount, createOnboardingLink } from '@/lib/stripe/connect';
 import { ensureBraiderRecord } from './ensure';
 import { syncConnectStatus } from './connect-sync';
@@ -30,6 +31,34 @@ export async function startStripeOnboarding(): Promise<{ url: string } | { error
   if ('error' in ensured) return { error: ensured.error };
 
   const admin = dbAdmin();
+
+  // Demo mode (no Stripe keys): there is no real Connect account to create or a
+  // hosted form to complete. Simulate a finished activation — mark the studio able
+  // to accept charges — and send the braider straight to the dashboard success
+  // state, so the activation checklist ticks off and the whole onboarding path
+  // works end-to-end without a Stripe account. No real account, no money.
+  if (!isStripeConfigured()) {
+    const { error } = await admin
+      .from('braiders')
+      .update({
+        stripe_account_id: `acct_demo_${user.id}`,
+        charges_enabled: true,
+        payouts_enabled: true,
+        stripe_onboarding_complete: true,
+        onboarding_completed_at: new Date().toISOString()
+      })
+      .eq('id', user.id);
+    if (error) return { error: 'Could not update your studio. Try again.' };
+    await recordAuditLog({
+      actorId: user.id,
+      action: 'connect.account_created',
+      entityType: 'braider',
+      entityId: user.id,
+      metadata: { demo: true }
+    });
+    return { url: '/dashboard?connect=done' };
+  }
+
   const { data: braider } = await admin
     .from('braiders')
     .select('stripe_account_id')
@@ -85,7 +114,7 @@ export async function refreshConnectStatus(): Promise<
   if (!braider?.stripe_account_id) return { error: 'Start Stripe setup first.' };
 
   try {
-    const status = await syncConnectStatus(user.id, braider.stripe_account_id);
+    const status = await syncConnectStatus(braider.stripe_account_id);
     return { ok: true, chargesEnabled: status.chargesEnabled };
   } catch (err) {
     captureException(err, { stage: 'connect.refresh', braiderId: user.id });

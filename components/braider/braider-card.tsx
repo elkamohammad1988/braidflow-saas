@@ -68,7 +68,7 @@ export function BraiderCard({
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/25 via-transparent to-transparent" />
           )}
           {startingFromCents != null && (
-            <span className="absolute right-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 font-mono text-[11px] font-semibold text-ink shadow-card ring-1 ring-gold/20 backdrop-blur">
+            <span className="absolute end-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 font-mono text-[11px] font-semibold text-ink shadow-card ring-1 ring-gold/20 backdrop-blur">
               {t('fromPrice', { price: formatMoney(startingFromCents) })}
             </span>
           )}

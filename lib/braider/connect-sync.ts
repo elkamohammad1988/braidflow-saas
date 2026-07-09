@@ -55,10 +55,7 @@ export async function applyConnectStatus(
  * refresh so the dashboard reflects reality immediately, independent of webhook
  * delivery timing.
  */
-export async function syncConnectStatus(
-  braiderId: string,
-  accountId: string
-): Promise<ConnectAccountStatus> {
+export async function syncConnectStatus(accountId: string): Promise<ConnectAccountStatus> {
   const status = await retrieveAccountStatus(accountId);
   await applyConnectStatus(dbAdmin(), accountId, status);
   return status;

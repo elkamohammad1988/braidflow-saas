@@ -27,7 +27,9 @@ export function ResetPasswordForm() {
       return;
     }
 
-    // Password is set locally; send the user back to sign in with it.
+    // This form only renders when an email provider is configured; a real
+    // deployment posts the new password to its reset endpoint here, then returns
+    // the user to sign in. (In the demo, this page shows an explanation instead.)
     router.push('/login');
     router.refresh();
   }
@@ -52,7 +54,7 @@ export function ResetPasswordForm() {
         required
       />
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-700">
           {error}
         </p>
       )}

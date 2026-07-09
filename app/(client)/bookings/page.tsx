@@ -52,7 +52,7 @@ export default async function MyBookings() {
   const reviewedBookingIds = new Set((myReviews ?? []).map((r) => r.booking_id));
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-6 py-10">
       <PageHeader
         title={t('title')}
         description={t('description')}
@@ -63,7 +63,7 @@ export default async function MyBookings() {
         }
       />
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-6 space-y-3">
         {(!bookings || bookings.length === 0) && (
           <EmptyState
             icon={CalendarHeart}

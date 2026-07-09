@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { ShieldCheck, CreditCard, CalendarCheck, Star } from 'lucide-react';
+import { ShieldCheck, CreditCard, CalendarCheck, Star, Sparkles } from 'lucide-react';
 import { Logo } from '@/components/shared/logo';
 
 const highlights = [
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-screen">
       {/* Brand panel — the night atelier */}
-      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-12 text-ivory lg:flex">
+      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-10 text-ivory lg:flex">
         <div className="absolute inset-0 bg-aurora opacity-90" aria-hidden />
         <div className="absolute inset-0 bg-grid-gold bg-radial-fade opacity-60" aria-hidden />
         <div className="relative">
@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               em: (chunks) => <span className="italic text-gilt">{chunks}</span>
             })}
           </p>
-          <ul className="mt-9 space-y-4">
+          <ul className="mt-8 space-y-3.5">
             {highlights.map((h) => (
               <li key={h.key} className="flex items-center gap-3.5 text-ivory/85">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 text-gold ring-1 ring-gold/20">
@@ -76,9 +76,37 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main
           id="main-content"
-          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 pb-16 lg:pb-6"
+          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 pb-12 lg:pb-6"
         >
           {children}
+
+          {/* Honest demo access note — no real accounts exist; any credentials
+              map to shared sample personas. Keeps the auth screens truthful. */}
+          <div className="mt-8 rounded-card border border-line bg-cream-deep/40 p-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-gold" strokeWidth={2} />
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
+                {t('demo.title')}
+              </p>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t('demo.body')}</p>
+            <ul className="mt-3 space-y-1.5 text-sm text-ink">
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-clay" />
+                <span>
+                  {t.rich('demo.busyStudio', {
+                    code: (chunks) => (
+                      <span className="font-mono text-[0.8rem] text-ink">{chunks}</span>
+                    )
+                  })}
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-moss" />
+                <span>{t('demo.freshStudio')}</span>
+              </li>
+            </ul>
+          </div>
         </main>
       </div>
     </div>

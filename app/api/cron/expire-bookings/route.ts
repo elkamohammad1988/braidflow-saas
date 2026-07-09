@@ -55,7 +55,7 @@ export async function GET(req: Request) {
   let expired = 0;
 
   for (const b of candidates ?? []) {
-    const deposit = (b.payments ?? []).find((p: any) => p.kind === 'deposit');
+    const deposit = (b.payments ?? []).find((p) => p.kind === 'deposit');
 
     // A succeeded deposit means the booking is (or is about to be) confirmed by
     // the webhook — never release it.

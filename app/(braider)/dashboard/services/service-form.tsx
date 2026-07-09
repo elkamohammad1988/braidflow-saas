@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Alert } from '@/components/ui/alert';
 import { Textarea, fieldSurface } from '@/components/ui/field';
 import { ChevronDown } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
@@ -159,14 +160,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         </span>
       </label>
 
-      {error && (
-        <p
-          role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
-          {error}
-        </p>
-      )}
+      {error && <Alert tone="danger">{error}</Alert>}
 
       <div className="flex gap-3">
         <Button type="submit" disabled={pending}>

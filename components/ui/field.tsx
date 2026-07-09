@@ -57,7 +57,7 @@ function FieldShell({
           role={error ? 'alert' : undefined}
           className={cn(
             'mt-1.5 block text-xs',
-            error ? 'text-red-600 dark:text-red-400' : 'text-ink-muted'
+            error ? 'text-red-700 dark:text-red-400' : 'text-ink-muted'
           )}
         >
           {error ?? hint}

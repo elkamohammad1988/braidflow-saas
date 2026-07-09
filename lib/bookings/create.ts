@@ -134,8 +134,8 @@ export async function createBookingAction(input: CreateBookingInput) {
     .single();
 
   // 23P01 = exclusion violation → slot already taken.
-  if (insertError) {
-    if (insertError.code === '23P01') {
+  if (insertError || !booking) {
+    if (insertError?.code === '23P01') {
       return { error: 'Someone just grabbed that slot. Pick another time.' };
     }
     return { error: 'Could not create that booking. Try again.' };

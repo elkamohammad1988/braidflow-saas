@@ -8,6 +8,7 @@ import { Check } from 'lucide-react';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { Alert } from '@/components/ui/alert';
 import { rescheduleBookingAction } from '@/lib/bookings/reschedule';
 import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 
@@ -75,8 +76,14 @@ export function RescheduleFlow({
 
   if (success && selectedSlot) {
     return (
-      <div className="motion-safe:animate-fade-in-up rounded-card border border-line bg-paper p-8 text-center shadow-soft">
-        <span className="motion-safe:animate-pop-in mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
+      <div
+        role="status"
+        className="motion-safe:animate-fade-in-up rounded-card border border-line bg-paper p-6 text-center shadow-soft"
+      >
+        <span
+          aria-hidden="true"
+          className="motion-safe:animate-pop-in mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15"
+        >
           <Check className="h-6 w-6" strokeWidth={2.2} />
         </span>
         <p className="font-display text-2xl text-ink">{t('moved')}</p>
@@ -90,7 +97,7 @@ export function RescheduleFlow({
 
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_320px]">
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div className="rounded-card border border-line bg-paper px-5 py-4 shadow-soft">
           <p className="text-xs uppercase tracking-wider text-ink-muted">{t('currentlyScheduled')}</p>
           <p className="mt-1 font-medium text-ink">{fmt(currentTime)}</p>
@@ -124,9 +131,9 @@ export function RescheduleFlow({
           )}
 
           {error && (
-            <p className="motion-safe:animate-fade-in-up mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <Alert tone="danger" className="motion-safe:animate-fade-in-up mt-4">
               {error}
-            </p>
+            </Alert>
           )}
 
           <Button

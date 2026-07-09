@@ -112,7 +112,7 @@ export default async function CalendarPage() {
                 <p
                   className={cn(
                     'text-[11px] font-semibold uppercase tracking-wider',
-                    isToday ? 'text-clay' : isPast ? 'text-ink-subtle' : 'text-ink-muted'
+                    isToday ? 'text-clay-text' : isPast ? 'text-ink-subtle' : 'text-ink-muted'
                   )}
                 >
                   {formatInZone(day, tz, 'EEE')}

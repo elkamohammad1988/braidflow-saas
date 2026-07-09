@@ -1,16 +1,20 @@
 'use server';
 
 import { rateLimit, clientIpKey } from '@/lib/rate-limit';
+import { isEmailConfigured } from '@/lib/email/config';
 
-// Always-generic shape: we never reveal whether an email maps to a real
-// account (prevents user enumeration). The only non-success case is a rate-limit
-// trip, which is independent of whether the address exists.
-export type ResetRequestResult = { ok: true } | { ok: false; error: string };
+// `delivery` tells the UI what actually happened so it never over-promises:
+//   - 'email' → an email provider is configured and a reset link would be sent
+//     (generic messaging, so the page can't be used to probe which addresses
+//     are registered);
+//   - 'demo'  → no email provider is wired up (the deployed demo). We say so
+//     plainly rather than faking a "check your inbox" screen.
+// The only failure case is a rate-limit trip, independent of whether the address
+// exists.
+export type ResetRequestResult =
+  | { ok: true; delivery: 'email' | 'demo' }
+  | { ok: false; error: string };
 
-// Request a password reset. This build ships without an email provider, so the
-// request is accepted and rate-limited but no message is sent — the UI shows the
-// same generic "check your inbox" confirmation either way. Wire up an email
-// service here to send a real reset link.
 export async function requestPasswordReset(emailRaw: string): Promise<ResetRequestResult> {
   const email = emailRaw.trim().toLowerCase();
 
@@ -23,5 +27,8 @@ export async function requestPasswordReset(emailRaw: string): Promise<ResetReque
     return { ok: false, error: 'Too many attempts. Please wait a few minutes and try again.' };
   }
 
-  return { ok: true };
+  // No email provider (the self-contained demo): be honest — nothing was sent.
+  // With Resend configured, a real signed reset link would be dispatched here.
+  if (!isEmailConfigured()) return { ok: true, delivery: 'demo' };
+  return { ok: true, delivery: 'email' };
 }

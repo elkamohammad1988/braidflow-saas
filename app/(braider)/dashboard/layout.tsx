@@ -37,7 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const userBlock = (
     <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-clay/15 text-sm font-semibold text-clay">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-clay/15 text-sm font-semibold text-clay-text">
         {initials(profile.full_name) || 'B'}
       </span>
       <div className="min-w-0">
@@ -56,7 +56,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Logo />
           </Link>
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-clay/15 text-sm font-semibold text-clay">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-clay/15 text-sm font-semibold text-clay-text">
               {initials(profile.full_name) || 'B'}
             </span>
             <ThemeToggle />
@@ -75,7 +75,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Logo />
           </Link>
 
-          <div className="mt-8 flex-1">
+          <div className="mt-6 flex-1">
             <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-subtle">
               {t('dashboardNav.workspace')}
             </p>
@@ -106,7 +106,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </aside>
 
         {/* Main */}
-        <main id="main-content" className="min-w-0 flex-1 px-5 py-8 md:px-10 md:py-12">
+        <main id="main-content" className="min-w-0 flex-1 px-5 py-6 md:px-10 md:py-10">
           <div className="mx-auto max-w-5xl motion-safe:animate-fade-in-up">
             {needsConnect && (
               <ConnectBanner onboardingComplete={connect?.stripe_onboarding_complete ?? false} />

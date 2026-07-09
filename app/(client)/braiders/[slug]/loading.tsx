@@ -2,15 +2,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Loading() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
-      <div className="grid gap-10 md:grid-cols-[1fr_340px]">
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="grid gap-8 md:grid-cols-[1fr_340px]">
         <div>
           <Skeleton className="aspect-[16/10] w-full rounded-xl2" />
-          <Skeleton className="mt-7 h-10 w-3/4" />
+          <Skeleton className="mt-6 h-10 w-3/4" />
           <Skeleton className="mt-3 h-4 w-1/2" />
           <Skeleton className="mt-6 h-4 w-full" />
           <Skeleton className="mt-2 h-4 w-5/6" />
-          <div className="mt-12 space-y-6 border-y border-line py-6">
+          <div className="mt-10 space-y-6 border-y border-line py-6">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-start justify-between gap-4">
                 <div className="flex-1">

@@ -15,8 +15,7 @@ export type RefundedProps = {
   amountCents: number;
 };
 
-export const refundedSubject = (p: RefundedProps) =>
-  `Your deposit refund is on the way`;
+export const refundedSubject = (_p: RefundedProps) => `Your deposit refund is on the way`;
 
 export function DepositRefundedEmail(p: RefundedProps) {
   return (

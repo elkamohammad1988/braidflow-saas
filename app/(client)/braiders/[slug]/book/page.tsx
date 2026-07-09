@@ -45,7 +45,7 @@ export default async function BookPage({ params }: { params: { slug: string } })
 
   if (!braider) notFound();
 
-  const services = (braider.services ?? []).filter((s: any) => s.is_active);
+  const services = (braider.services ?? []).filter((s) => s.is_active);
 
   // A braider is bookable only when they're accepting bookings AND Stripe can
   // take charges for them. Clients don't need to know which is missing — both
@@ -116,7 +116,7 @@ export default async function BookPage({ params }: { params: { slug: string } })
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8 md:py-10">
+    <div className="mx-auto max-w-3xl px-6 py-6 md:py-8">
       <Link
         href={`/braiders/${params.slug}`}
         className="inline-flex items-center gap-1 text-sm text-ink-muted transition-colors hover:text-ink"
@@ -132,7 +132,7 @@ export default async function BookPage({ params }: { params: { slug: string } })
         {t('chooseServiceTime', { hours: CANCELLATION_REFUND_WINDOW_HOURS })}
       </p>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <BookingFlow
           services={services}
           slotsByService={slotsByService}

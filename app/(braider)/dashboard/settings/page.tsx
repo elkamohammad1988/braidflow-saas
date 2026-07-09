@@ -34,7 +34,7 @@ export default async function SettingsPage() {
       <PageHeader title={t('settings.title')} description={t('settings.description')} />
 
       {bookingUrl && (
-        <Card className="mt-8">
+        <Card className="mt-6">
           <CardBody className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-wider text-ink-muted">{t('settings.bookingLinkLabel')}</p>

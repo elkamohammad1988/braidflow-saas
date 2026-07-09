@@ -15,12 +15,15 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-cream/70 backdrop-blur-xl backdrop-saturate-150">
-      <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="transition-opacity hover:opacity-80">
+      {/* Three tracks — logo | centered nav | controls — so the nav is truly
+          centered yet can never overlap the right cluster the way an absolutely
+          positioned nav did once the labels got long (e.g. French). */}
+      <div className="mx-auto grid h-[68px] max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-6">
+        <Link href="/" className="justify-self-start transition-opacity hover:opacity-80">
           <Logo />
         </Link>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 text-sm font-medium text-ink-muted md:flex">
+        <nav className="hidden items-center justify-self-center gap-0.5 text-sm font-medium text-ink-muted md:flex">
           {[
             { href: '/braiders', label: t('nav.findBraider') },
             { href: '/pricing', label: t('nav.pricing') },
@@ -29,7 +32,7 @@ export async function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              className="group relative rounded-full px-3.5 py-2 transition-colors hover:text-ink"
+              className="group relative whitespace-nowrap rounded-full px-2.5 py-2 transition-colors hover:text-ink"
             >
               <span
                 aria-hidden
@@ -40,9 +43,12 @@ export async function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-self-end gap-3">
           <LanguageSwitcher className="hidden md:inline-flex" />
-          <ThemeToggle className="hidden md:inline-flex" />
+          {/* Extra breathing room (logical, so it mirrors in RTL) sets the locale
+              selector clearly apart from the appearance controls — ~20px total,
+              never attached, whatever width "Français" needs. */}
+          <ThemeToggle className="hidden md:ms-2 md:inline-flex" />
           {session ? (
             <>
               <Link href={isBraider ? '/dashboard' : '/bookings'} className="hidden md:inline-flex">
@@ -56,7 +62,7 @@ export async function Navbar() {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-ink-muted transition-colors hover:text-ink md:block"
+                className="hidden whitespace-nowrap text-sm font-medium text-ink-muted transition-colors hover:text-ink md:block"
               >
                 {t('common.logIn')}
               </Link>

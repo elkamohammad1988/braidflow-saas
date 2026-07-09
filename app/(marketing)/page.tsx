@@ -20,6 +20,13 @@ import { CountUp } from '@/components/motion/count-up';
 import { BRAID_PHOTOS, STUDIO_PHOTOS, WARM_BLUR } from '@/lib/media';
 import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
 import { useTranslations } from 'next-intl';
+import type { Metadata } from 'next';
+
+// Title/description inherit the root defaults (this is the home page); set an
+// explicit self-canonical so `/` never competes with a query-string variant.
+export const metadata: Metadata = {
+  alternates: { canonical: '/' }
+};
 
 const stats = [
   { to: 100, key: 'deposit' },
@@ -67,7 +74,7 @@ export default function Home() {
         {/* seam fade into the ivory page below */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-cream" aria-hidden />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-16 px-6 pb-32 pt-20 md:grid-cols-[1.08fr_0.92fr] md:pb-40 md:pt-28">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-24 pt-20 md:grid-cols-[1.08fr_0.92fr] md:pb-32 md:pt-28">
           <div>
             <Reveal delay={0}>
               <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/[0.07] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold-bright backdrop-blur-sm">
@@ -90,13 +97,13 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={180}>
-              <p className="mt-7 max-w-lg text-lg leading-relaxed text-ivory/65">
+              <p className="mt-6 max-w-lg text-lg leading-relaxed text-ivory/65">
                 {t('subtitle')}
               </p>
             </Reveal>
 
             <Reveal delay={260}>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Magnetic strength={0.5}>
                   <Link href="/signup?role=braider">
                     <Button size="lg">
@@ -116,7 +123,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={340}>
-              <div className="mt-11 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
+              <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
                   <div key={p.key} className="flex items-center gap-2 text-sm text-ivory/75">
                     <p.icon className="h-4 w-4 text-gold" strokeWidth={1.9} />
@@ -139,7 +146,7 @@ export default function Home() {
           <Reveal className="relative overflow-hidden rounded-xl3 border border-line bg-paper shadow-lifted">
             <div className="grid divide-y divide-line sm:grid-cols-2 sm:divide-y-0 md:grid-cols-4 md:divide-x">
               {stats.map((s) => (
-                <div key={s.key} className="px-7 py-8">
+                <div key={s.key} className="px-6 py-7">
                   <p className="font-display text-5xl font-medium tracking-tight text-ink">
                     <CountUp to={s.to} suffix={t(`stats.suffix.${s.key}`)} />
                   </p>
@@ -154,8 +161,8 @@ export default function Home() {
       </section>
 
       {/* ───────────────────────── DEPOSIT VALUE PROP ───────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-        <div className="grid gap-14 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-20">
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-16">
           <div>
             <Reveal>
               <p className="label flex items-center gap-2 text-clay-text">
@@ -194,14 +201,14 @@ export default function Home() {
 
       {/* ───────────────────────── HOW IT WORKS ───────────────────────── */}
       <section className="border-y border-line bg-cream-deep/40">
-        <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <Reveal>
             <p className="label text-clay-text">{t('how.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
               {t('how.title')}
             </h2>
           </Reveal>
-          <ol className="mt-14 grid gap-6 md:grid-cols-3">
+          <ol className="mt-10 grid gap-6 md:grid-cols-3">
             {steps.map((step, i) => (
               <Reveal
                 as="li"
@@ -209,7 +216,7 @@ export default function Home() {
                 delay={i * 110}
                 className={i === 1 ? 'md:mt-10' : i === 2 ? 'md:mt-20' : ''}
               >
-                <div className="group relative h-full overflow-hidden rounded-card border border-line bg-paper p-7 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1.5 hover:shadow-lifted">
+                <div className="group relative h-full overflow-hidden rounded-card border border-line bg-paper p-6 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1.5 hover:shadow-lifted">
                   <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.14),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <div className="flex items-center justify-between">
                     <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-onyx-soft to-night text-gold ring-1 ring-gold/20">
@@ -263,17 +270,18 @@ export default function Home() {
       </section>
 
       {/* ───────────────────────── TESTIMONIALS ───────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
         <Reveal>
           <p className="label text-clay-text">{t('testimonials.label')}</p>
           <h2 className="mt-3 max-w-2xl font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
             {t('testimonials.title')}
           </h2>
+          <p className="mt-4 max-w-2xl text-sm text-ink-subtle">{t('testimonials.disclaimer')}</p>
         </Reveal>
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
           {testimonials.map((item, i) => (
             <Reveal as="figure" key={item.key} delay={i * 110} className={i === 1 ? 'md:-mt-6' : ''}>
-              <figure className="flex h-full flex-col justify-between rounded-card border border-line bg-paper p-7 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1 hover:shadow-lifted">
+              <figure className="flex h-full flex-col justify-between rounded-card border border-line bg-paper p-6 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1 hover:shadow-lifted">
                 <div>
                   <div className="flex gap-0.5 text-gold">
                     {Array.from({ length: 5 }).map((_, s) => (
@@ -284,7 +292,7 @@ export default function Home() {
                     &ldquo;{t(`testimonials.items.${item.key}.quote`)}&rdquo;
                   </blockquote>
                 </div>
-                <figcaption className="mt-7 flex items-center gap-3 border-t border-line pt-5">
+                <figcaption className="mt-6 flex items-center gap-3 border-t border-line pt-5">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-clay/25 to-plum/15 font-display text-base font-medium text-clay-deep">
                     {t(`testimonials.items.${item.key}.name`).charAt(0)}
                   </span>
@@ -305,7 +313,7 @@ export default function Home() {
 
       {/* ───────────────────────── COMPARISON ───────────────────────── */}
       <section className="border-y border-line bg-cream-deep/40">
-        <div className="mx-auto max-w-4xl px-6 py-24">
+        <div className="mx-auto max-w-4xl px-6 py-20">
           <Reveal>
             <p className="label text-clay-text">{t('comparison.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-5xl">
@@ -317,7 +325,7 @@ export default function Home() {
           </Reveal>
 
           <Reveal delay={120}>
-            <div className="mt-12 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
+            <div className="mt-10 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
               <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50">
                 <div>{t('comparison.feature')}</div>
                 <div className="w-24 text-center text-gold">BraidFlow</div>
@@ -357,8 +365,8 @@ export default function Home() {
       </section>
 
       {/* ───────────────────────── FAQ ───────────────────────── */}
-      <section className="mx-auto max-w-5xl px-6 py-24 md:py-28">
-        <div className="grid gap-12 md:grid-cols-[0.8fr_1.2fr]">
+      <section className="mx-auto max-w-5xl px-6 py-20 md:py-24">
+        <div className="grid gap-10 md:grid-cols-[0.8fr_1.2fr]">
           <Reveal>
             <p className="label text-clay-text">{t('faq.label')}</p>
             <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.03em] text-ink md:text-[2.75rem]">
@@ -380,7 +388,7 @@ export default function Home() {
           <dl className="divide-y divide-line">
             {faqs.map((item, i) => (
               <Reveal as="div" key={item.key} delay={i * 70}>
-                <div className="py-6">
+                <div className="py-5">
                   <dt className="font-display text-lg font-medium text-ink">
                     {t(`faq.items.${item.key}.q`)}
                   </dt>
@@ -398,7 +406,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-night text-ivory">
         <AtelierBackdrop className="absolute inset-0 opacity-90" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream to-transparent" aria-hidden />
-        <div className="relative mx-auto max-w-4xl px-6 py-28 text-center md:py-36">
+        <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
           <Reveal>
             <p className="label mx-auto flex w-fit items-center gap-2 text-gold-bright">
               <span className="h-1 w-1 rounded-full bg-gold-bright" />
@@ -419,7 +427,7 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={250}>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Magnetic strength={0.5}>
                 <Link href="/signup?role=braider">
                   <Button size="lg">

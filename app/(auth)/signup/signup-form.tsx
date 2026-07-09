@@ -75,7 +75,7 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
       />
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-700">
           {error}
         </p>
       )}

@@ -3,19 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { MailCheck } from 'lucide-react';
+import { MailCheck, KeyRound } from 'lucide-react';
 import { requestPasswordReset } from '@/lib/auth/password-reset';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
+type Sent = { delivery: 'email' | 'demo'; email: string };
 
 export function ForgotPasswordForm() {
   const t = useTranslations('auth');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Set once the request succeeds — flips to a generic "check your inbox"
-  // screen. We show this whether or not the email maps to an account, so the
-  // page can never be used to probe which addresses are registered.
-  const [sentTo, setSentTo] = useState<string | null>(null);
+  // Set once the request succeeds. `delivery` decides which screen shows: a
+  // generic "check your inbox" when an email provider is configured, or an
+  // honest "reset isn't part of the demo" note otherwise — never a fake inbox.
+  const [sent, setSent] = useState<Sent | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,11 +31,31 @@ export function ForgotPasswordForm() {
       setPending(false);
       return;
     }
-    setSentTo(email);
+    setSent({ delivery: res.delivery, email });
     setPending(false);
   }
 
-  if (sentTo) {
+  if (sent?.delivery === 'demo') {
+    return (
+      <div className="motion-safe:animate-fade-in-up space-y-4">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-clay/10 text-clay-text">
+          <KeyRound className="h-6 w-6" strokeWidth={1.9} />
+        </span>
+        <div>
+          <h2 className="font-display text-xl text-ink">{t('forgot.demo.title')}</h2>
+          <p className="mt-1 text-sm text-ink-muted">{t('forgot.demo.body')}</p>
+        </div>
+        <Link
+          href="/login"
+          className="inline-flex text-sm font-medium text-ink hover:underline underline-offset-4"
+        >
+          {t('forgot.backToSignIn')}
+        </Link>
+      </div>
+    );
+  }
+
+  if (sent) {
     return (
       <div className="motion-safe:animate-fade-in-up space-y-4">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-moss/10 text-moss">
@@ -43,7 +65,7 @@ export function ForgotPasswordForm() {
           <h2 className="font-display text-xl text-ink">{t('forgot.sent.title')}</h2>
           <p className="mt-1 text-sm text-ink-muted">
             {t.rich('forgot.sent.body', {
-              address: sentTo,
+              address: sent.email,
               email: (chunks) => <span className="font-medium text-ink">{chunks}</span>
             })}
           </p>
@@ -54,7 +76,7 @@ export function ForgotPasswordForm() {
               <button
                 type="button"
                 onClick={() => {
-                  setSentTo(null);
+                  setSent(null);
                   setError(null);
                 }}
                 className="font-medium text-ink hover:underline underline-offset-4"
@@ -77,7 +99,7 @@ export function ForgotPasswordForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <Input name="email" type="email" label={t('forgot.form.email')} autoComplete="email" required />
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-700">
           {error}
         </p>
       )}

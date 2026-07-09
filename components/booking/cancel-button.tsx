@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cancelBookingAction } from '@/lib/bookings/cancel';
@@ -21,14 +21,26 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  // Keyboard focus follows the interaction: into the destructive "Yes" button
+  // when the confirm row opens, back to the trigger when it's dismissed —
+  // otherwise focus silently falls to <body>.
+  useEffect(() => {
+    if (confirming && !wasConfirming.current) confirmRef.current?.focus();
+    else if (!confirming && wasConfirming.current) triggerRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
 
   function run() {
     setError(null);
     startTransition(async () => {
       const result = await cancelBookingAction(bookingId, token);
       if (result && 'error' in result) {
+        // Stay in confirm mode so the (announced) error stays visible to retry.
         setError(result.error ?? t('genericError'));
-        setConfirming(false);
         return;
       }
       router.refresh();
@@ -38,10 +50,11 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
   if (!confirming) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setConfirming(true)}
         className={cn(
-          'text-sm font-medium text-ink-muted hover:text-red-600',
+          'text-sm font-medium text-ink-muted hover:text-red-700',
           className
         )}
       >
@@ -55,10 +68,11 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
       <div className="inline-flex items-center gap-3 text-sm">
         <span className="text-ink-muted">{t('cancelConfirm')}</span>
         <button
+          ref={confirmRef}
           type="button"
           onClick={run}
           disabled={pending}
-          className="inline-flex items-center font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+          className="inline-flex items-center font-medium text-red-700 hover:text-red-700 disabled:opacity-50"
         >
           {pending && <Spinner className="me-1.5 h-3 w-3" />}
           {t('yesCancel')}
@@ -73,7 +87,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-xs text-red-600">
+        <p role="alert" className="text-xs text-red-700">
           {error}
         </p>
       )}

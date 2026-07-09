@@ -171,7 +171,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
       </label>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-red-600">
+        <p role="alert" className="mt-3 text-sm text-red-700">
           {error}
         </p>
       )}

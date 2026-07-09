@@ -39,13 +39,13 @@ export default async function AvailabilityPage() {
         description={t('availability.description')}
       />
 
-      <Card className="mt-8">
+      <Card className="mt-6">
         <CardBody>
           <WeeklyEditor rules={rules ?? []} />
         </CardBody>
       </Card>
 
-      <div className="mt-10">
+      <div className="mt-8">
         <OverridesEditor overrides={overrides ?? []} timeZone={timeZone} />
       </div>
     </div>

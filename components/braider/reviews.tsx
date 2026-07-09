@@ -35,7 +35,7 @@ export async function BraiderReviews({
   const all = reviews ?? [];
 
   return (
-    <section id="reviews" className="mt-10 scroll-mt-6">
+    <section id="reviews" className="mt-8 scroll-mt-6">
       <div className="flex items-baseline justify-between">
         <h2 className="font-display text-2xl text-ink">{t('reviewsHeading')}</h2>
         <p className="text-sm text-ink-muted">

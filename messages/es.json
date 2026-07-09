@@ -7,13 +7,25 @@
     "myBookings": "Mis reservas",
     "viewSite": "Ver sitio",
     "language": "Idioma",
-    "theme": "Tema"
+    "theme": "Tema",
+    "menu": "Menú",
+    "copied": "Copiado",
+    "copy": "Copiar",
+    "skipToContent": "Saltar al contenido",
+    "demoBadge": {
+      "label": "Modo demo",
+      "title": "Estás explorando una demo interactiva",
+      "description": "Cada pantalla funciona con datos de ejemplo realistas: sin cuenta, sin pagos ni correos reales y sin nada que configurar. Los cambios son para explorar y pueden restablecerse. Explora con libertad.",
+      "dismiss": "Cerrar aviso de demo"
+    }
   },
   "nav": {
     "findBraider": "Buscar trenzadora",
     "pricing": "Precios",
     "forBraiders": "Para trenzadoras",
-    "imBraider": "Soy trenzadora"
+    "imBraider": "Soy trenzadora",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "theme": {
     "label": "Tema de color",
@@ -43,6 +55,913 @@
       "noShow": "Protección contra ausencias",
       "mobile": "Reservas desde el móvil",
       "free": "Empieza gratis"
+    },
+    "stats": {
+      "suffix": {
+        "deposit": "%",
+        "commission": "%",
+        "setup": " min",
+        "booking": "s"
+      },
+      "label": {
+        "deposit": "de cada depósito es tuyo",
+        "commission": "de comisión sobre tus servicios",
+        "setup": "para configurar tu página",
+        "booking": "para que una clienta reserve desde el móvil"
+      }
+    },
+    "deposit": {
+      "label": "Protección contra ausencias",
+      "title": "Los depósitos llegan antes que la cita.",
+      "body": "Las clientas pagan un depósito para confirmar — retenido por Stripe, reembolsado si cancelas, tuyo si no aparecen. Se acabaron las ausencias que te cuestan una silla.",
+      "props": {
+        "setup": "Configura tus servicios, duraciones e importes de depósito una sola vez.",
+        "blocks": "Bloquea los días que no estás — vacaciones, eventos de tus hijos, lo que traiga la semana.",
+        "selfBook": "Las clientas reservan solas el turno adecuado. Lo ves en tu calendario al instante.",
+        "balance": "El resto se cobra en persona — igual que lo haces hoy."
+      }
+    },
+    "how": {
+      "label": "Todo el proceso",
+      "title": "Tres pasos. Luego funciona solo.",
+      "steps": {
+        "build": {
+          "title": "Crea tu página",
+          "desc": "Añade tus servicios, precios y los días que atiendes. Toma unos diez minutos."
+        },
+        "share": {
+          "title": "Comparte el enlace",
+          "desc": "Ponlo en tu bio. Las nuevas clientas reservan solas — a cualquier hora, sin ida y vuelta."
+        },
+        "show": {
+          "title": "Preséntate y trenza",
+          "desc": "El depósito ya está pagado. Recibes un recordatorio esa mañana. La semana se organiza sola."
+        }
+      }
+    },
+    "testimonials": {
+      "label": "En sus sillas",
+      "title": "Trenzadoras que organizan toda su semana con esto.",
+      "items": {
+        "aisha": {
+          "quote": "Perdía dos cabezas por semana por ausencias. Los depósitos lo frenaron el primer mes. Por fin siento que mi calendario es mío.",
+          "name": "Aisha O.",
+          "role": "Box braids · Atlanta"
+        },
+        "nia": {
+          "quote": "Square se hizo para cafeterías, no para citas de 6 horas. BraidFlow entiende el trabajo — depósitos, duraciones, bloqueos de días.",
+          "name": "Nia M.",
+          "role": "Knotless · Brooklyn"
+        },
+        "kemi": {
+          "quote": "La configuración tomó 15 minutos. El enlace en mi bio por fin hace el trabajo en vez de que yo escriba la misma respuesta 40 veces por semana.",
+          "name": "Kemi A.",
+          "role": "Goddess locs · Houston"
+        }
+      },
+      "disclaimer": "Escenarios ilustrativos basados en los problemas que describen las trenzadoras, no reseñas de clientes verificadas. BraidFlow es un producto de reciente lanzamiento."
+    },
+    "comparison": {
+      "label": "La versión honesta",
+      "title": "¿Por qué no usar Square o Acuity?",
+      "body": "Puedes. Muchas trenzadoras lo hacen, y nos siguen escribiendo por las mismas carencias. Esto es lo que cambia cuando la herramienta se creó para el trabajo que de verdad haces.",
+      "feature": "Función",
+      "genericTools": "Herramientas genéricas",
+      "included": "Incluido",
+      "notIncluded": "No incluido",
+      "features": {
+        "longAppts": "Pensado para citas de 4 a 8 horas",
+        "deposits": "Depósitos antes de confirmar la reserva",
+        "dayBlocks": "Bloqueos de días para vacaciones y vida",
+        "perService": "Importes de depósito por servicio",
+        "noCut": "Sin comisión sobre tus servicios",
+        "quickSetup": "Configúralo en 15 minutos"
+      },
+      "themValues": {
+        "addon": "Complemento / plan de pago",
+        "limited": "Limitado",
+        "someCut": "Algunas cobran 1–3%"
+      }
+    },
+    "faq": {
+      "label": "Preguntas",
+      "title": "Preguntas frecuentes, respuestas reales.",
+      "stillUnsure": "¿Aún con dudas? <a>Escríbenos</a> — una persona real lee todo.",
+      "items": {
+        "different": {
+          "q": "¿En qué se diferencia de Square o Acuity?",
+          "a": "Esos se crearon para turnos de 30 minutos de cafetería. BraidFlow se creó para citas de 4 a 8 horas donde una ausencia sí duele. Los depósitos son lo normal, no un extra. Las duraciones de los servicios y los bloqueos de días funcionan como las trenzadoras planifican de verdad su semana."
+        },
+        "account": {
+          "q": "¿Mis clientas necesitan una cuenta para reservar?",
+          "a": "No. Tocan tu enlace, eligen un servicio, eligen un turno y pagan el depósito. Listo. Todo el proceso toma unos 90 segundos en el móvil."
+        },
+        "cancel": {
+          "q": "¿Qué pasa con el depósito si cancelo?",
+          "a": "Se reembolsa automáticamente a la tarjeta de la clienta. Si cancela dentro de tu margen de cortesía (tú lo defines), lo recupera. Después de eso, es tuyo."
+        },
+        "technical": {
+          "q": "No soy nada técnica. ¿De verdad puedo configurarlo?",
+          "a": "Sí. Si puedes escribir tu nombre, tus precios y los días que trabajas, ya está. La mayoría de las trenzadoras están en marcha en menos de 15 minutos."
+        }
+      }
+    },
+    "finalCta": {
+      "badge": "Gratis mientras estamos en beta",
+      "title": "Empieza gratis.<br></br>Conserva <em>lo que ganas.</em>",
+      "body": "Te quedas con el 100% de cada depósito. Configura tu página en quince minutos — sin tarjeta para empezar.",
+      "cta": "Configura tu página",
+      "seePricing": "Ver precios"
+    },
+    "preview": {
+      "name": "Trenzas de Nia",
+      "location": "Knotless · Brooklyn, NY",
+      "status": "Reservando",
+      "service": "Trenzas knotless — medianas",
+      "duration": "5 horas",
+      "deposit": "40 $ de depósito",
+      "date": "Sábado, 14 jun",
+      "slots": [
+        "9:00",
+        "11:30",
+        "14:00"
+      ],
+      "payLabel": "Paga el depósito para confirmar",
+      "payButton": "Pagar y reservar",
+      "secured": "Depósito asegurado"
+    }
+  },
+  "legal": {
+    "shell": {
+      "label": "Legal",
+      "lastUpdated": "Última actualización: {updated}"
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "updatedDate": "13 de junio de 2026",
+      "intro": "BraidFlow («BraidFlow», «nosotros») es una plataforma de reservas que conecta a clientas con trenzadoras y estilistas de peinados protectores. Esta política explica qué información recopilamos, por qué la recopilamos y las opciones que tienes. Se aplica a nuestro sitio web y servicios.",
+      "collect": {
+        "title": "Información que recopilamos",
+        "account": "<s>Información de la cuenta.</s> Al registrarte recopilamos tu nombre, tu correo electrónico y si te unes como clienta o como trenzadora, además de la contraseña que estableces (almacenada solo como un hash con sal por nuestro proveedor de autenticación).",
+        "profile": "<s>Perfil y datos del negocio.</s> Las trenzadoras aportan información como su nombre público, ubicación, servicios, precios y disponibilidad para que las clientas puedan encontrarlas y reservar.",
+        "booking": "<s>Información de la reserva.</s> Cuando se hace una reserva recopilamos el servicio, la fecha y la hora, cualquier nota que añadas y las partes implicadas.",
+        "payment": "<s>Información de pago.</s> Los depósitos los procesa Stripe. El número completo de tu tarjeta se envía directamente a Stripe y nunca se almacena en nuestros servidores. Solo conservamos metadatos de pago no sensibles (como el importe, el estado y los identificadores de Stripe) necesarios para hacer seguimiento de reservas y reembolsos.",
+        "technical": "<s>Datos técnicos.</s> Como la mayoría de los servicios, nosotros y nuestros proveedores recibimos automáticamente información técnica básica (como la dirección IP y el tipo de navegador) para mantener el servicio seguro, funcional y libre de abuso."
+      },
+      "use": {
+        "title": "Cómo usamos la información",
+        "item1": "Crear y gestionar tu cuenta y autenticarte.",
+        "item2": "Permitir el descubrimiento, las reservas, los depósitos, los cambios de fecha, las cancelaciones y los reembolsos.",
+        "item3": "Enviar correos transaccionales — confirmaciones, recordatorios y avisos de la cuenta.",
+        "item4": "Prevenir el fraude y el abuso, hacer cumplir nuestros Términos y mantener la plataforma segura.",
+        "item5": "Cumplir con las obligaciones legales y resolver disputas.",
+        "note": "No vendemos tu información personal y no la usamos para publicidad de terceros."
+      },
+      "share": {
+        "title": "Cómo compartimos la información",
+        "lead": "Compartimos información solo cuando es necesario para prestar el servicio:",
+        "parties": "<s>Entre las partes de una reserva.</s> Una trenzadora puede ver el nombre, los datos de contacto y los detalles de la reserva de las clientas que reservan con ella, y viceversa, para que la cita pueda realizarse.",
+        "providers": "<s>Proveedores de servicios.</s> Nos apoyamos en Stripe (pagos), Resend (correo transaccional) y Vercel (alojamiento de la aplicación). Procesan datos en nuestro nombre bajo sus propios términos y compromisos de seguridad.",
+        "legal": "<s>Aspectos legales y de seguridad.</s> Podemos divulgar información si lo exige la ley, o para proteger los derechos, la propiedad o la seguridad de nuestros usuarios o del público."
+      },
+      "payments": {
+        "title": "Pagos",
+        "body": "Los pagos con tarjeta los gestiona Stripe, un procesador de pagos certificado PCI-DSS de nivel 1. Cuando pagas un depósito, los datos de tu tarjeta se transmiten directamente a Stripe a través de una conexión cifrada. BraidFlow no ve ni almacena el número completo de tu tarjeta, el CVC ni la fecha de caducidad. Consulta la propia política de privacidad de Stripe para más detalles sobre cómo procesa los datos de pago."
+      },
+      "cookies": {
+        "title": "Cookies y sesiones",
+        "body": "Usamos cookies estrictamente necesarias para iniciar tu sesión y mantenerla de forma segura. No usamos cookies de publicidad ni de seguimiento entre sitios. Si en el futuro añadimos analíticas opcionales, actualizaremos esta política."
+      },
+      "retention": {
+        "title": "Conservación de los datos",
+        "body": "Conservamos tu información mientras tu cuenta esté activa o mientras sea necesario para prestar el servicio. Los registros de reservas y pagos pueden conservarse más tiempo cuando lo exijan cuestiones fiscales, contables, de resolución de disputas o de cumplimiento legal. Puedes pedirnos que eliminemos tu cuenta, tras lo cual borramos o anonimizamos los datos personales que no estemos obligados a conservar."
+      },
+      "security": {
+        "title": "Seguridad",
+        "body": "Los datos se cifran en tránsito. El acceso se controla mediante comprobaciones de autorización en el servidor para que, por ejemplo, las clientas solo vean sus propias reservas y las trenzadoras solo vean los datos de su propio negocio. Las operaciones privilegiadas se ejecutan en el servidor con los mínimos privilegios. Ningún sistema es perfectamente seguro, pero trabajamos para proteger tu información con salvaguardas estándar del sector."
+      },
+      "rights": {
+        "title": "Tus derechos",
+        "body": "Según donde vivas, puedes tener derecho a acceder, corregir, exportar o eliminar tu información personal, y a oponerte o restringir ciertos tratamientos. Puedes actualizar la mayoría de los datos desde tu cuenta, o escribirnos a <a>privacy@braidflow.app</a> y responderemos en un plazo razonable."
+      },
+      "children": {
+        "title": "Menores",
+        "body": "BraidFlow no está dirigido a menores de 16 años y no recopilamos conscientemente información personal de ellos. Si crees que un menor nos ha facilitado información, contáctanos y la eliminaremos."
+      },
+      "changes": {
+        "title": "Cambios en esta política",
+        "body": "Podemos actualizar esta política de vez en cuando. Cuando lo hagamos, revisaremos la fecha de «Última actualización» de arriba y, para cambios importantes, daremos un aviso más destacado."
+      },
+      "contact": {
+        "title": "Contacto",
+        "body": "¿Preguntas sobre esta política? Escribe a <a>privacy@braidflow.app</a>. Consulta también nuestros <terms>Términos del servicio</terms>."
+      }
+    },
+    "terms": {
+      "title": "Términos del servicio",
+      "updatedDate": "13 de junio de 2026",
+      "intro": "Estos Términos del servicio («Términos») rigen tu acceso y uso de BraidFlow. Al crear una cuenta o usar el servicio, aceptas estos Términos. Si no estás de acuerdo, no uses BraidFlow.",
+      "s1": {
+        "title": "1. Quiénes somos y qué hace BraidFlow",
+        "body": "BraidFlow es una plataforma de reservas que permite a las clientas descubrir trenzadoras, reservar citas y pagar un depósito para confirmar una hora. Las trenzadoras son proveedoras de servicios independientes — no empleadas, agentes ni socias de BraidFlow. Proporcionamos el software que facilita las reservas y los pagos de depósitos; no somos parte del acuerdo de servicio entre una clienta y una trenzadora, y no prestamos servicios de trenzado nosotros mismos."
+      },
+      "s2": {
+        "title": "2. Requisitos y cuentas",
+        "body": "Debes tener al menos 18 años (o la mayoría de edad donde vivas) y capacidad para celebrar un contrato vinculante para usar BraidFlow. Eres responsable de la exactitud de la información que facilitas, de mantener tu contraseña confidencial y de toda la actividad en tu cuenta. Avísanos de inmediato de cualquier uso no autorizado."
+      },
+      "s3": {
+        "title": "3. Reservas y depósitos",
+        "body": "Para confirmar una reserva, la clienta paga un depósito a través de la plataforma. El turno se retiene solo una vez pagado el depósito; hasta entonces queda disponible para otras. El depósito se aplica al precio total del servicio, y el saldo restante se paga directamente a la trenzadora, normalmente en persona en la cita. Los precios, los importes de los depósitos, las duraciones y la disponibilidad los establece cada trenzadora."
+      },
+      "s4": {
+        "title": "4. Pagos",
+        "body": "Los depósitos los procesa Stripe. Al pagar, autorizas el cargo y aceptas los términos de Stripe. Declaras que estás autorizada a usar el método de pago que facilitas. BraidFlow no es responsable de las comisiones que puedan aplicar tu banco o el emisor de tu tarjeta."
+      },
+      "s5": {
+        "title": "5. Cancelaciones, cambios de fecha y reembolsos",
+        "body": "Una reserva puede cambiarse de fecha o cancelarse a través de la plataforma según la política de la trenzadora. Cuando una reserva se cambia de fecha, el depósito existente se traslada a la nueva hora. Una trenzadora puede emitir un reembolso del depósito; si un depósito es reembolsable, y en qué plazo, lo determina la política de cancelación declarada de la trenzadora y la ley aplicable. BraidFlow facilita los reembolsos solicitados a través de la plataforma, pero no garantiza por sí mismo ningún reembolso."
+      },
+      "s6": {
+        "title": "6. Ausencias y llegadas tardías",
+        "body": "Los depósitos existen para proteger a las trenzadoras de las ausencias, que cuestan un día de trabajo. Si una clienta no asiste a una cita confirmada, la trenzadora puede retener el depósito conforme a su política. Las clientas deben llegar puntuales; las trenzadoras deben respetar las reservas confirmadas o avisar con antelación razonable si no pueden."
+      },
+      "s7": {
+        "title": "7. Responsabilidades de la trenzadora",
+        "item1": "Proporcionar listados, precios, disponibilidad y descripciones de servicios exactos.",
+        "item2": "Respetar las reservas confirmadas y comunicar con prontitud cualquier cambio.",
+        "item3": "Contar con las licencias, registros y seguros exigidos en tu jurisdicción, y cumplir con todas las obligaciones sanitarias, de seguridad y fiscales aplicables.",
+        "item4": "Prestar los servicios de forma profesional y tal como se describen."
+      },
+      "s8": {
+        "title": "8. Uso aceptable",
+        "lead": "Aceptas no:",
+        "item1": "Usar la plataforma para cualquier fin ilícito, fraudulento o dañino.",
+        "item2": "Suplantar a otras personas o falsear tu identidad o afiliación.",
+        "item3": "Intentar acceder a cuentas o datos que no son tuyos, ni sondear o interrumpir el servicio.",
+        "item4": "Extraer datos, sobrecargar o interferir con la plataforma o sus funciones de seguridad.",
+        "item5": "Publicar contenido ilícito, abusivo, acosador o infractor."
+      },
+      "s9": {
+        "title": "9. Reseñas y contenido de usuario",
+        "body": "Las clientas pueden dejar reseñas de las citas completadas. Las reseñas deben ser honestas, basarse en experiencias genuinas y estar libres de contenido ilícito o abusivo. Conservas la propiedad del contenido que envías, pero concedes a BraidFlow una licencia no exclusiva y libre de regalías para alojarlo y mostrarlo como parte de la operación del servicio. Podemos retirar contenido que infrinja estos Términos."
+      },
+      "s10": {
+        "title": "10. Propiedad intelectual",
+        "body": "BraidFlow y sus logotipos, diseño y software son de nuestra propiedad y están protegidos por las leyes de propiedad intelectual. Te concedemos un derecho limitado, no exclusivo e intransferible a usar el servicio conforme a estos Términos. No puedes copiar, modificar ni crear obras derivadas de la plataforma salvo en lo permitido por la ley."
+      },
+      "s11": {
+        "title": "11. Renuncias de garantía",
+        "body": "La plataforma se ofrece «tal cual» y «según disponibilidad», sin garantías de ningún tipo, ya sean expresas o implícitas, incluida la idoneidad para un fin determinado y la no infracción. BraidFlow no garantiza que el servicio sea ininterrumpido o libre de errores. Dado que las trenzadoras son proveedoras independientes, BraidFlow no garantiza la calidad, la seguridad ni la legalidad de ningún servicio reservado a través de la plataforma."
+      },
+      "s12": {
+        "title": "12. Limitación de responsabilidad",
+        "body": "En la máxima medida permitida por la ley, BraidFlow no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos, ni de la pérdida de beneficios o datos, derivados de tu uso del servicio. Nuestra responsabilidad total por cualquier reclamación relacionada con el servicio no superará la mayor de las siguientes cantidades: el importe que pagaste a BraidFlow en los tres meses anteriores a la reclamación, o cincuenta dólares estadounidenses."
+      },
+      "s13": {
+        "title": "13. Indemnización",
+        "body": "Aceptas indemnizar y eximir de responsabilidad a BraidFlow frente a reclamaciones, pérdidas y gastos (incluidos honorarios legales razonables) derivados de tu uso del servicio, de tu contenido o de tu incumplimiento de estos Términos o de los derechos de terceros."
+      },
+      "s14": {
+        "title": "14. Terminación",
+        "body": "Puedes dejar de usar BraidFlow y cerrar tu cuenta en cualquier momento. Podemos suspender o cancelar el acceso si incumples estos Términos o para proteger la plataforma y a sus usuarios. Las disposiciones que por su naturaleza deban sobrevivir a la terminación — como las obligaciones de pago, las renuncias de garantía y las limitaciones de responsabilidad — seguirán vigentes."
+      },
+      "s15": {
+        "title": "15. Cambios en estos Términos",
+        "body": "Podemos actualizar estos Términos de vez en cuando. Cuando lo hagamos, revisaremos la fecha de «Última actualización» de arriba y, para cambios importantes, daremos un aviso más destacado. El uso continuado del servicio después de que los cambios entren en vigor constituye su aceptación."
+      },
+      "s16": {
+        "title": "16. Ley aplicable y disputas",
+        "body": "Estos Términos se rigen por las leyes de la jurisdicción en la que opera BraidFlow, sin atender a las normas de conflicto de leyes. Aceptas contactarnos primero para intentar resolver cualquier disputa de forma informal antes de emprender acciones formales."
+      },
+      "s17": {
+        "title": "17. Contacto",
+        "body": "¿Preguntas sobre estos Términos? Escribe a <a>legal@braidflow.app</a>. Consulta también nuestra <privacy>Política de privacidad</privacy>."
+      }
+    }
+  },
+  "dashboard": {
+    "overview": {
+      "eyebrow": "Panel",
+      "title": "Hola, {name}",
+      "description": "Así se perfila la semana.",
+      "connectDone": {
+        "title": "Stripe conectado.",
+        "body": "Ya puedes aceptar reservas — los depósitos se abonan directamente en tu cuenta."
+      },
+      "connectPending": {
+        "title": "Casi listo.",
+        "body": "Stripe está revisando tu cuenta — los depósitos empiezan en cuanto se apruebe, normalmente en minutos."
+      },
+      "stats": {
+        "bookedThisWeek": "Reservado esta semana",
+        "revenueThisMonth": "Ingresos este mes",
+        "revenueHint": "Confirmados + completados",
+        "awaitingDeposit": "A la espera de depósito",
+        "awaitingDepositHint": "Retenciones aún no cobradas",
+        "totalClients": "Total de clientas",
+        "totalClientsHint": "Únicas, histórico"
+      },
+      "upNext": {
+        "title": "A continuación",
+        "subtitle": "Tus próximas cinco citas.",
+        "viewAll": "Todas las citas"
+      },
+      "empty": {
+        "title": "Nada agendado para esta semana",
+        "description": "Comparte tu página de reservas y la llenaremos.",
+        "action": "Copiar tu enlace"
+      }
+    },
+    "appointments": {
+      "title": "Citas",
+      "description": "Todas las reservas, pasadas y próximas.",
+      "empty": {
+        "title": "Aún no hay citas",
+        "description": "Cuando las clientas reserven en tu página, cada cita — pasada y próxima — aparecerá aquí."
+      },
+      "reschedule": "Cambiar fecha",
+      "refundDeposit": "Reembolsar depósito",
+      "retryRefund": "Reintentar reembolso",
+      "table": {
+        "when": "Cuándo",
+        "client": "Clienta",
+        "service": "Servicio",
+        "status": "Estado",
+        "total": "Total"
+      }
+    },
+    "calendar": {
+      "title": "Esta semana",
+      "appointments": "{count, plural, one {cita} other {citas}}",
+      "bookedValue": "valor reservado",
+      "open": "Libre",
+      "today": "Hoy"
+    },
+    "clients": {
+      "title": "Clientas",
+      "description": "Todas las que han reservado contigo.",
+      "empty": {
+        "title": "Aún no hay clientas",
+        "description": "En cuanto alguien reserve, aparecerá aquí — con su historial y notas en un solo lugar."
+      },
+      "visits": "{count, plural, one {# visita} other {# visitas}}",
+      "lifetime": "histórico",
+      "lastSeen": "última vez {date}",
+      "newClient": "Clienta nueva"
+    },
+    "services": {
+      "title": "Servicios",
+      "description": "Los estilos que ofreces. Las clientas eligen de esta lista.",
+      "addService": "Añadir servicio",
+      "emptyTitle": "Aún no hay servicios",
+      "emptyDescription": "Añade los estilos que ofreces con precios y cuánto tardan.",
+      "addFirst": "Añade tu primer servicio",
+      "hidden": "Oculto",
+      "depositLabel": "depósito",
+      "edit": "Editar",
+      "eyebrow": "Servicios",
+      "editDescription": "Edita cómo aparece esto ante las clientas.",
+      "newTitle": "Nuevo servicio",
+      "newDescription": "Añade un estilo que ofreces. Puedes editarlo cuando quieras.",
+      "form": {
+        "nameLabel": "Nombre del servicio",
+        "namePlaceholder": "Box braids knotless — medianas",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Qué incluye, largo, qué esperar.",
+        "descriptionHint": "Opcional. Se muestra en tu página de reservas.",
+        "duration": "Duración",
+        "hours": "Horas",
+        "minutes": "Minutos",
+        "priceLabel": "Precio del servicio",
+        "depositLabel": "Depósito",
+        "depositHint": "Se cobra cuando la clienta reserva.",
+        "showLabel": "Mostrar en mi página de reservas",
+        "showHint": "Desmarca para ocultarlo sin eliminarlo.",
+        "saving": "Guardando…",
+        "saveChanges": "Guardar cambios",
+        "create": "Añadir servicio",
+        "cancel": "Cancelar"
+      }
+    },
+    "availability": {
+      "title": "Disponibilidad",
+      "description": "Las horas en que atiendes citas cada semana. Bloquea fechas concretas por separado.",
+      "days": {
+        "sunday": "Domingo",
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado"
+      },
+      "off": "Cerrado",
+      "addRange": "+ Añadir franja",
+      "removeRange": "Quitar franja",
+      "invalidTime": "Elige una hora válida.",
+      "from": "Desde",
+      "to": "Hasta",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "timeOff": "Ausencias",
+      "addBlock": "Añadir bloqueo",
+      "timeOffDescription": "¿Te vas de vacaciones o sales una tarde? Bloquéalo aquí para que nadie lo reserve.",
+      "nothingBlocked": "Nada bloqueado ahora mismo.",
+      "remove": "Quitar",
+      "invalidDateTime": "Elige una fecha y hora válidas.",
+      "date": "Fecha",
+      "noteOptional": "Nota (opcional)",
+      "notePlaceholder": "Cumpleaños, evento familiar, viaje…",
+      "saveBlock": "Guardar bloqueo"
+    },
+    "settings": {
+      "title": "Ajustes",
+      "description": "Tu página pública y tu cuenta.",
+      "bookingLinkLabel": "Tu página de reservas",
+      "copyLink": "Copiar enlace",
+      "genericError": "Algo salió mal.",
+      "bookingSection": {
+        "title": "Tu página de reservas",
+        "description": "Lo que ven las clientas cuando llegan a tu enlace."
+      },
+      "accountSection": {
+        "title": "Cuenta",
+        "description": "Solo tú ves esto."
+      },
+      "businessName": "Nombre del negocio",
+      "bio": "Biografía",
+      "bioPlaceholder": "Especialidades, años de experiencia, lo que te hace única.",
+      "city": "Ciudad",
+      "cityPlaceholder": "Atlanta, GA",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "braidsbyyou",
+      "instagramHint": "Sin el @.",
+      "timezone": "Zona horaria",
+      "timezoneHint": "Tus horas semanales y cada hora de cita se muestran en esta zona. Ponla donde de verdad trenzas.",
+      "acceptingBookings": "Aceptando nuevas reservas",
+      "acceptingBookingsHint": "Desmarca para pausar tu página sin retirarla.",
+      "stripeRequired": "Conecta Stripe (banner en la parte superior de tu panel) antes de poder aceptar reservas — las clientas no pueden pagar un depósito hasta que tu cuenta esté configurada.",
+      "yourName": "Tu nombre",
+      "phone": "Teléfono",
+      "phonePlaceholder": "(555) 123-4567",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios",
+      "saved": "Guardado."
+    },
+    "error": {
+      "title": "No pudimos cargar esto",
+      "description": "Algo salió mal al obtener tus datos. Suele ser temporal.",
+      "reference": "Referencia: {digest}",
+      "retry": "Reintentar"
+    },
+    "status": {
+      "confirmed": "Confirmada",
+      "awaitingDeposit": "A la espera de depósito",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "noShow": "Ausencia",
+      "deposit": "Depósito"
+    }
+  },
+  "deposit": {
+    "depositNone": "Sin depósito",
+    "depositPending": "A la espera de depósito",
+    "depositHeld": "Depósito retenido",
+    "depositRefundPending": "Reembolso pendiente",
+    "depositRefunded": "Depósito reembolsado",
+    "depositRefundFailed": "Reembolso fallido"
+  },
+  "auth": {
+    "panel": {
+      "tagline": "La plataforma de reservas creada para <em>trenzadoras.</em>",
+      "highlights": {
+        "deposits": "Cobra depósitos por adelantado con Stripe",
+        "noshows": "Deja de perder sillas por ausencias",
+        "autopilot": "Toda tu semana, en piloto automático"
+      },
+      "testimonial": {
+        "quote": "La configuración tomó 15 minutos. El enlace en mi bio por fin hace el trabajo en vez de mí.",
+        "author": "Ejemplo ilustrativo — BraidFlow es de reciente lanzamiento"
+      }
+    },
+    "login": {
+      "title": "Bienvenida de nuevo",
+      "subtitle": "Inicia sesión para gestionar tus reservas.",
+      "newHere": "¿Nueva por aquí?",
+      "createAccount": "Crear una cuenta",
+      "errors": {
+        "verification": "Ese enlace no es válido o ha caducado. Intenta iniciar sesión o restablece tu contraseña."
+      },
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "form": {
+        "email": "Correo electrónico",
+        "password": "Contraseña"
+      },
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión…"
+    },
+    "signup": {
+      "title": {
+        "braider": "Crea tu página de reservas",
+        "client": "Crea tu cuenta"
+      },
+      "subtitle": {
+        "braider": "Toma alrededor de un minuto. Añadirás servicios justo después.",
+        "client": "Reserva tu próxima cita en un par de toques."
+      },
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Iniciar sesión",
+      "roleLegend": "Me registro como",
+      "role": {
+        "client": "Clienta",
+        "braider": "Trenzadora"
+      },
+      "form": {
+        "fullName": "Nombre completo",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "passwordHint": "Al menos 8 caracteres."
+      },
+      "creatingAccount": "Creando cuenta…",
+      "createAccount": "Crear cuenta",
+      "terms": "Al crear una cuenta, aceptas nuestros <terms>Términos</terms> y nuestra <privacy>Política de privacidad</privacy>."
+    },
+    "forgot": {
+      "title": "Restablece tu contraseña",
+      "subtitle": "Introduce el correo de tu cuenta y te enviaremos un enlace para establecer una nueva contraseña.",
+      "remembered": "¿La recordaste?",
+      "backToSignIn": "Volver a iniciar sesión",
+      "form": {
+        "email": "Correo electrónico"
+      },
+      "sendResetLink": "Enviar enlace de restablecimiento",
+      "sendingLink": "Enviando enlace…",
+      "sent": {
+        "title": "Revisa tu bandeja de entrada",
+        "body": "Si existe una cuenta para <email>{address}</email>, hemos enviado un enlace para restablecer tu contraseña. Caduca en aproximadamente una hora.",
+        "retry": "¿No lo recibiste? Revisa el spam o <retry>inténtalo de nuevo</retry>."
+      },
+      "demo": {
+        "title": "No hace falta restablecer en la demo",
+        "body": "Esta demo acepta cualquier correo y contraseña (8 caracteres o más), así que no hay contraseña que restablecer. Vuelve a iniciar sesión."
+      }
+    },
+    "reset": {
+      "title": "Establece una nueva contraseña",
+      "subtitle": "Elige una contraseña segura que no uses en ningún otro sitio.",
+      "form": {
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirma la nueva contraseña",
+        "passwordHint": "Al menos 8 caracteres."
+      },
+      "saveNewPassword": "Guardar nueva contraseña",
+      "saving": "Guardando…",
+      "errors": {
+        "mismatch": "Esas contraseñas no coinciden."
+      },
+      "demo": {
+        "body": "Esto es una demo: los enlaces de restablecimiento no se envían y el inicio de sesión acepta cualquier correo y contraseña. Vuelve a iniciar sesión para continuar."
+      }
+    },
+    "demo": {
+      "title": "Acceso de demostración",
+      "body": "Inicia sesión con cualquier correo y contraseña (8 caracteres o más). No se crea ninguna cuenta real: estás explorando datos de ejemplo compartidos.",
+      "busyStudio": "Estudio activo: inicia sesión con <code>amara@braidflow.app</code>",
+      "freshStudio": "Estudio nuevo: regístrate como trenzadora para empezar desde un espacio vacío."
+    }
+  },
+  "errors": {
+    "backToHome": "Volver al inicio",
+    "tryAgain": "Reintentar",
+    "reference": "Referencia: {digest}",
+    "boundary": {
+      "code": "Vaya",
+      "title": "Algo se enredó por nuestra parte.",
+      "description": "Lo hemos registrado. Inténtalo de nuevo en un momento — y si sigue pasando, escríbenos."
+    },
+    "notFound": {
+      "title": "Esa página se escapó de la trenza.",
+      "description": "El enlace puede ser antiguo, o la página nunca existió. En cualquier caso — te devolvemos al camino.",
+      "browseBraiders": "O explora trenzadoras"
+    },
+    "client": {
+      "title": "Algo salió mal",
+      "description": "No pudimos cargar esta página. Inténtalo de nuevo en un momento."
+    },
+    "home": "Inicio"
+  },
+  "footer": {
+    "tagline": "La plataforma de reservas creada para trenzadoras. Cobra depósitos, elimina las ausencias y organiza tu semana sin los DM.",
+    "columns": {
+      "product": {
+        "heading": "Producto",
+        "links": {
+          "findBraider": "Buscar trenzadora",
+          "pricing": "Precios",
+          "forBraiders": "Para trenzadoras"
+        }
+      },
+      "account": {
+        "heading": "Cuenta",
+        "links": {
+          "login": "Iniciar sesión",
+          "createAccount": "Crear cuenta",
+          "myBookings": "Mis reservas"
+        }
+      },
+      "company": {
+        "heading": "Empresa",
+        "links": {
+          "contact": "Contacto",
+          "privacy": "Privacidad",
+          "terms": "Términos"
+        }
+      }
+    },
+    "copyright": "© {year} BraidFlow. Todos los derechos reservados.",
+    "securedByStripe": "Pagos protegidos por Stripe"
+  },
+  "booking": {
+    "anythingHeading": "Algo que debamos saber",
+    "balanceAtAppointment": "Saldo en la cita",
+    "bookAppointment": "Reserva tu cita",
+    "booksClosed": "Su agenda está cerrada por ahora. Vuelve pronto o explora otras trenzadoras.",
+    "browseBraiders": "Explorar trenzadoras",
+    "chooseServiceTime": "Elige un servicio y una hora — un pequeño depósito retiene tu turno, reembolsable hasta {hours} horas antes.",
+    "chooseTime": "Elige una hora",
+    "continue": "Continuar",
+    "continueToDeposit": "Continuar al depósito",
+    "depositDueNow": "Depósito a pagar ahora",
+    "durationDeposit": "{duration} · depósito {deposit}",
+    "guestEmail": "Correo electrónico",
+    "guestEmailHint": "Aquí llega tu confirmación",
+    "guestEmailPlaceholder": "tu@email.com",
+    "guestName": "Tu nombre",
+    "guestNamePlaceholder": "Aisha Bello",
+    "guestPhone": "Teléfono (opcional)",
+    "guestPhonePlaceholder": "Para que tu trenzadora pueda contactarte",
+    "haveAccountLogIn": "¿Tienes una cuenta? Inicia sesión",
+    "noChargeUntilConfirm": "No se cobra nada hasta que confirmes el pago",
+    "noOpenings": "No hay turnos este día",
+    "noServices": "Esta trenzadora aún no ha publicado servicios. Vuelve pronto.",
+    "notTakingBookings": "{name} no está aceptando reservas ahora mismo",
+    "notesAria": "Notas para tu trenzadora",
+    "notesPlaceholder": "Textura del cabello, largo, raya preferida…",
+    "optional": "— opcional",
+    "pickService": "Elige un servicio",
+    "pickServiceTime": "Elige un servicio y una hora",
+    "reserving": "Reservando…",
+    "serviceTotal": "Total del servicio",
+    "stepDetails": "Tus datos",
+    "stepService": "Servicio",
+    "stepTime": "Hora",
+    "trustCancellation": "Cancelación gratuita hasta <strong>{hours} horas</strong> antes — depósito íntegro de vuelta.",
+    "trustCard": "Tarjeta protegida por Stripe. Nunca vemos los datos de tu tarjeta.",
+    "trustDeposit": "Tu depósito va directo a <strong>{name}</strong> — cuenta para tu total.",
+    "tryOtherDates": "Prueba una de las otras fechas de arriba.",
+    "viewProfile": "Ver perfil",
+    "yourBooking": "Tu reserva"
+  },
+  "bookingActions": {
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "cancelConfirm": "¿Cancelar esta reserva?",
+    "confirm": "Confirmar",
+    "genericError": "Algo salió mal.",
+    "keepIt": "Mantenerla",
+    "markCompleted": "Marcar como completada",
+    "markCompletedConfirm": "¿Marcar como completada?",
+    "markNoShowConfirm": "¿Marcar como ausencia?",
+    "noShow": "Ausencia",
+    "refundConfirm": "¿Reembolsar {amount} a la clienta?",
+    "refundDeposit": "Reembolsar depósito",
+    "yesCancel": "Sí, cancelar",
+    "yesRefund": "Sí, reembolsar"
+  },
+  "bookings": {
+    "bookAnother": "Reservar otra",
+    "browseBraiders": "Explorar trenzadoras",
+    "completeDeposit": "Completar depósito →",
+    "description": "Citas próximas y pasadas.",
+    "emptyDescription": "Encuentra una trenzadora cerca de ti y asegura tu primera cita.",
+    "emptyTitle": "Aún no hay reservas",
+    "reschedule": "Cambiar fecha",
+    "reviewed": "Reseñado · ¡gracias!",
+    "title": "Mis reservas",
+    "with": "con",
+    "statusPendingPayment": "A la espera de depósito",
+    "statusConfirmed": "Confirmada",
+    "statusCompleted": "Completada",
+    "statusCancelled": "Cancelada",
+    "statusNoShow": "Ausencia"
+  },
+  "reschedule": {
+    "appointmentsList": "lista de citas",
+    "back": "Atrás",
+    "backToAppointments": "Volver a las citas",
+    "backToMyBookings": "Volver a mis reservas",
+    "bookingsList": "lista de reservas",
+    "cantFindTime": "¿No encuentras una hora que te sirva?",
+    "cantReschedule": "Esta reserva no se puede cambiar de fecha",
+    "cantRescheduleBody": "Ya está cancelada o completada.",
+    "confirmNewTime": "Confirmar nueva hora",
+    "confirming": "Confirmando…",
+    "currentlyScheduled": "Agendada actualmente",
+    "depositTransfers": "Tu depósito se transfiere automáticamente.",
+    "keepCurrentTime": "Mantener la hora actual",
+    "moved": "Movida.",
+    "movedBody": "Tu cita con {business} ahora es {time}.",
+    "newAppointment": "Nueva cita",
+    "newTime": "Nueva hora",
+    "orCancelFrom": "o cancela desde tu",
+    "pickATime": "Elige una hora",
+    "pickNewTime": "Elige una nueva hora",
+    "rescheduleLabel": "Cambiar fecha",
+    "sameServiceWith": "El mismo {service} con {business}. Tu depósito se traslada — no hace falta pagar nada.",
+    "seePage": "Ver la página de {business}",
+    "takingBack": "Te llevamos de vuelta…"
+  },
+  "confirmation": {
+    "backToBraider": "Volver a la trenzadora",
+    "balanceAtAppointment": "Saldo en la cita",
+    "bookingConfirmed": "Reserva confirmada",
+    "bookingNotActive": "Reserva no activa",
+    "braider": "Trenzadora",
+    "depositPaid": "Depósito pagado",
+    "finalizing": "Finalizando tu reserva…",
+    "finalizingBody": "Tu tarjeta se procesó. Estamos confirmando con la agenda de la trenzadora.",
+    "findAnotherTime": "Buscar otra hora",
+    "goToMyBookings": "Ir a mis reservas",
+    "guestEmailNote": "Tu confirmación está en camino por correo. ",
+    "guestKeepEmail": "Guarda el correo que te enviamos — tiene el enlace para gestionar esta reserva cuando quieras.",
+    "justASec": "Un segundo",
+    "onTheBooks": "Ya estás agendada.",
+    "paymentFailed": "El pago no se completó",
+    "pollerTimeout": "Esto está tardando más de lo normal. Tu pago está a salvo — te enviaremos la confirmación por correo en cuanto se acredite.",
+    "remindBefore": "Te recordaremos antes de tu cita.",
+    "reschedule": "Cambiar fecha",
+    "seeAllBookings": "Ver todas mis reservas",
+    "service": "Servicio",
+    "slotReleased": "Este turno se liberó.",
+    "slotReleasedBody": "La retención caducó o la reserva se canceló. Cualquier reembolso del depósito sigue la política de cancelación — reembolso íntegro si se cancela al menos {hours} horas antes de la cita. Puedes reservar de nuevo cuando quieras.",
+    "tryAgainBody": "Tu tarjeta fue rechazada. Tu turno queda retenido unos minutos más.",
+    "tryAgainTitle": "Intentémoslo de nuevo.",
+    "tryDifferentCard": "Prueba con otra tarjeta",
+    "waitingConfirmation": "Esperando confirmación",
+    "when": "Cuándo"
+  },
+  "pay": {
+    "testMode": "Modo de prueba",
+    "demoNote": "no se cobra ninguna tarjeta real. Paga para simular el depósito y ver tu confirmación.",
+    "demoCard": "Tarjeta de prueba",
+    "backToBraider": "Volver a la trenzadora",
+    "balanceAtAppointment": "Saldo en la cita",
+    "bookingWith": "Reservando con",
+    "cancellationTerms": "Al pagar, aceptas la política de cancelación: reembolso íntegro del depósito si cancelas al menos {hours} horas antes de tu cita; el depósito no es reembolsable después de eso.",
+    "cancelledBody": "Si fue un error, puedes reservar de nuevo desde la página de la trenzadora.",
+    "cancelledTitle": "Esta reserva fue cancelada",
+    "cantLoadBody": "Inténtalo de nuevo en un momento. Si sigue pasando, reserva de nuevo desde la página de la trenzadora.",
+    "cantLoadTitle": "No podemos cargar este pago",
+    "cardError": "Algo salió mal con tu tarjeta.",
+    "cardSecured": "Tarjeta protegida por Stripe — nunca vemos tus datos.",
+    "charging": "Cobrando tu depósito…",
+    "depositDueNow": "Depósito a pagar ahora",
+    "findAnotherTime": "Buscar otra hora",
+    "freeCancellation": "Cancelación gratuita hasta {hours} horas antes — depósito íntegro de vuelta.",
+    "loadingCheckout": "Cargando el pago seguro…",
+    "payDeposit": "Pagar {amount} de depósito",
+    "payYourDeposit": "Paga tu depósito",
+    "serviceTotal": "Total del servicio",
+    "slotHeld": "Tu turno queda retenido mientras terminas — solo toma un minuto.",
+    "tryAgain": "Reintentar"
+  },
+  "pricing": {
+    "badge": "Precios",
+    "title": "Gratis mientras estamos en <em>beta.</em>",
+    "subtitle": "Sin cuota mensual. Sin comisión sobre tus servicios. Te quedas con el 100% de cada depósito — solo lo enviamos directo a tu cuenta de Stripe.",
+    "card": {
+      "badge": "Beta",
+      "title": "Todo, gratis",
+      "priceNote": "durante la beta",
+      "body": "El producto completo, sin límites ocultos. Añadiremos planes de pago más adelante — con aviso — pero todo lo de abajo es tuyo hoy."
+    },
+    "startFree": "Empieza gratis",
+    "included": [
+      "Tu propia página de reservas con tu marca",
+      "Depósitos con Stripe — te quedas con el 100%",
+      "Disponibilidad semanal + bloqueos de días",
+      "Importes de depósito por servicio",
+      "Recordatorios automáticos por correo a 24 h y 2 h",
+      "Cambio de fecha + cancelación con el margen de reembolso que definas",
+      "Notas de clientas e historial de reservas",
+      "Reseñas de las citas completadas"
+    ],
+    "stripeNote": "La comisión de procesamiento estándar de Stripe (~2,9% + 30¢) se aplica a cada depósito y va a Stripe, no a nosotros.",
+    "faqLabel": "Preguntas que nos hacen las trenzadoras",
+    "faqTitle": "La letra pequeña, en palabras claras.",
+    "cta": {
+      "title": "Una ausencia ya es <em>una de más.</em>",
+      "body": "La mayoría de las trenzadoras con las que hablamos pierden 1–2 citas al mes por plantones. Los depósitos por adelantado lo frenan — y ahora mismo todo es gratis."
+    },
+    "faqs": {
+      "cost": {
+        "q": "¿Cuánto cuesta BraidFlow?",
+        "a": "Es gratis mientras estamos en beta. No hay cuota mensual y nos quedamos con el 0% de tus depósitos — te quedas con cada dólar. Stripe cobra su comisión de procesamiento estándar (~2,9% + 30¢) sobre el depósito; eso va a Stripe, no a nosotros."
+      },
+      "alwaysFree": {
+        "q": "¿Siempre será gratis?",
+        "a": "Introduciremos planes de pago más adelante a medida que añadamos más. Te avisaremos con mucha antelación antes de cualquier cambio, y nunca convertiremos en de pago una función de la que dependas sin decírtelo primero."
+      },
+      "cut": {
+        "q": "¿Os quedáis con una parte de mis servicios?",
+        "a": "No. Durante la beta nuestra comisión es del 0%. Los depósitos van directo a tu cuenta de Stripe conectada — nunca tocamos el dinero más allá de dirigirlo hacia ti."
+      },
+      "clientPay": {
+        "q": "¿Mis clientas pagan algo por usar BraidFlow?",
+        "a": "No. Reservan y pagan su depósito — el mismo proceso que usarían en cualquier sitio de peluquería. Nunca ven una comisión de BraidFlow."
+      },
+      "start": {
+        "q": "¿Qué necesito para empezar a cobrar depósitos?",
+        "a": "Una cuenta de Stripe. La conectas desde tu panel en unos dos minutos (Stripe se encarga de los detalles) y entonces las clientas pueden reservar. Hasta que esté conectada, tu página de reservas permanece en pausa."
+      },
+      "noStripe": {
+        "q": "¿Y si Stripe no está disponible en mi país?",
+        "a": "Ahora mismo BraidFlow funciona con Stripe, así que necesitas un país que Stripe admita. Si estás en un lugar donde no llega, escríbenos — estamos midiendo la demanda y añadiremos alternativas en función de ella."
+      }
+    }
+  },
+  "directory": {
+    "clearSearch": "Borrar búsqueda",
+    "countAvailable": "{count, plural, one {# trenzadora disponible} other {# trenzadoras disponibles}}",
+    "countForQuery": "{count, plural, one {# trenzadora} other {# trenzadoras}} para «{query}»",
+    "description": "Estilistas reales, disponibilidad real. Busca en tu ciudad, compara y reserva en un minuto.",
+    "emptyDescription": "Estamos incorporando a las primeras estilistas ahora. Vuelve pronto.",
+    "emptyMatchDescription": "Prueba con otro nombre o ciudad, o borra la búsqueda para ver a todas.",
+    "emptyMatchTitle": "Ninguna trenzadora coincide con «{query}»",
+    "emptyTitle": "Aún no hay trenzadoras aquí",
+    "eyebrow": "El directorio",
+    "fromPrice": "desde {price}",
+    "new": "Nueva",
+    "searchAriaLabel": "Buscar trenzadoras por nombre o ciudad",
+    "searchButton": "Buscar",
+    "searchPlaceholder": "Busca por nombre o ciudad",
+    "sortAriaLabel": "Ordenar trenzadoras",
+    "title": "Buscar trenzadora",
+    "sortRating": "Mejor valoradas",
+    "sortPriceLowHigh": "Precio: de menor a mayor",
+    "sortNewest": "Más recientes"
+  },
+  "profile": {
+    "workHeading": "Trabajos recientes",
+    "bookHeading": "Reserva una cita",
+    "bookSubtitle": "Elige un servicio y una hora que te sirva. El depósito retiene tu turno.",
+    "cancel": "Cancelar",
+    "clientFallback": "Clienta",
+    "durationDeposit": "{duration} · depósito {deposit}",
+    "howWasAppointment": "¿Qué tal tu cita?",
+    "leaveReview": "Deja una reseña",
+    "notBookingOnline": "{name} no está aceptando reservas en línea ahora mismo.",
+    "pickRating": "Elige una valoración en estrellas.",
+    "postReview": "Publicar reseña",
+    "posting": "Publicando…",
+    "reachInstagram": "Contacta por Instagram",
+    "reviewCount": "{count, plural, one {# reseña} other {# reseñas}}",
+    "reviewPlaceholder": "Comparte lo que destacó (opcional).",
+    "reviewsHeading": "Lo que dicen las clientas",
+    "seeAvailableTimes": "Ver horas disponibles",
+    "servicesHeading": "Servicios",
+    "starAria": "{count, plural, one {# estrella} other {# estrellas}}",
+    "starsAriaLabel": "Valorada {rating} de 5"
+  },
+  "connect": {
+    "connect": "Conectar Stripe",
+    "continueSetup": "Continuar configuración",
+    "description": "Las clientas no pueden reservar hasta que conectes una cuenta de Stripe para recibir depósitos. Toma unos dos minutos y te quedas con el 100% de cada depósito.",
+    "opening": "Abriendo Stripe…",
+    "title": "Conecta Stripe para empezar a aceptar reservas",
+    "verifyingDescription": "Tus datos están en revisión. Los depósitos siguen en pausa hasta que Stripe apruebe tu cuenta — esto suele tardar solo unos minutos.",
+    "verifyingTitle": "Stripe está verificando tu cuenta"
+  },
+  "activation": {
+    "title": "Termina de configurar tu página de reservas",
+    "subtitle": "Tres pasos rápidos y las clientas podrán empezar a reservar y pagar depósitos.",
+    "addService": {
+      "title": "Añade tu primer servicio",
+      "description": "Indica un estilo, su precio y el depósito que retiene el turno.",
+      "action": "Añadir un servicio"
+    },
+    "setHours": {
+      "title": "Define tus horas semanales",
+      "description": "Elige los días y las horas en que las clientas pueden reservar.",
+      "action": "Definir horas"
+    },
+    "stripe": {
+      "title": "Conecta Stripe para cobrar",
+      "reviewDescription": "Tus datos están en revisión — los depósitos empiezan cuando Stripe apruebe, normalmente en minutos.",
+      "description": "Los depósitos se abonan directamente en tu cuenta. Toma unos dos minutos.",
+      "opening": "Abriendo…",
+      "continue": "Continuar",
+      "connect": "Conectar Stripe"
     }
   }
 }

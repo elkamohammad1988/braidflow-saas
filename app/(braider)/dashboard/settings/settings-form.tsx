@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { Alert } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Select, Textarea } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -69,7 +70,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
         e.preventDefault();
         submit();
       }}
-      className="space-y-8"
+      className="space-y-6"
     >
       <Section
         title={t('settings.bookingSection.title')}
@@ -174,12 +175,9 @@ export function SettingsForm({ initial }: { initial: Initial }) {
       </Section>
 
       {error && (
-        <p
-          role="alert"
-          className="motion-safe:animate-fade-in-up rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
-        >
+        <Alert tone="danger" className="motion-safe:animate-fade-in-up">
           {error}
-        </p>
+        </Alert>
       )}
 
       <div className="flex items-center gap-4">

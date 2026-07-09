@@ -117,7 +117,7 @@ export function BookingFlow({
   return (
     <>
       <div className="grid gap-8 pb-28 md:grid-cols-[minmax(0,1fr)_340px] md:pb-0">
-        <div className="min-w-0 space-y-9">
+        <div className="min-w-0 space-y-8">
           <section>
             <StepHeader n={1} label={t('stepService')} done={Boolean(serviceId)} />
             <ServiceList services={services} selectedId={serviceId} onSelect={onSelectService} />
@@ -229,7 +229,7 @@ export function BookingFlow({
           </ul>
 
           {error && (
-            <p role="alert" className="text-sm text-red-600 md:hidden">
+            <p role="alert" className="text-sm text-red-700 md:hidden">
               {error}
             </p>
           )}
@@ -264,7 +264,7 @@ export function BookingFlow({
             )}
 
             {error && (
-              <p role="alert" className="mt-4 text-sm text-red-600">
+              <p role="alert" className="mt-4 text-sm text-red-700">
                 {error}
               </p>
             )}

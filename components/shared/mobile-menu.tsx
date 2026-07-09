@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -17,24 +17,65 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   const t = useTranslations();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape while the menu is open.
+  // While open: close on Escape, keep Tab within the panel (it visually covers
+  // the page, so focus must not wander behind it), lock body scroll, move focus
+  // into the panel, and restore it to the trigger on close.
   useEffect(() => {
     if (!open) return;
+    // Captured now so the cleanup restores focus to the same node (the trigger
+    // is always mounted, but this satisfies the exhaustive-deps ref rule).
+    const trigger = triggerRef.current;
+    document.body.style.overflow = 'hidden';
+
+    const focusables = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), select, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      );
+
+    // Focus the first control once the panel has mounted.
+    focusables()[0]?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      const activeEl = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && activeEl === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && activeEl === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      trigger?.focus();
+    };
   }, [open]);
 
   return (
     <div className="md:hidden">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-label={open ? t('nav.closeMenu') : t('nav.openMenu')}
         aria-expanded={open}
+        aria-haspopup="dialog"
         aria-controls="mobile-menu-panel"
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-paper text-ink shadow-card"
       >
@@ -50,6 +91,10 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
           />
           <div
             id="mobile-menu-panel"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('common.menu')}
             className="fixed inset-x-3 top-[4.5rem] z-50 rounded-card border border-line bg-paper p-4 shadow-lifted"
           >
             <nav className="flex flex-col">

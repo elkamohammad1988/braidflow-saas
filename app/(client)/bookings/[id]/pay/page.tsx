@@ -100,7 +100,7 @@ export default async function PayPage({
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8 md:py-10">
+    <div className="mx-auto max-w-3xl px-6 py-6 md:py-8">
       <p className="text-sm text-ink-muted">
         {t('bookingWith')} <span className="text-ink">{booking.braiders?.business_name}</span>
       </p>
@@ -109,11 +109,11 @@ export default async function PayPage({
       </h1>
 
       <div className="mt-5 flex items-center gap-2.5 rounded-lg border border-clay/20 bg-clay/[0.07] px-4 py-2.5 text-sm text-ink">
-        <Clock className="h-4 w-4 shrink-0 text-clay" strokeWidth={2} />
+        <Clock className="h-4 w-4 shrink-0 text-clay-text" strokeWidth={2} />
         {t('slotHeld')}
       </div>
 
-      <div className="mt-8 grid gap-8 md:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid gap-8 md:grid-cols-[1fr_320px]">
         {demo ? (
           <DemoCheckout
             bookingId={booking.id}
