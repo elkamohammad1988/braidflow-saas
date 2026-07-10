@@ -8,6 +8,7 @@
 // seeded persona (see lib/auth/personas.ts).
 
 import { cookies } from 'next/headers';
+import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { createSessionToken } from './session-token';
 import {
   SESSION_COOKIE,
@@ -18,6 +19,15 @@ import {
 } from './personas';
 
 export type AuthResult = { ok: true; role: Role } | { error: string };
+
+// Throttle credential submissions per client IP. Each one mints a signed session
+// cookie, so an unthrottled loop is a session-spam / abuse vector — and this is
+// the hook real password verification would slot into. Generous enough that a
+// human correcting a typo never trips it. Mirrors requestPasswordReset's limit.
+function throttleAuth(scope: 'login' | 'signup'): AuthResult | null {
+  const limit = rateLimit(`auth:${scope}:${clientIpKey()}`, { limit: 10, windowMs: 5 * 60_000 });
+  return limit.ok ? null : { error: 'Too many attempts. Please wait a moment and try again.' };
+}
 
 async function establishSession(persona: Persona, name: string): Promise<void> {
   const token = await createSessionToken(
@@ -34,6 +44,9 @@ async function establishSession(persona: Persona, name: string): Promise<void> {
 }
 
 export async function loginAction(input: { email: string; password: string }): Promise<AuthResult> {
+  const throttled = throttleAuth('login');
+  if (throttled) return throttled;
+
   const email = (input.email ?? '').trim();
   const password = input.password ?? '';
   if (!email || !password) {
@@ -50,6 +63,9 @@ export async function signupAction(input: {
   fullName: string;
   role: Role;
 }): Promise<AuthResult> {
+  const throttled = throttleAuth('signup');
+  if (throttled) return throttled;
+
   const email = (input.email ?? '').trim();
   const password = input.password ?? '';
   const fullName = (input.fullName ?? '').trim();

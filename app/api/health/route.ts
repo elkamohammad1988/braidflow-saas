@@ -23,6 +23,9 @@ export async function GET() {
 
   const body = {
     status: dataOk ? 'ok' : 'degraded',
+    // The deployed commit, so an uptime monitor can verify exactly what's live and
+    // gate a rollback on it. Vercel sets VERCEL_GIT_COMMIT_SHA; falls back to 'dev'.
+    version: process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev',
     checks: {
       data: dataOk ? 'ok' : 'error'
     },

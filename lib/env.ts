@@ -23,6 +23,15 @@ function optional<T extends z.ZodTypeAny>(schema: T) {
   );
 }
 
+// A string that must parse to a sampling rate in [0, 1]. A garbage value like
+// `abc` would otherwise become `NaN` and silently disable/skew Sentry sampling.
+function rate01(name: string) {
+  return z.string().refine((v) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 && n <= 1;
+  }, `${name} must be a number between 0 and 1.`);
+}
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).optional(),
@@ -37,8 +46,19 @@ const envSchema = z
     RESEND_API_KEY: optional(z.string().startsWith('re_', 'RESEND_API_KEY must start with "re_".')),
     EMAIL_FROM: optional(z.string()),
     CRON_SECRET: optional(z.string().min(16, 'CRON_SECRET should be a long random string (16+ chars).')),
+    PENDING_BOOKING_TTL_MINUTES: optional(
+      z
+        .string()
+        .refine(
+          (v) => Number.isFinite(Number(v)) && Number(v) > 0,
+          'PENDING_BOOKING_TTL_MINUTES must be a positive number of minutes.'
+        )
+    ),
     NEXT_PUBLIC_SITE_URL: optional(z.string().url('NEXT_PUBLIC_SITE_URL must be an absolute URL.')),
-    NEXT_PUBLIC_SENTRY_DSN: optional(z.string().url('NEXT_PUBLIC_SENTRY_DSN must be a URL.'))
+    NEXT_PUBLIC_SENTRY_DSN: optional(z.string().url('NEXT_PUBLIC_SENTRY_DSN must be a URL.')),
+    SENTRY_DSN: optional(z.string().url('SENTRY_DSN must be a URL.')),
+    SENTRY_TRACES_SAMPLE_RATE: optional(rate01('SENTRY_TRACES_SAMPLE_RATE')),
+    NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: optional(rate01('NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE'))
   })
   .superRefine((env, ctx) => {
     const hasSecret = Boolean(env.STRIPE_SECRET_KEY);
@@ -57,6 +77,21 @@ const envSchema = z
         code: z.ZodIssueCode.custom,
         path: ['STRIPE_WEBHOOK_SECRET'],
         message: 'STRIPE_WEBHOOK_SECRET is required when Stripe keys are set (webhook signature verification).'
+      });
+    }
+    // Live Stripe means real money moving — and real, distinct users. In that mode
+    // the committed AUTH_SECRET fallback (lib/crypto/signing.ts) is account-takeover
+    // grade: anyone who knows the public fallback could forge a braider session
+    // cookie and issue refunds or read client PII. So once live keys are present a
+    // real AUTH_SECRET becomes mandatory. The keyless demo and `sk_test_` setups
+    // keep booting on the fallback (which still logs a loud one-time warning).
+    if (env.STRIPE_SECRET_KEY?.startsWith('sk_live_') && !env.AUTH_SECRET) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['AUTH_SECRET'],
+        message:
+          'AUTH_SECRET is required when live Stripe keys (sk_live_) are configured — without it, ' +
+          'session cookies are signed with the public demo fallback and are forgeable.'
       });
     }
   });

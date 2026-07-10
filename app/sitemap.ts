@@ -18,7 +18,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data } = await dbAdmin()
       .from('braiders')
       .select('slug')
+      // Only index braiders who are actually bookable (accepting AND charges live),
+      // matching the public directory — otherwise the sitemap points crawlers at
+      // profiles whose book flow dead-ends.
       .eq('accepting_bookings', true)
+      .eq('charges_enabled', true)
       .limit(5000);
 
     const braiderRoutes: MetadataRoute.Sitemap = (data ?? []).map((b: { slug: string }) => ({

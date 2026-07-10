@@ -56,6 +56,8 @@ export async function submitReviewAction(input: SubmitReviewInput): Promise<Resu
     .eq('id', booking.braider_id)
     .maybeSingle();
   if (braider?.slug) revalidatePath(`/braiders/${braider.slug}`);
+  // A new review moves the braider's average rating, shown on the directory card too.
+  revalidatePath('/braiders');
   revalidatePath('/bookings');
 
   return { ok: true };

@@ -1,15 +1,23 @@
 import { NextResponse } from 'next/server';
 import { subMinutes } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { isAuthorizedCron } from '@/lib/cron/auth';
 import { assertRuntimeEnv } from '@/lib/env';
+import { createLogger, errorInfo } from '@/lib/log';
+
+const log = createLogger('cron.expire-bookings');
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 // Each stale hold costs one synchronous Stripe call, so cap wall-clock and the
-// batch size. The cron runs every 15 min, so any backlog drains over a few runs.
+// batch size; any backlog beyond EXPIRE_BATCH drains over subsequent runs. The
+// SCHEDULE is defined in vercel.json — currently daily (the Vercel Hobby cron
+// limit). On a plan that allows sub-daily crons, tighten it (e.g. */15) so an
+// abandoned hold frees its slot closer to PENDING_BOOKING_TTL_MINUTES rather than
+// at the next daily sweep. See docs/DEPLOYMENT.md.
 export const maxDuration = 60;
 
 const DEFAULT_TTL_MINUTES = 30;
@@ -48,7 +56,7 @@ export async function GET(req: Request) {
     .limit(EXPIRE_BATCH);
 
   if (error) {
-    console.error('[cron/expire-bookings] lookup failed', error);
+    log.error('lookup failed', { code: error.code });
     return NextResponse.json({ error: 'lookup failed' }, { status: 500 });
   }
 
@@ -65,16 +73,16 @@ export async function GET(req: Request) {
     // rejects the cancel — that's our signal to leave the booking alone so the
     // webhook can confirm it. Only a successfully-cancelled (or absent) PI lets
     // us safely release the slot.
+    // In the keyless demo the id is a synthesized `pi_demo_*` with no Stripe
+    // object, and the lazy Stripe client throws when unconfigured — so skip the
+    // call and treat the hold as dead (mirrors cancel.ts). Without this guard the
+    // throw is caught below, piDead stays false, and NO hold ever expires in demo.
     let piDead = true;
-    if (deposit?.stripe_payment_intent_id && deposit.status === 'pending') {
+    if (isStripeConfigured() && deposit?.stripe_payment_intent_id && deposit.status === 'pending') {
       try {
         await stripe.paymentIntents.cancel(deposit.stripe_payment_intent_id);
       } catch (err) {
-        console.error(
-          '[cron/expire-bookings] PI cancel failed, leaving booking',
-          b.id,
-          err
-        );
+        log.error('PI cancel failed, leaving booking', { bookingId: b.id, ...errorInfo(err) });
         piDead = false;
       }
     }

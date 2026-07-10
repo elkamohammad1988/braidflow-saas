@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db/server';
+import { getSession } from '@/lib/auth/session';
 import {
   availabilityRuleSchema,
   overrideSchema,
@@ -9,11 +10,14 @@ import {
   type OverrideInput
 } from './validation';
 
+// Enforce the braider ROLE in the action itself (see the note in
+// lib/services/actions.ts) — middleware routing is not a substitute, since a
+// server action can be invoked by id from an unprotected route.
 async function requireBraiderId() {
-  const database = db();
-  const { data: { user } } = await database.auth.getUser();
-  if (!user) throw new Error('Not signed in');
-  return { database, userId: user.id };
+  const session = await getSession();
+  if (!session) throw new Error('Not signed in');
+  if (session.profile.role !== 'braider') throw new Error('Not authorized');
+  return { database: db(), userId: session.user.id };
 }
 
 export async function addAvailabilityRuleAction(input: AvailabilityRuleInput) {

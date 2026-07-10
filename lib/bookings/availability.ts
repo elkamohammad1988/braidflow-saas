@@ -30,6 +30,10 @@ export type ExistingBooking = {
 export type Slot = { start: Date; end: Date };
 
 const SLOT_GRANULARITY_MINUTES = 30;
+// A slot must START far enough ahead to actually be bookable. Mirrors the
+// server-side guard in create.ts/reschedule.ts (a start at/under `now + 60s` is
+// rejected), so the picker never offers a slot the create action would refuse.
+const MIN_LEAD_MS = 60_000;
 
 // Set a wall-clock minute-of-day on a zoned day-start. Done by setting the local
 // time FIELDS (not adding absolute minutes) so the result is the correct instant
@@ -100,13 +104,19 @@ export function computeSlotsForDay(
       +addMinutes(cursor, serviceDurationMinutes) === +window.end
     ) {
       const slotEnd = addMinutes(cursor, serviceDurationMinutes);
-      const isPast = isBefore(slotEnd, now);
+      // Gate on the START, not the end: a slot whose start is already in the past
+      // (or under the booking lead) must not be offered even if it hasn't finished.
+      const tooSoon = +cursor <= now.getTime() + MIN_LEAD_MS;
       const overlaps = conflicts.some((c) => cursor < c.end && slotEnd > c.start);
       // Normalize to a plain Date so callers serialize a clean UTC instant.
-      if (!isPast && !overlaps) slots.push({ start: new Date(+cursor), end: new Date(+slotEnd) });
+      if (!tooSoon && !overlaps) slots.push({ start: new Date(+cursor), end: new Date(+slotEnd) });
       cursor = addMinutes(cursor, SLOT_GRANULARITY_MINUTES);
     }
   }
 
-  return slots.sort((a, b) => +a.start - +b.start);
+  // Overlapping weekly rules or an `open` override that overlaps working hours can
+  // emit the same start twice; collapse to one slot per start instant.
+  const unique = new Map<number, Slot>();
+  for (const slot of slots) if (!unique.has(+slot.start)) unique.set(+slot.start, slot);
+  return [...unique.values()].sort((a, b) => +a.start - +b.start);
 }

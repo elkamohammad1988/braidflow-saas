@@ -14,7 +14,14 @@ type PaymentRow = {
 export function depositStateFromPayments(payments: PaymentRow[] | null | undefined): DepositState {
   const list = payments ?? [];
   const deposit = list.find((p) => p.kind === 'deposit');
-  const refund = list.find((p) => p.kind === 'refund');
+  // A booking can carry more than one refund row — a failed attempt followed by a
+  // successful retry. Reflect the FINAL outcome, not whichever row is first:
+  // prefer a settled refund, then a pending one, else the (failed) remainder.
+  const refunds = list.filter((p) => p.kind === 'refund');
+  const refund =
+    refunds.find((r) => r.status === 'succeeded' || r.status === 'refunded') ??
+    refunds.find((r) => r.status === 'pending') ??
+    refunds[0];
 
   if (!deposit || deposit.status === 'pending') return 'deposit_pending';
   if (deposit.status !== 'succeeded') return 'no_deposit';

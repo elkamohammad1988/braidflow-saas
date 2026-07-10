@@ -5,11 +5,14 @@ import { dbAdmin } from '@/lib/db/server';
 import { notifyBookingConfirmed } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureMessage } from '@/lib/monitoring';
+import { createLogger } from '@/lib/log';
 import { assertRuntimeEnv } from '@/lib/env';
 import { readAccountStatus } from '@/lib/stripe/connect';
 import { applyConnectStatus } from '@/lib/braider/connect-sync';
 
 export const runtime = 'nodejs';
+
+const log = createLogger('stripe.webhook');
 
 function refundStatus(status: Stripe.Refund['status']) {
   return status === 'succeeded'
@@ -53,7 +56,7 @@ export async function POST(req: Request) {
     }
     // A non-duplicate dedupe failure shouldn't drop the event — log and proceed
     // (the per-handler guards below are themselves idempotent).
-    console.error('[stripe webhook] dedupe insert failed', dedupeError);
+    log.error('dedupe insert failed', { eventId: event.id, code: dedupeError.code });
   }
 
   switch (event.type) {
@@ -61,7 +64,7 @@ export async function POST(req: Request) {
       const pi = event.data.object;
       const bookingId = pi.metadata.booking_id;
       if (!bookingId) {
-        console.error('[stripe webhook] succeeded PI without booking_id', pi.id);
+        log.error('succeeded PI without booking_id', { paymentIntent: pi.id });
         break;
       }
 
@@ -175,7 +178,7 @@ export async function POST(req: Request) {
         bookingId = dep?.booking_id ?? null;
       }
 
-      console.error('[stripe webhook] dispute opened', {
+      log.error('dispute opened', {
         disputeId: dispute.id,
         paymentIntent: piId,
         bookingId,

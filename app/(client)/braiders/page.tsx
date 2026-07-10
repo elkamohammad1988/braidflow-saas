@@ -36,7 +36,11 @@ export default async function BraidersIndex({
     .select(
       'id, slug, business_name, city, hero_image_url, created_at, services(price_cents, is_active)'
     )
-    .eq('accepting_bookings', true);
+    // Both flags: a braider whose Stripe charges were revoked can be left
+    // accepting_bookings=true (connect-sync clears it, but belt-and-suspenders),
+    // and their book button would dead-end. Only list braiders who can be booked.
+    .eq('accepting_bookings', true)
+    .eq('charges_enabled', true);
 
   if (q) {
     // Strip characters that would break the PostgREST or() filter grammar.

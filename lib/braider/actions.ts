@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db/server';
+import { getSession } from '@/lib/auth/session';
 import { recordAuditLog } from '@/lib/audit/log';
 import { ensureBraiderRecord } from './ensure';
 import { braiderSettingsSchema, type BraiderSettingsInput } from './validation';
@@ -13,8 +14,15 @@ export async function updateBraiderSettingsAction(input: BraiderSettingsInput) {
   }
 
   const database = db();
-  const { data: { user } } = await database.auth.getUser();
-  if (!user) return { error: 'You need to be signed in.' };
+  const session = await getSession();
+  if (!session) return { error: 'You need to be signed in.' };
+  // Require the braider role in-action: ensureBraiderRecord() below would
+  // otherwise mint a braiders row + public slug for a client id (self-promotion)
+  // if this action were invoked outside the /dashboard middleware guard.
+  if (session.profile.role !== 'braider') {
+    return { error: 'Only braiders can update studio settings.' };
+  }
+  const user = session.user;
 
   // Without a braiders row the UPDATE below matches nothing and reports success
   // while saving nothing. Guarantee the row exists first.

@@ -113,14 +113,22 @@ export async function ensureBookingFromSnapshot(
 
   const chargeId = snap.ps === 'succeeded' ? `ch_demo_${bookingId}` : null;
   if (!payment) {
-    await admin.from('payments').insert({
-      booking_id: bookingId,
-      kind: 'deposit',
-      amount_cents: snap.b.deposit_cents,
-      status: snap.ps,
-      stripe_payment_intent_id: `pi_demo_${bookingId}`,
-      stripe_charge_id: chargeId
-    });
+    // Upsert on the stable per-booking `pi_demo_` id, not a plain insert: two
+    // requests can rehydrate the same booking onto one instance concurrently
+    // (both read `payment` as null above), and without the conflict key they'd
+    // create two deposit rows for one booking. Keyed this way, the second is a
+    // no-op update.
+    await admin.from('payments').upsert(
+      {
+        booking_id: bookingId,
+        kind: 'deposit',
+        amount_cents: snap.b.deposit_cents,
+        status: snap.ps,
+        stripe_payment_intent_id: `pi_demo_${bookingId}`,
+        stripe_charge_id: chargeId
+      },
+      { onConflict: 'stripe_payment_intent_id' }
+    );
   } else if (payment.status !== snap.ps && payment.status !== 'succeeded') {
     await admin
       .from('payments')

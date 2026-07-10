@@ -67,7 +67,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
               'inline-flex items-center font-medium disabled:opacity-50',
               isComplete
                 ? 'text-moss hover:text-moss/80'
-                : 'text-red-700 hover:text-red-700'
+                : 'text-red-700 hover:text-red-700 dark:text-red-400 dark:hover:text-red-400'
             )}
           >
             {pending && <Spinner className="me-1.5 h-3 w-3" />}
@@ -83,7 +83,7 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
           </button>
         </div>
         {error && (
-          <p role="alert" className="text-xs text-red-700">
+          <p role="alert" className="text-xs text-red-700 dark:text-red-400">
             {error}
           </p>
         )}
@@ -106,13 +106,13 @@ export function FinalizeBookingButtons({ bookingId }: { bookingId: string }) {
         <button
           type="button"
           onClick={() => setConfirming('no_show')}
-          className="font-medium text-ink-muted hover:text-red-700"
+          className="font-medium text-ink-muted hover:text-red-700 dark:hover:text-red-400"
         >
           {t('noShow')}
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-xs text-red-700">
+        <p role="alert" className="text-xs text-red-700 dark:text-red-400">
           {error}
         </p>
       )}

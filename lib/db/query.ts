@@ -32,12 +32,27 @@ function makeError(message: string, code?: string): Error & { code?: string } {
 
 // Columns that must be unique — the app relies on the resulting `23505` to drive
 // retry/idempotency logic (slug minting, one-review-per-booking, webhook dedupe).
+// Every table's primary key `id` is unique too: without it a fixed-id insert (e.g.
+// the demo-snapshot self-heal, which reuses the original booking id) could create
+// a duplicate row under a race, whereas real Postgres would reject the second.
 const UNIQUE_COLUMNS: Partial<Record<TableName, string[]>> = {
   profiles: ['id'],
   braiders: ['id', 'slug'],
-  reviews: ['booking_id'],
+  services: ['id'],
+  availability_rules: ['id'],
+  availability_overrides: ['id'],
+  bookings: ['id'],
+  payments: ['id', 'stripe_refund_id'],
+  reviews: ['id', 'booking_id'],
+  audit_logs: ['id'],
   stripe_webhook_events: ['id']
 };
+
+// Booking statuses that occupy a slot — mirrors the WHERE clause of the
+// production `bookings_no_overlap` exclusion constraint
+// (supabase/migrations/0001_initial_schema.sql). A cancelled/completed/no-show
+// booking frees its time.
+const ACTIVE_BOOKING_STATUSES = ['pending_payment', 'confirmed'];
 
 type Op = 'select' | 'insert' | 'update' | 'delete' | 'upsert';
 type Predicate = (row: StoredRow) => boolean;
@@ -267,11 +282,15 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
     return this.predicates.every((p) => p(row));
   }
 
-  private shape(rows: StoredRow[]): QueryResult<unknown> {
+  private shape(rows: StoredRow[], totalCount?: number): QueryResult<unknown> {
     const fields = parseSelect(this.selectStr ?? '*');
     const projected = rows.map((r) => projectRow(r, this.tableName, fields));
+    // count:'exact' is the total matching the filter, independent of any limit or
+    // range (PostgREST semantics) — so `totalCount` (the pre-limit count) is used
+    // when supplied, letting callers show a correct "N of M".
+    const exact = this.countExact ? totalCount ?? rows.length : null;
     if (this.cardinality === 'array') {
-      return { data: projected, error: null, count: this.countExact ? rows.length : null };
+      return { data: projected, error: null, count: exact };
     }
     if (projected.length === 0) {
       // maybeSingle → no error; single → PostgREST returns an error, but every
@@ -280,9 +299,20 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
         this.cardinality === 'single'
           ? (makeError('No rows found', 'PGRST116') as QueryError)
           : null;
-      return { data: null, error, count: this.countExact ? 0 : null };
+      return { data: null, error, count: exact };
     }
-    return { data: projected[0], error: null, count: this.countExact ? rows.length : null };
+    // .single() asserts exactly one row: >1 matches is a coercion error in
+    // PostgREST (PGRST116). Surfacing it turns a silent "return the first of N" —
+    // which would mask a duplicate-key bug — into a visible error. maybeSingle is
+    // left permissive (returns the first) to preserve existing callers.
+    if (this.cardinality === 'single' && projected.length > 1) {
+      return {
+        data: null,
+        error: makeError('Cannot coerce the result to a single JSON object', 'PGRST116') as QueryError,
+        count: exact
+      };
+    }
+    return { data: projected[0], error: null, count: exact };
   }
 
   private run(): QueryResult<unknown> {
@@ -325,7 +355,8 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
       });
     }
     if (this.limitCount != null) rows = rows.slice(0, this.limitCount);
-    return this.shape(rows);
+    // Pass the pre-limit total so count:'exact' reflects all matches, not the page.
+    return this.shape(rows, count ?? undefined);
   }
 
   private applyDefaults(raw: StoredRow): StoredRow {
@@ -342,6 +373,31 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
     );
   }
 
+  // Emulates the production `bookings_no_overlap` GiST exclusion constraint: two
+  // ACTIVE bookings for the same braider may never occupy overlapping time. Runs
+  // synchronously inside the insert/update mutation, so — unlike the app-level
+  // read-then-insert check in create.ts/reschedule.ts — it holds under concurrency
+  // and raises 23P01 exactly like Postgres, keeping those actions' catch blocks
+  // live. `all` is the live table; `candidate` is the post-defaults/post-patch row.
+  private bookingOverlaps(candidate: StoredRow, all: StoredRow[]): boolean {
+    if (this.tableName !== 'bookings') return false;
+    if (!ACTIVE_BOOKING_STATUSES.includes(String(candidate.status))) return false;
+    const start = Date.parse(String(candidate.scheduled_at));
+    const end = start + Number(candidate.duration_minutes) * 60_000;
+    if (Number.isNaN(start) || Number.isNaN(end)) return false;
+    return all.some((other) => {
+      // Skip self (same object on insert, same id on update).
+      if (other === candidate || other.id === candidate.id) return false;
+      if (other.braider_id !== candidate.braider_id) return false;
+      if (!ACTIVE_BOOKING_STATUSES.includes(String(other.status))) return false;
+      const oStart = Date.parse(String(other.scheduled_at));
+      const oEnd = oStart + Number(other.duration_minutes) * 60_000;
+      if (Number.isNaN(oStart)) return false;
+      // Half-open [start, end) overlap, matching tstzrange's '[)' bounds.
+      return start < oEnd && oStart < end;
+    });
+  }
+
   private returning(rows: StoredRow[]): QueryResult<unknown> {
     if (!this.hasReturning) return { data: null, error: null, count: null };
     return this.shape(rows);
@@ -355,6 +411,13 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
       if (this.uniqueViolation(row, rows)) {
         return { data: null, error: makeError('duplicate key value', '23505') as QueryError, count: null };
       }
+      if (this.bookingOverlaps(row, rows)) {
+        return {
+          data: null,
+          error: makeError('conflicting key value violates exclusion constraint "bookings_no_overlap"', '23P01') as QueryError,
+          count: null
+        };
+      }
       rows.push(row);
       inserted.push(row);
     }
@@ -363,7 +426,22 @@ export class QueryBuilder<Row> implements PromiseLike<QueryResult<Row[]>> {
 
   private runUpdate(): QueryResult<unknown> {
     const patch = this.payload[0] ?? {};
-    const matched = getTable(this.tableName).filter((r) => this.matches(r));
+    const all = getTable(this.tableName);
+    const matched = all.filter((r) => this.matches(r));
+    // Validate the post-patch rows against the exclusion constraint BEFORE
+    // committing, so a reschedule onto a taken slot fails atomically with 23P01
+    // (matching Postgres + reschedule.ts's catch) instead of silently overlapping.
+    if (this.tableName === 'bookings') {
+      for (const row of matched) {
+        if (this.bookingOverlaps({ ...row, ...patch }, all)) {
+          return {
+            data: null,
+            error: makeError('conflicting key value violates exclusion constraint "bookings_no_overlap"', '23P01') as QueryError,
+            count: null
+          };
+        }
+      }
+    }
     for (const row of matched) Object.assign(row, patch);
     return this.returning(matched);
   }

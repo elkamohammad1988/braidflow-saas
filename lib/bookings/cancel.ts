@@ -7,9 +7,12 @@ import { db, dbAdmin } from '@/lib/db/server';
 import { notifyCancellation } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
+import { createLogger, errorInfo } from '@/lib/log';
 import { issueDepositRefund } from './refund';
 import { decideDepositRefund, type RefundDecision } from './cancellation-policy';
 import { authorizeBookingMutation } from './access';
+
+const log = createLogger('booking.cancel');
 
 export async function cancelBookingAction(bookingId: string, token?: string) {
   const database = db();
@@ -81,7 +84,7 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
     if ('error' in outcome) {
       // The booking is already cancelled; surface the refund failure loudly so
       // support can settle it manually rather than silently keeping the money.
-      console.error('[cancel] auto-refund failed', bookingId, outcome.error);
+      log.error('auto-refund failed', { bookingId, error: outcome.error });
       captureException(new Error('Auto-refund on cancellation failed'), {
         bookingId,
         stage: 'cancel.refund'
@@ -106,7 +109,7 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
         // Stripe rejects the cancel when the intent already succeeded — i.e. the
         // client paid in the race window. The deposit is now charged, so apply the
         // refund policy to it.
-        console.error('[cancel] PI cancel failed, settling charged deposit', bookingId, err);
+        log.error('PI cancel failed, settling charged deposit', { bookingId, ...errorInfo(err) });
         await settleChargedDeposit(decision);
         captureException(err, { bookingId, stage: 'cancel.settle' });
       }
@@ -133,7 +136,14 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
 
   await notifyCancellation(bookingId, isClient ? 'client' : 'braider');
 
+  // Revalidate every surface that shows this booking — matching complete.ts /
+  // reschedule.ts. A braider can cancel straight from the appointments table, so
+  // without busting the dashboard overview, calendar and clients views their
+  // soft-navigation would keep drawing the now-cancelled appointment.
   revalidatePath('/bookings');
+  revalidatePath('/dashboard');
   revalidatePath('/dashboard/appointments');
+  revalidatePath('/dashboard/calendar');
+  revalidatePath('/dashboard/clients');
   return { ok: true as const };
 }

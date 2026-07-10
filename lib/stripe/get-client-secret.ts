@@ -2,6 +2,9 @@ import { stripe } from './client';
 import { isStripeConfigured } from './config';
 import { dbAdmin } from '@/lib/db/server';
 import { guestTokenMatches } from '@/lib/bookings/guest-token';
+import { createLogger, errorInfo } from '@/lib/log';
+
+const log = createLogger('stripe.client-secret');
 
 // Who is asking for the deposit secret: the authenticated owner, or a guest
 // holding the booking's capability token. Authorization lives in this helper
@@ -55,7 +58,7 @@ export async function getDepositClientSecret(bookingId: string, access: DepositA
   } catch (err) {
     // Stripe unreachable / intent gone — let the pay page render its fallback
     // rather than 500.
-    console.error('[stripe] could not retrieve deposit intent', bookingId, err);
+    log.error('could not retrieve deposit intent', { bookingId, ...errorInfo(err) });
     return null;
   }
 }

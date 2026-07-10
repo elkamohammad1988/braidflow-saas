@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege: this workflow only reads the repo. A compromised dependency in
+# `npm ci`/build then can't push, tamper with releases, or open PRs.
+permissions:
+  contents: read
+
 # Cancel superseded runs on the same ref to save minutes.
 concurrency:
   group: ci-${{ github.ref }}
@@ -24,6 +29,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Restore Next's build cache so incremental CI builds are fast (Next prints a
+      # warning without it). Keyed on source so it invalidates when code changes.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -37,3 +52,19 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: '1'
+
+  # Dependency vulnerability visibility. Informational (Dependabot opens the fix
+  # PRs) so a fresh transitive advisory outside our control can't red-wall every
+  # unrelated PR, but high/critical findings are surfaced on each run.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: npm audit (high+)
+        run: npm audit --audit-level=high
+        continue-on-error: true

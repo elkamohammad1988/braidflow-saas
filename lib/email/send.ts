@@ -1,6 +1,9 @@
 import 'server-only';
 import { Resend } from 'resend';
 import type { ReactElement } from 'react';
+import { createLogger, maskEmail, errorInfo } from '@/lib/log';
+
+const log = createLogger('email');
 
 let resend: Resend | null = null;
 
@@ -22,17 +25,17 @@ type Args = {
 export async function sendEmail({ to, subject, react, replyTo }: Args) {
   const r = client();
   if (!process.env.EMAIL_FROM && process.env.NODE_ENV === 'production') {
-    console.error(
-      '[email] EMAIL_FROM is unset in production — falling back to the Resend ' +
-        'sandbox sender, which has poor deliverability and only reaches the ' +
-        'account owner. Set EMAIL_FROM to a verified domain.'
+    log.error(
+      'EMAIL_FROM unset in production — falling back to the Resend sandbox sender ' +
+        '(poor deliverability, reaches only the account owner). Set EMAIL_FROM to a verified domain.'
     );
   }
   const from = process.env.EMAIL_FROM ?? 'BraidFlow <onboarding@resend.dev>';
 
   if (!r) {
-    // Local dev without Resend configured — log a one-line breadcrumb instead of crashing.
-    console.warn(`[email] skipped (no RESEND_API_KEY) → "${subject}" to ${to}`);
+    // Local dev without Resend configured — breadcrumb only. Mask the recipient so
+    // no PII lands in logs even in the no-provider path.
+    log.warn('skipped (no RESEND_API_KEY)', { subject, to: maskEmail(to) });
     return { skipped: true as const };
   }
 
@@ -45,12 +48,13 @@ export async function sendEmail({ to, subject, react, replyTo }: Args) {
       replyTo
     });
     if (error) {
-      console.error('[email] resend error', error);
+      // Log the message only — the raw error object can echo the recipient address.
+      log.error('resend send failed', { subject, to: maskEmail(to), error: error.message });
       return { skipped: false as const, ok: false as const, error: error.message };
     }
     return { skipped: false as const, ok: true as const, id: data?.id };
   } catch (err) {
-    console.error('[email] send threw', err);
+    log.error('send threw', { subject, to: maskEmail(to), ...errorInfo(err) });
     return { skipped: false as const, ok: false as const, error: 'send failed' };
   }
 }

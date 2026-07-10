@@ -126,6 +126,11 @@ export function BookingFlow({
           <section>
             <StepHeader n={2} label={t('stepTime')} done={Boolean(selectedSlot)} />
             <SlotPicker
+              // Remount per service so the picker re-defaults to that service's
+              // first open day. Without a stable identity React preserves the
+              // previous service's active day, which may have no slots for the new
+              // one — showing a false "no openings" at the highest-intent step.
+              key={serviceId ?? 'none'}
               slotsByDay={hydratedDays}
               selected={selectedSlot}
               onSelect={setSelectedSlot}
@@ -229,7 +234,7 @@ export function BookingFlow({
           </ul>
 
           {error && (
-            <p role="alert" className="text-sm text-red-700 md:hidden">
+            <p role="alert" className="text-sm text-red-700 dark:text-red-400 md:hidden">
               {error}
             </p>
           )}
@@ -264,7 +269,7 @@ export function BookingFlow({
             )}
 
             {error && (
-              <p role="alert" className="mt-4 text-sm text-red-700">
+              <p role="alert" className="mt-4 text-sm text-red-700 dark:text-red-400">
                 {error}
               </p>
             )}

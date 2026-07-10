@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { endOfDay, startOfDay, subDays } from 'date-fns';
+import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 import { db, dbAdmin } from '@/lib/db/server';
 import { notifyReschedule } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
@@ -72,8 +72,11 @@ export async function rescheduleBookingAction(
     return { error: 'This braider isn\'t accepting bookings right now.' };
   }
 
+  // Pad the window a full day on each side: the day boundaries are in the runtime
+  // zone (UTC) but the braider's day is in their zone, so an evening booking can
+  // land past UTC midnight. isSlotBookable does the precise overlap. (See create.ts.)
   const windowStart = subDays(startOfDay(newTime), 1).toISOString();
-  const windowEnd = endOfDay(newTime).toISOString();
+  const windowEnd = endOfDay(addDays(newTime, 1)).toISOString();
   const { data: dayBookings } = await admin
     .from('bookings')
     .select('scheduled_at, duration_minutes')

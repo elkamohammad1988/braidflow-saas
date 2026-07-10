@@ -1,5 +1,7 @@
 import 'server-only';
 import { dbAdmin } from '@/lib/db/server';
+import { createLogger } from '@/lib/log';
+import { captureMessage } from '@/lib/monitoring';
 import { sendEmail } from './send';
 import {
   BookingConfirmedClientEmail,
@@ -26,6 +28,8 @@ import {
   refundedSubject,
   type RefundedProps
 } from './templates/deposit-refunded';
+
+const log = createLogger('notify');
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
@@ -77,7 +81,7 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
 
   // Note: `client` is intentionally NOT required — guest bookings have no profile.
   if (!data || !data.services || !data.braiders) {
-    console.error('[notify] booking context unavailable', bookingId);
+    log.error('booking context unavailable', { bookingId });
     return null;
   }
 
@@ -103,8 +107,8 @@ async function loadBookingContext(bookingId: string): Promise<BookingContext | n
 
   // A missing email no longer suppresses BOTH messages — we send to whoever we
   // can reach and log the gap rather than silently dropping everything.
-  if (!clientEmail) console.error('[notify] missing client email for booking', bookingId);
-  if (!braiderEmail) console.error('[notify] missing braider email for booking', bookingId);
+  if (!clientEmail) log.error('missing client email for booking', { bookingId });
+  if (!braiderEmail) log.error('missing braider email for booking', { bookingId });
 
   // Guests manage via their capability URL (no account); registered clients via
   // their bookings list.
@@ -178,7 +182,11 @@ export async function notifyBookingConfirmed(bookingId: string) {
   }
   const settled = await Promise.allSettled(sends);
   if (settled.some((r) => r.status === 'rejected' || (r.status === 'fulfilled' && !sendOk(r.value)))) {
-    console.error('[notify] confirmation email(s) failed for booking', ctx.bookingId);
+    // Fired from the webhook after a successful charge — a failure here means a
+    // PAID booking whose confirmation never reached the client. Surface it in
+    // monitoring, not just logs, so ops can resend before the appointment.
+    log.error('confirmation email(s) failed', { bookingId: ctx.bookingId });
+    captureMessage('Confirmation email failed after payment', { bookingId: ctx.bookingId });
   }
 }
 

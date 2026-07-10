@@ -70,4 +70,27 @@ describe('assertRuntimeEnv', () => {
     process.env.NEXT_PUBLIC_SITE_URL = 'not a url';
     await expect(assertEnv()).rejects.toThrow(/NEXT_PUBLIC_SITE_URL/);
   });
+
+  it('requires AUTH_SECRET once LIVE Stripe keys are configured', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_live_x';
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
+    // No AUTH_SECRET → forgeable session cookies while real money moves.
+    await expect(assertEnv()).rejects.toThrow(/AUTH_SECRET/);
+  });
+
+  it('accepts LIVE Stripe keys when a real AUTH_SECRET is set', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_live_x';
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
+    process.env.AUTH_SECRET = 'a-sufficiently-long-random-secret';
+    await expect(assertEnv()).resolves.toBeUndefined();
+  });
+
+  it('does NOT require AUTH_SECRET for test-key Stripe (the demo stays zero-config)', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_x';
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_test_x';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
+    await expect(assertEnv()).resolves.toBeUndefined();
+  });
 });

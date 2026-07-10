@@ -54,7 +54,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
         type="button"
         onClick={() => setConfirming(true)}
         className={cn(
-          'text-sm font-medium text-ink-muted hover:text-red-700',
+          'text-sm font-medium text-ink-muted hover:text-red-700 dark:hover:text-red-400',
           className
         )}
       >
@@ -72,7 +72,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
           type="button"
           onClick={run}
           disabled={pending}
-          className="inline-flex items-center font-medium text-red-700 hover:text-red-700 disabled:opacity-50"
+          className="inline-flex items-center font-medium text-red-700 hover:text-red-700 disabled:opacity-50 dark:text-red-400 dark:hover:text-red-400"
         >
           {pending && <Spinner className="me-1.5 h-3 w-3" />}
           {t('yesCancel')}
@@ -87,7 +87,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-xs text-red-700">
+        <p role="alert" className="text-xs text-red-700 dark:text-red-400">
           {error}
         </p>
       )}

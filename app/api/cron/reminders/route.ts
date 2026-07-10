@@ -4,6 +4,9 @@ import { dbAdmin } from '@/lib/db/server';
 import { notifyReminder } from '@/lib/email/notifications';
 import { isAuthorizedCron } from '@/lib/cron/auth';
 import { assertRuntimeEnv } from '@/lib/env';
+import { createLogger } from '@/lib/log';
+
+const log = createLogger('cron.reminders');
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,15 +14,18 @@ export const dynamic = 'force-dynamic';
 // and get killed mid-send (which would leave reminders claimed-but-unsent).
 export const maxDuration = 60;
 
-// Max reminders processed per window per run. Each window is ~2h wide and the
-// cron is hourly, so any overflow is picked up on the next tick. Tune up once a
-// queue replaces the inline send.
+// Max reminders processed per window per run; any overflow is picked up on the
+// next tick. Tune up once a queue replaces the inline send.
 const REMINDER_BATCH = 100;
 
 type WindowKind = '24h' | '2h';
 
-// Each window is sized at ~2x the cron cadence (hourly) so a single missed run
-// still gets caught on the next tick.
+// The reminder WINDOWS below (±1h around the 24h and 2h marks) are sized for a
+// roughly-hourly cron so a single missed run still gets caught next tick. The
+// actual SCHEDULE lives in vercel.json — currently daily (Vercel Hobby limit),
+// at which cadence only bookings whose 24h/2h mark lands near the daily run time
+// are reminded. For full coverage run the cron hourly on a plan that allows it
+// (see docs/DEPLOYMENT.md); reminders are best-effort and never block the flow.
 type Window = {
   name: WindowKind;
   column: 'reminder_sent_at' | 'final_reminder_sent_at';
@@ -70,7 +76,7 @@ export async function GET(req: Request) {
       .limit(REMINDER_BATCH);
 
     if (dueError) {
-      console.error(`[cron/reminders] ${w.name} lookup failed`, dueError);
+      log.error('lookup failed', { window: w.name, code: dueError.code });
       results.push({ window: w.name, claimed: 0, failed: 0 });
       continue;
     }
@@ -93,7 +99,7 @@ export async function GET(req: Request) {
       .select('id');
 
     if (error) {
-      console.error(`[cron/reminders] ${w.name} claim failed`, error);
+      log.error('claim failed', { window: w.name, code: error.code });
       results.push({ window: w.name, claimed: 0, failed: 0 });
       continue;
     }

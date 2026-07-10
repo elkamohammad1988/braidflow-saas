@@ -67,6 +67,21 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
     };
   }, [open]);
 
+  // The whole menu is CSS-hidden at the `md` breakpoint. If the viewport grows
+  // past it while the menu is open (desktop resize, tablet rotation, dev tools),
+  // the panel and its toggle vanish but `open` stays true — leaving body scroll
+  // locked with no visible way to close it. Close on cross so the effect above
+  // runs its cleanup and restores scrolling.
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const sync = () => {
+      if (desktop.matches) setOpen(false);
+    };
+    sync();
+    desktop.addEventListener('change', sync);
+    return () => desktop.removeEventListener('change', sync);
+  }, []);
+
   return (
     <div className="md:hidden">
       <button

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { TZDate } from '@date-fns/tz';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
@@ -40,7 +41,7 @@ export function OverridesEditor({
         {t('availability.timeOffDescription')}
       </p>
 
-      {adding && <AddOverrideForm onDone={() => setAdding(false)} />}
+      {adding && <AddOverrideForm timeZone={timeZone} onDone={() => setAdding(false)} />}
 
       <ul className="mt-4 space-y-2">
         {overrides.length === 0 && !adding && (
@@ -94,9 +95,25 @@ function OverrideRow({ override, timeZone }: { override: Override; timeZone: str
   );
 }
 
-function AddOverrideForm({ onDone }: { onDone: () => void }) {
+// Build an absolute instant from a wall-clock `yyyy-MM-dd` + `HH:mm` interpreted
+// in the braider's business timezone (NOT the browser's). Overrides are stored
+// as UTC instants and re-read by computeSlotsForDay in the same zone, so parsing
+// with a bare `new Date('…')` (which uses the runtime zone) would block the wrong
+// hours whenever the braider's device zone differs from their studio's.
+function zonedInstant(dateStr: string, timeStr: string, timeZone: string): Date | null {
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const [h, mi] = timeStr.split(':').map(Number);
+  if ([y, mo, d, h, mi].some((n) => n === undefined || Number.isNaN(n))) return null;
+  const zoned = new TZDate(y!, mo! - 1, d!, h!, mi!, 0, 0, timeZone);
+  const ms = zoned.getTime();
+  return Number.isNaN(ms) ? null : new Date(ms);
+}
+
+function AddOverrideForm({ timeZone, onDone }: { timeZone: string; onDone: () => void }) {
   const t = useTranslations('dashboard');
-  const today = new Date().toISOString().slice(0, 10);
+  // "Today" in the braider's zone, so the date picker's min/default match the
+  // zone the block is actually stored and displayed in.
+  const today = formatInZone(new Date(), timeZone, 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
@@ -106,10 +123,10 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
 
   function save() {
     setError(null);
-    const startsAt = new Date(`${date}T${startTime}:00`);
-    const endsAt = new Date(`${date}T${endTime}:00`);
+    const startsAt = zonedInstant(date, startTime, timeZone);
+    const endsAt = zonedInstant(date, endTime, timeZone);
 
-    if (Number.isNaN(+startsAt) || Number.isNaN(+endsAt)) {
+    if (!startsAt || !endsAt) {
       setError(t('availability.invalidDateTime'));
       return;
     }
@@ -171,7 +188,7 @@ function AddOverrideForm({ onDone }: { onDone: () => void }) {
       </label>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-red-700">
+        <p role="alert" className="mt-3 text-sm text-red-700 dark:text-red-400">
           {error}
         </p>
       )}

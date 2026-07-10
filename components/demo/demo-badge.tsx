@@ -15,7 +15,7 @@ export function DemoBadge() {
   if (dismissed) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-[60] -translate-x-1/2 print:hidden md:left-auto md:right-5 md:translate-x-0">
+    <div className="fixed bottom-4 left-1/2 z-[60] -translate-x-1/2 print:hidden md:left-auto md:end-5 md:translate-x-0">
       <div className="flex items-center gap-2 rounded-full border border-gold/25 bg-gradient-to-br from-onyx-soft to-night px-3.5 py-2 text-ivory shadow-[0_10px_30px_-12px_rgba(35,24,16,0.65)] ring-1 ring-gold/10">
         <button
           type="button"
@@ -37,7 +37,7 @@ export function DemoBadge() {
       </div>
 
       {open && (
-        <div className="absolute bottom-full mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-card border border-line bg-paper p-4 text-start shadow-[0_18px_50px_-18px_rgba(35,24,16,0.45)] md:right-0">
+        <div className="absolute bottom-full mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-card border border-line bg-paper p-4 text-start shadow-[0_18px_50px_-18px_rgba(35,24,16,0.45)] md:end-0">
           <p className="text-sm font-medium text-ink">{t('demoBadge.title')}</p>
           <p className="mt-1 text-sm leading-relaxed text-ink-muted">
             {t('demoBadge.description')}

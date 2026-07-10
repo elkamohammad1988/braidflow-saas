@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['lib/**/*.test.ts']
+    // Cover route-handler tests under app/ (webhook + crons) too, not just lib/.
+    include: ['{lib,app}/**/*.test.ts']
   },
   resolve: {
     // Mirror the tsconfig "@/*" path alias so unit tests can import app modules.

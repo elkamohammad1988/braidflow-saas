@@ -79,3 +79,29 @@ describe('computeSlotsForDay — timezone correctness', () => {
     expect(slots.some((s) => s.start.toISOString() === '2030-06-17T13:00:00.000Z')).toBe(false);
   });
 });
+
+describe('computeSlotsForDay — bookability & dedup', () => {
+  it('never offers a slot whose start is already in the past', () => {
+    // Build "today" in NY with an all-day rule. Regardless of the current time,
+    // no returned slot may start at or before now (gating on start, not end).
+    const now = new Date();
+    const day = startOfDay(new TZDate(now, NY));
+    const rules: AvailabilityRule[] = [
+      { day_of_week: day.getDay(), start_minute: 0, end_minute: 1440 }
+    ];
+    const slots = computeSlotsForDay(day, NY, 60, rules, [], []);
+    expect(slots.every((s) => +s.start > now.getTime())).toBe(true);
+  });
+
+  it('deduplicates slots when two rules overlap (no repeated start times)', () => {
+    const day = nyDayStart('2030-06-17T12:00:00Z');
+    const dow = day.getDay();
+    const rules: AvailabilityRule[] = [
+      { day_of_week: dow, start_minute: 9 * 60, end_minute: 13 * 60 },
+      { day_of_week: dow, start_minute: 12 * 60, end_minute: 17 * 60 }
+    ];
+    const slots = computeSlotsForDay(day, NY, 60, rules, [], []);
+    const starts = slots.map((s) => s.start.toISOString());
+    expect(new Set(starts).size).toBe(starts.length);
+  });
+});

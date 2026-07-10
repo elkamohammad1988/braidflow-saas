@@ -107,7 +107,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
       />
 
       {error && (
-        <p role="alert" className="mt-2 text-sm text-red-700">
+        <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-400">
           {error}
         </p>
       )}

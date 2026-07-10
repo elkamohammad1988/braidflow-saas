@@ -1,6 +1,9 @@
 import 'server-only';
 import { dbAdmin } from '@/lib/db/server';
+import { createLogger, errorInfo } from '@/lib/log';
 import type { Json } from '@/types/db';
+
+const log = createLogger('audit');
 
 export type AuditAction =
   | 'booking.created'
@@ -37,9 +40,9 @@ export async function recordAuditLog(entry: AuditEntry): Promise<void> {
       metadata: entry.metadata ?? {}
     });
     if (error) {
-      console.error('[audit] failed to record', entry.action, error);
+      log.error('failed to record', { action: entry.action, code: error.code });
     }
   } catch (err) {
-    console.error('[audit] unexpected error recording', entry.action, err);
+    log.error('unexpected error recording', { action: entry.action, ...errorInfo(err) });
   }
 }

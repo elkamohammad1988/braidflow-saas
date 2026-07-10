@@ -3,13 +3,34 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db/server';
+import { getSession } from '@/lib/auth/session';
 import { serviceSchema, type ServiceInput } from './validation';
 
+// Enforce the braider ROLE in the action, not just authentication — and not only
+// in middleware. A server action can be POSTed to any (unprotected) route by its
+// id, so the `/dashboard` middleware guard is not a substitute for checking here.
+// Without the role check a client-role session could write services under its own
+// id (see the sibling check in lib/braider/actions.ts).
 async function requireBraiderId() {
-  const database = db();
-  const { data: { user } } = await database.auth.getUser();
-  if (!user) throw new Error('Not signed in');
-  return { database, userId: user.id };
+  const session = await getSession();
+  if (!session) throw new Error('Not signed in');
+  if (session.profile.role !== 'braider') throw new Error('Not authorized');
+  return { database: db(), userId: session.user.id };
+}
+
+// A service change moves the public profile's service list + "from" price, the
+// directory card's starting price, and the dashboard activation/service count —
+// not just the services editor. Bust all of them (mirrors lib/braider/actions.ts).
+async function revalidateServiceSurfaces(database: ReturnType<typeof db>, userId: string) {
+  revalidatePath('/dashboard/services');
+  revalidatePath('/dashboard');
+  revalidatePath('/braiders');
+  const { data: braider } = await database
+    .from('braiders')
+    .select('slug')
+    .eq('id', userId)
+    .maybeSingle();
+  if (braider?.slug) revalidatePath(`/braiders/${braider.slug}`);
 }
 
 export async function createServiceAction(input: ServiceInput) {
@@ -31,7 +52,7 @@ export async function createServiceAction(input: ServiceInput) {
 
   if (error) return { error: 'Could not save that service.' };
 
-  revalidatePath('/dashboard/services');
+  await revalidateServiceSurfaces(database, userId);
   redirect('/dashboard/services');
 }
 
@@ -64,7 +85,7 @@ export async function updateServiceAction(id: string, input: ServiceInput) {
     return { error: 'That service isn\'t in your studio.' };
   }
 
-  revalidatePath('/dashboard/services');
+  await revalidateServiceSurfaces(database, userId);
   redirect('/dashboard/services');
 }
 
@@ -77,5 +98,5 @@ export async function archiveServiceAction(id: string) {
     .eq('braider_id', userId)
     .select('id');
   // Only touch the cache if a row we own was actually archived.
-  if (archived && archived.length > 0) revalidatePath('/dashboard/services');
+  if (archived && archived.length > 0) await revalidateServiceSurfaces(database, userId);
 }

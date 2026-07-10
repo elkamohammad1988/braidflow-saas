@@ -1,18 +1,21 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { endOfDay, startOfDay, subDays } from 'date-fns';
+import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
 import { isStripeConfigured } from '@/lib/stripe/config';
 import { signBookingSnapshot } from './demo-snapshot';
 import { db, dbAdmin } from '@/lib/db/server';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
+import { createLogger, errorInfo } from '@/lib/log';
 import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { CURRENCY } from '@/lib/constants';
 import { isSlotBookable } from './slot-check';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 import { generateGuestToken } from './guest-token';
+
+const log = createLogger('booking.create');
 
 export async function createBookingAction(input: CreateBookingInput) {
   const parsed = createBookingSchema.safeParse(input);
@@ -61,6 +64,11 @@ export async function createBookingAction(input: CreateBookingInput) {
   if (Number.isNaN(requestedStart.getTime())) {
     return { error: 'Pick a valid time.' };
   }
+  // Store a canonical ISO instant. `z.string().datetime()` accepts forms without
+  // milliseconds (e.g. `…:00Z`) while the seed and window bounds use `.toISOString()`
+  // (`…:00.000Z`); mixing them would break the engine's lexicographic range/order
+  // comparisons on `scheduled_at` at a boundary. Normalize once, use everywhere.
+  const scheduledAtIso = requestedStart.toISOString();
 
   // Future-date guard, with a small skew allowance for clock drift.
   if (requestedStart.getTime() <= Date.now() + 60_000) {
@@ -88,10 +96,14 @@ export async function createBookingAction(input: CreateBookingInput) {
   }
   const connectedAccountId = braider.stripe_account_id;
 
-  // Pull the braider's bookings around the requested day (one day back to catch
-  // an appointment that spills past midnight) for the overlap check.
+  // Pull the braider's bookings around the requested day for the overlap check.
+  // These day boundaries are in the RUNTIME zone (UTC on Vercel), but the braider's
+  // day is in THEIR zone, so an evening appointment can fall past UTC midnight.
+  // Pad a full day on each side so such bookings are still fetched — isSlotBookable
+  // does the precise overlap, so over-fetching is free; under-fetching would
+  // false-accept an already-taken slot.
   const windowStart = subDays(startOfDay(requestedStart), 1).toISOString();
-  const windowEnd = endOfDay(requestedStart).toISOString();
+  const windowEnd = endOfDay(addDays(requestedStart, 1)).toISOString();
   const { data: dayBookings } = await admin
     .from('bookings')
     .select('scheduled_at, duration_minutes')
@@ -119,7 +131,7 @@ export async function createBookingAction(input: CreateBookingInput) {
       client_id: user?.id ?? null,
       braider_id: service.braider_id,
       service_id: service.id,
-      scheduled_at: parsed.data.scheduledAt,
+      scheduled_at: scheduledAtIso,
       duration_minutes: service.duration_minutes,
       price_cents: service.price_cents,
       deposit_cents: service.deposit_cents,
@@ -165,7 +177,7 @@ export async function createBookingAction(input: CreateBookingInput) {
     } catch (err) {
       // Roll back the hold so the slot isn't stuck until the expiry cron, and the
       // user gets a clean error instead of an unhandled rejection.
-      console.error('[booking] PaymentIntent creation failed, rolling back', booking.id, err);
+      log.error('PaymentIntent creation failed, rolling back', { bookingId: booking.id, ...errorInfo(err) });
       captureException(err, { stage: 'payment_intent.create', bookingId: booking.id });
       await admin.from('bookings').delete().eq('id', booking.id);
       return { error: 'Could not start payment. Please try again.' };
@@ -186,14 +198,14 @@ export async function createBookingAction(input: CreateBookingInput) {
     // Without a payments row the deposit could be charged with no local record
     // and the webhook would match nothing. Cancel the intent and release the
     // hold rather than proceed.
-    console.error('[booking] payment row insert failed, rolling back', booking.id, paymentError);
+    log.error('payment row insert failed, rolling back', { bookingId: booking.id, code: paymentError.code });
     if (isStripeConfigured()) {
       try {
         await stripe.paymentIntents.cancel(paymentIntentId);
       } catch (cancelErr) {
         // Worst case: a live PaymentIntent with no local payment row. Alert loudly
         // so it can be reconciled before a client is charged for a phantom booking.
-        console.error('[booking] PI cancel during rollback failed', paymentIntentId, cancelErr);
+        log.error('PI cancel during rollback failed', { paymentIntentId, ...errorInfo(cancelErr) });
         captureException(cancelErr, { stage: 'payment_intent.cancel', paymentIntentId });
       }
     }
@@ -210,7 +222,7 @@ export async function createBookingAction(input: CreateBookingInput) {
     metadata: {
       braider_id: service.braider_id,
       service_id: service.id,
-      scheduled_at: parsed.data.scheduledAt,
+      scheduled_at: scheduledAtIso,
       deposit_cents: service.deposit_cents,
       guest: Boolean(guest)
     }
@@ -229,7 +241,7 @@ export async function createBookingAction(input: CreateBookingInput) {
         client_id: user?.id ?? null,
         braider_id: service.braider_id,
         service_id: service.id,
-        scheduled_at: parsed.data.scheduledAt,
+        scheduled_at: scheduledAtIso,
         duration_minutes: service.duration_minutes,
         price_cents: service.price_cents,
         deposit_cents: service.deposit_cents,

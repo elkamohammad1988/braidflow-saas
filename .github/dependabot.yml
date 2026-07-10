@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # npm dependencies — weekly, grouped so a wall of minor bumps arrives as one PR.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+
+  # Keep the GitHub Actions themselves patched (supply-chain of the CI itself).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # Base image / OCI layers used by the container build.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

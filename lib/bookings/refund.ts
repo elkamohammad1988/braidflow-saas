@@ -8,6 +8,9 @@ import { db, dbAdmin } from '@/lib/db/server';
 import { notifyDepositRefunded } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
+import { createLogger, errorInfo } from '@/lib/log';
+
+const log = createLogger('booking.refund');
 
 type Result = { ok: true } | { error: string };
 
@@ -122,7 +125,7 @@ export async function issueDepositRefund(
     );
   } catch (err) {
     // Log the detail server-side; don't surface raw Stripe text to the UI.
-    console.error('[refund] stripe refund failed', bookingId, err);
+    log.error('stripe refund failed', { bookingId, ...errorInfo(err) });
     captureException(err, { stage: 'refund.create', bookingId });
     return { error: 'We couldn\'t process the refund. Try again or contact support.' };
   }

@@ -35,7 +35,17 @@ const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }
+  // Sever window.opener links to cross-origin pages we navigate to (tab-nabbing),
+  // while still allowing popups so Stripe's 3-D Secure challenge window works.
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+  // Deny powerful features by default; delegate `payment` to Stripe.js so Payment
+  // Request / Apple Pay in Elements keeps working, and opt out of the Topics API.
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=(), usb=(), payment=(self "https://js.stripe.com"), browsing-topics=()'
+  }
+  // NB: Cross-Origin-Resource-Policy is intentionally NOT set globally — a
+  // `same-origin` value would block social crawlers from fetching /opengraph-image.
 ];
 
 /** @type {import('next').NextConfig} */
