@@ -7,6 +7,7 @@ import { MailCheck, KeyRound } from 'lucide-react';
 import { requestPasswordReset } from '@/lib/auth/password-reset';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { GlassIcon } from '@/components/ui/glass-icon';
 
 type Sent = { delivery: 'email' | 'demo'; email: string };
 
@@ -37,10 +38,8 @@ export function ForgotPasswordForm() {
 
   if (sent?.delivery === 'demo') {
     return (
-      <div className="motion-safe:animate-fade-in-up space-y-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-clay/10 text-clay-text">
-          <KeyRound className="h-6 w-6" strokeWidth={1.9} />
-        </span>
+      <div className="space-y-4" role="status">
+        <GlassIcon icon={KeyRound} tone="accent" size="lg" />
         <div>
           <h2 className="font-display text-xl text-ink">{t('forgot.demo.title')}</h2>
           <p className="mt-1 text-sm text-ink-muted">{t('forgot.demo.body')}</p>
@@ -57,10 +56,8 @@ export function ForgotPasswordForm() {
 
   if (sent) {
     return (
-      <div className="motion-safe:animate-fade-in-up space-y-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-moss/10 text-moss">
-          <MailCheck className="h-6 w-6" strokeWidth={1.9} />
-        </span>
+      <div className="space-y-4" role="status">
+        <GlassIcon icon={MailCheck} tone="success" size="lg" />
         <div>
           <h2 className="font-display text-xl text-ink">{t('forgot.sent.title')}</h2>
           <p className="mt-1 text-sm text-ink-muted">

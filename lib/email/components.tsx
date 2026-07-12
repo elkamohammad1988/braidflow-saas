@@ -10,18 +10,25 @@ import {
 } from '@react-email/components';
 import type { ReactNode } from 'react';
 
+// Transactional emails stay on a light background for deliverability and cross-
+// client compatibility, but carry the app's violet brand — a cool near-neutral
+// palette with the signature violet accent on the wordmark and CTA. (The old
+// warm-brown/gold identity and Georgia serif were retired in the purple redesign;
+// Inter isn't loadable in email, so display type is the system sans set apart by
+// weight, mirroring the in-app Inter decision.)
 const colors = {
-  ink: '#1a1410',
-  inkMuted: '#6b5d52',
-  cream: '#faf6f1',
+  ink: '#1b1235',
+  inkMuted: '#635d78',
+  cream: '#f5f4fa',
   card: '#ffffff',
-  border: 'rgba(26,20,16,0.06)',
-  clay: '#c98b5e'
+  border: 'rgba(27,18,53,0.09)',
+  accent: '#6d28d9'
 };
 
+const sansStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 const fonts = {
-  sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-  display: 'Georgia, "Times New Roman", serif'
+  sans: sansStack,
+  display: sansStack
 };
 
 export function EmailShell({
@@ -54,8 +61,9 @@ export function EmailShell({
             style={{
               fontFamily: fonts.display,
               fontSize: 22,
-              letterSpacing: '-0.01em',
-              color: colors.ink,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: colors.accent,
               margin: '0 0 24px 4px'
             }}
           >
@@ -68,7 +76,7 @@ export function EmailShell({
               border: `1px solid ${colors.border}`,
               borderRadius: 14,
               padding: '32px 32px 28px',
-              boxShadow: '0 8px 24px -12px rgba(26,20,16,0.10)'
+              boxShadow: '0 8px 24px -12px rgba(27,18,53,0.12)'
             }}
           >
             {children}
@@ -92,8 +100,9 @@ export function H1({ children }: { children: ReactNode }) {
       style={{
         fontFamily: fonts.display,
         fontSize: 28,
+        fontWeight: 600,
         lineHeight: 1.15,
-        letterSpacing: '-0.01em',
+        letterSpacing: '-0.02em',
         color: colors.ink,
         margin: '0 0 12px'
       }}
@@ -149,7 +158,7 @@ export function EmailButton({ href, children }: { href: string; children: ReactN
       <tr>
         <td
           style={{
-            backgroundColor: colors.ink,
+            backgroundColor: colors.accent,
             borderRadius: 999
           }}
         >
@@ -157,9 +166,9 @@ export function EmailButton({ href, children }: { href: string; children: ReactN
             href={href}
             style={{
               display: 'inline-block',
-              color: colors.cream,
+              color: '#ffffff',
               fontSize: 14,
-              fontWeight: 500,
+              fontWeight: 600,
               padding: '11px 22px',
               textDecoration: 'none'
             }}

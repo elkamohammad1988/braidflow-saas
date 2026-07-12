@@ -37,7 +37,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         }}
         className={cn(
           'cursor-pointer appearance-none rounded-full border border-line bg-paper py-1.5 pe-7 ps-8 text-sm font-medium text-ink shadow-card transition-colors',
-          'hover:border-clay/30 focus-visible:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/50',
+          'hover:border-clay/30 focus-visible:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45',
           'disabled:cursor-wait disabled:opacity-60'
         )}
       >

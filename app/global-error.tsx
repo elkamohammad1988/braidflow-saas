@@ -26,25 +26,32 @@ export default function GlobalError({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'system-ui, sans-serif',
-          background: '#f5eee3',
-          color: '#231810',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          background:
+            'radial-gradient(60% 60% at 50% 0%, rgba(124,58,237,0.18), transparent 70%), #04030A',
+          color: '#FFFFFF',
           textAlign: 'center',
           padding: '0 1.5rem',
           margin: 0
         }}
       >
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Something went wrong</h1>
-        <p style={{ marginTop: '0.5rem', color: '#6d5c4e', maxWidth: '28rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 600, letterSpacing: '-0.02em' }}>
+          Something went wrong
+        </h1>
+        <p style={{ marginTop: '0.5rem', color: '#A89CCF', maxWidth: '28rem', lineHeight: 1.6 }}>
           We&apos;ve been notified. Please refresh the page or try again in a moment.
         </p>
         <a
           href="/"
           style={{
             marginTop: '1.5rem',
-            color: '#231810',
-            textDecoration: 'underline',
-            fontWeight: 500
+            padding: '0.625rem 1.25rem',
+            borderRadius: '999px',
+            background: 'linear-gradient(180deg, #8B5CF6, #7C3AED)',
+            color: '#FFFFFF',
+            textDecoration: 'none',
+            fontWeight: 600,
+            boxShadow: '0 8px 24px -8px rgba(124,58,237,0.6)'
           }}
         >
           Back to home

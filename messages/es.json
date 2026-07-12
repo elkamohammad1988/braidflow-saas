@@ -7,7 +7,6 @@
     "myBookings": "Mis reservas",
     "viewSite": "Ver sitio",
     "language": "Idioma",
-    "theme": "Tema",
     "menu": "Menú",
     "copied": "Copiado",
     "copy": "Copiar",
@@ -26,12 +25,6 @@
     "imBraider": "Soy trenzadora",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú"
-  },
-  "theme": {
-    "label": "Tema de color",
-    "light": "Claro",
-    "system": "Sistema",
-    "dark": "Oscuro"
   },
   "dashboardNav": {
     "workspace": "Espacio de trabajo",
@@ -387,7 +380,8 @@
         "client": "Clienta",
         "service": "Servicio",
         "status": "Estado",
-        "total": "Total"
+        "total": "Total",
+        "actions": "Acciones"
       }
     },
     "calendar": {
@@ -913,6 +907,7 @@
   },
   "profile": {
     "workHeading": "Trabajos recientes",
+    "galleryAlt": "Trabajo de trenzado de {name}",
     "bookHeading": "Reserva una cita",
     "bookSubtitle": "Elige un servicio y una hora que te sirva. El depósito retiene tu turno.",
     "cancel": "Cancelar",
@@ -931,7 +926,8 @@
     "seeAvailableTimes": "Ver horas disponibles",
     "servicesHeading": "Servicios",
     "starAria": "{count, plural, one {# estrella} other {# estrellas}}",
-    "starsAriaLabel": "Valorada {rating} de 5"
+    "starsAriaLabel": "Valorada {rating} de 5",
+    "opensInNewTab": "(se abre en una pestaña nueva)"
   },
   "connect": {
     "connect": "Conectar Stripe",

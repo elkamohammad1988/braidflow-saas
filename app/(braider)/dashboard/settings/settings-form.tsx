@@ -139,6 +139,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
               checked={acceptingBookings && initial.chargesEnabled}
               onChange={(e) => setAcceptingBookings(e.target.checked)}
               disabled={!initial.chargesEnabled}
+              aria-describedby={!initial.chargesEnabled ? 'accepting-bookings-note' : undefined}
               className="h-4 w-4 accent-clay"
             />
             <span className="text-sm">
@@ -149,7 +150,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
             </span>
           </label>
           {!initial.chargesEnabled && (
-            <p className="mt-1.5 text-xs text-clay-text">
+            <p id="accepting-bookings-note" className="mt-1.5 text-xs text-clay-text">
               {t('settings.stripeRequired')}
             </p>
           )}
@@ -175,7 +176,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
       </Section>
 
       {error && (
-        <Alert tone="danger" className="motion-safe:animate-fade-in-up">
+        <Alert tone="danger">
           {error}
         </Alert>
       )}
@@ -192,7 +193,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
           )}
         </Button>
         {saved && !pending && (
-          <span role="status" className="motion-safe:animate-fade-in text-sm text-ink-muted">
+          <span role="status" className="text-sm text-ink-muted">
             {t('settings.saved')}
           </span>
         )}

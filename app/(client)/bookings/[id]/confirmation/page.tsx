@@ -65,7 +65,7 @@ export default async function ConfirmationPage({
             {isGuest ? t('guestEmailNote') : ''}{t('remindBefore')}
           </p>
 
-          {/* Receipt — a gold-topped ticket for the moment they paid. */}
+          {/* Receipt — a violet-topped ticket for the moment they paid. */}
           <dl className="mx-auto mt-8 w-full max-w-sm overflow-hidden rounded-xl2 border border-line bg-paper text-start text-sm tabular-nums shadow-lifted">
             <div className="h-1 bg-gradient-to-r from-gold-bright via-gold to-clay" aria-hidden />
             <div className="divide-y divide-line px-6">

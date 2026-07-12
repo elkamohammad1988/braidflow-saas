@@ -7,7 +7,6 @@
     "myBookings": "Mes réservations",
     "viewSite": "Voir le site",
     "language": "Langue",
-    "theme": "Thème",
     "menu": "Menu",
     "copied": "Copié",
     "copy": "Copier",
@@ -26,12 +25,6 @@
     "imBraider": "Je suis tresseuse",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu"
-  },
-  "theme": {
-    "label": "Thème de couleur",
-    "light": "Clair",
-    "system": "Système",
-    "dark": "Sombre"
   },
   "dashboardNav": {
     "workspace": "Espace de travail",
@@ -387,7 +380,8 @@
         "client": "Cliente",
         "service": "Prestation",
         "status": "Statut",
-        "total": "Total"
+        "total": "Total",
+        "actions": "Actions"
       }
     },
     "calendar": {
@@ -913,6 +907,7 @@
   },
   "profile": {
     "workHeading": "Travaux récents",
+    "galleryAlt": "Réalisations de {name}",
     "bookHeading": "Prendre rendez-vous",
     "bookSubtitle": "Choisissez une prestation et un horaire qui vous conviennent. L’acompte retient votre créneau.",
     "cancel": "Annuler",
@@ -931,7 +926,8 @@
     "seeAvailableTimes": "Voir les horaires disponibles",
     "servicesHeading": "Prestations",
     "starAria": "{count, plural, one {# étoile} other {# étoiles}}",
-    "starsAriaLabel": "Noté {rating} sur 5"
+    "starsAriaLabel": "Noté {rating} sur 5",
+    "opensInNewTab": "(ouvre dans un nouvel onglet)"
   },
   "connect": {
     "connect": "Connecter Stripe",

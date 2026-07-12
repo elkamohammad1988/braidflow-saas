@@ -8,19 +8,19 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
- * The warm-paper field surface — one source of truth for every form control
- * (Input, Textarea, Select, and one-off date/time inputs). No height, width, or
- * padding here so each control sets its own; compose with
- * `cn(fieldSurface, 'h-11 w-full px-3.5')`.
+ * The recessed violet field surface — one source of truth for every form control
+ * (Input, Textarea, Select, and one-off date/time inputs). Sits a shade below the
+ * card so inputs read as inset. No height/width/padding here so each control sets
+ * its own; compose with `cn(fieldSurface, 'h-10 w-full px-3.5')`.
  */
 export const fieldSurface =
-  'rounded-xl border border-line-strong bg-paper text-sm text-ink ' +
-  'shadow-[inset_0_1px_2px_rgba(35,24,16,0.04)] placeholder:text-ink-subtle ' +
+  'rounded-xl border border-line-strong bg-onyx text-sm text-ink ' +
+  'shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)] placeholder:text-ink-subtle ' +
   'transition-colors focus-visible:border-clay focus-visible:outline-none ' +
-  'focus-visible:ring-2 focus-visible:ring-clay/50 ' +
+  'focus-visible:ring-2 focus-visible:ring-clay/45 ' +
   'disabled:cursor-not-allowed disabled:opacity-60';
 
-/** Error register — a warm red border + ring, layered over `fieldSurface`. */
+/** Error register — a red border + ring, layered over `fieldSurface`. */
 export const fieldInvalid =
   'border-red-500/60 focus-visible:border-red-500 focus-visible:ring-red-500/30';
 
@@ -118,7 +118,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           aria-describedby={describedById(fieldId, Boolean(hint || error))}
           className={cn(
             fieldSurface,
-            'h-11 w-full cursor-pointer appearance-none px-3.5 pe-10',
+            'h-10 w-full cursor-pointer appearance-none px-3.5 pe-10',
             error && fieldInvalid,
             className
           )}

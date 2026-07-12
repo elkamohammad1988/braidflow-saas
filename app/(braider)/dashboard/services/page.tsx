@@ -51,19 +51,19 @@ export default async function ServicesPage() {
           services.map((s) => (
             <Card key={s.id} className="transition-colors duration-300 hover:border-clay/25">
               <CardBody className="flex items-start justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-ink">{s.name}</p>
+                    <p className="break-words font-medium text-ink">{s.name}</p>
                     {!s.is_active && <Badge>{t('services.hidden')}</Badge>}
                   </div>
                   {s.description && (
-                    <p className="mt-1 text-sm text-ink-muted">{s.description}</p>
+                    <p className="mt-1 break-words text-sm text-ink-muted">{s.description}</p>
                   )}
                   <p className="mt-2 text-xs text-ink-muted">
                     {formatDuration(s.duration_minutes)} · {t('services.depositLabel')} {formatMoney(s.deposit_cents)}
                   </p>
                 </div>
-                <div className="text-end">
+                <div className="shrink-0 text-end">
                   <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents)}</p>
                   <Link
                     href={`/dashboard/services/${s.id}`}

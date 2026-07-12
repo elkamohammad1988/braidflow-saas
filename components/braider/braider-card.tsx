@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowUpRight, MapPin, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
-import { WARM_BLUR } from '@/lib/media';
+import { IMAGE_BLUR } from '@/lib/media';
 import { formatMoney } from '@/lib/utils';
 
 type Props = {
@@ -37,8 +37,8 @@ export function BraiderCard({
               fill
               sizes="(min-width: 768px) 33vw, 100vw"
               placeholder="blur"
-              blurDataURL={WARM_BLUR}
-              className="object-cover transition-transform duration-700 ease-spring group-hover:scale-[1.05]"
+              blurDataURL={IMAGE_BLUR}
+              className="object-cover transition-transform duration-300 ease-spring group-hover:scale-[1.05]"
             />
           ) : (
             <div className="relative flex h-full items-center justify-center overflow-hidden bg-gradient-to-br from-clay/25 via-cream-deep to-plum/15">
@@ -79,7 +79,7 @@ export function BraiderCard({
             <div className="mt-1 flex items-center gap-1.5 text-sm text-ink-muted">
               {reviewCount > 0 && rating != null ? (
                 <span className="flex items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-gold text-gold" />
+                  <Star aria-hidden strokeWidth={1.5} className="h-3.5 w-3.5 fill-gold text-gold" />
                   <span className="font-medium text-ink">{rating.toFixed(1)}</span>
                   <span className="font-mono text-xs text-ink-subtle">({reviewCount})</span>
                 </span>
@@ -91,14 +91,14 @@ export function BraiderCard({
               {city && (
                 <span className="flex min-w-0 items-center gap-1">
                   <span aria-hidden>·</span>
-                  <MapPin className="h-3.5 w-3.5 shrink-0" />
+                  <MapPin aria-hidden strokeWidth={1.8} className="h-3.5 w-3.5 shrink-0" />
                   <span className="truncate">{city}</span>
                 </span>
               )}
             </div>
           </div>
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/[0.05] text-ink-muted transition-all duration-300 ease-spring group-hover:bg-gradient-to-b group-hover:from-gold-bright group-hover:to-gold group-hover:text-night group-hover:shadow-glow-gold">
-            <ArrowUpRight className="h-4 w-4 transition-transform duration-300 ease-spring group-hover:rotate-45" />
+            <ArrowUpRight aria-hidden className="h-4 w-4 transition-transform duration-300 ease-spring group-hover:rotate-45" />
           </span>
         </div>
       </Card>

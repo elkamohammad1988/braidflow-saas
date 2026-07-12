@@ -5,7 +5,8 @@ import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Card, CardBody } from '@/components/ui/card';
-import { formatMoney, initials } from '@/lib/utils';
+import { formatMoney } from '@/lib/utils';
+import { InitialsAvatar } from '@/components/shared/initials-avatar';
 import { getTranslations } from 'next-intl/server';
 
 type ClientRow = {
@@ -95,9 +96,7 @@ export default async function ClientsPage() {
           clients.map((c) => (
             <Card key={c.id} className="transition-colors duration-300 hover:border-clay/25">
               <CardBody className="flex items-center gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay-text">
-                  {initials(c.name) || '—'}
-                </span>
+                <InitialsAvatar name={c.name} size="lg" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-ink">{c.name}</p>
                   {c.phone && (

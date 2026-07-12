@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, CreditCard, CalendarCheck, Star, Sparkles } from 'lucide-react';
 import { Logo } from '@/components/shared/logo';
+import { GlassIcon } from '@/components/ui/glass-icon';
 
 const highlights = [
   { icon: CreditCard, key: 'deposits' },
@@ -14,23 +15,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-screen">
       {/* Brand panel — the night atelier */}
-      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-10 text-ivory lg:flex">
+      <aside className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-night p-10 text-ivory lg:flex 2xl:max-w-[44rem]">
         <div className="absolute inset-0 bg-aurora opacity-90" aria-hidden />
         <div className="absolute inset-0 bg-grid-gold bg-radial-fade opacity-60" aria-hidden />
         <div className="relative">
-          <Link href="/" className="inline-flex">
-            <span className="inline-flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-gradient-to-br from-onyx-soft to-night text-gold ring-1 ring-gold/25">
-                <svg viewBox="0 0 24 24" fill="none" className="h-[19px] w-[19px]" aria-hidden>
-                  <path d="M7 2c0 3.5 10 5 10 10S7 18.5 7 22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  <path d="M17 2c0 3.5-10 5-10 10s10 6.5 10 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" opacity="0.55" />
-                  <circle cx="12" cy="12" r="1.6" fill="currentColor" />
-                </svg>
-              </span>
-              <span className="font-display text-xl font-medium tracking-[-0.03em] text-ivory">
-                Braid<span className="text-gold">flow</span>
-              </span>
-            </span>
+          <Link href="/" className="inline-flex transition-opacity hover:opacity-80">
+            <Logo tone="cream" />
           </Link>
         </div>
 
@@ -43,16 +33,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <ul className="mt-8 space-y-3.5">
             {highlights.map((h) => (
               <li key={h.key} className="flex items-center gap-3.5 text-ivory/85">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 text-gold ring-1 ring-gold/20">
-                  <h.icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
-                </span>
+                <GlassIcon icon={h.icon} tone="accent" size="md" glow={false} />
                 <span className="text-sm">{t(`panel.highlights.${h.key}`)}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="relative rounded-card border border-onyx-line bg-ivory/[0.04] p-5 backdrop-blur-sm">
+        <div className="relative rounded-card border border-line bg-ivory/[0.04] p-5 backdrop-blur-sm">
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} aria-hidden strokeWidth={0} className="h-3.5 w-3.5 fill-gold text-gold" />

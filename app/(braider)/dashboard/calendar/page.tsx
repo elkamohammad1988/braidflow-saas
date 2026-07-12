@@ -91,8 +91,10 @@ export default async function CalendarPage() {
         </span>
       </div>
 
-      {/* Desktop: seven-column week grid */}
-      <div className="mt-4 hidden gap-3 md:grid md:grid-cols-7">
+      {/* Desktop (lg+): seven-column week grid. Below lg the 240px sidebar mounts
+          and seven day-cells can't shrink to fit, so tablet-portrait uses the
+          agenda list instead of overflowing the viewport. */}
+      <div className="mt-4 hidden gap-3 lg:grid lg:grid-cols-7">
         {days.map((day) => {
           const key = formatInZone(day, tz, 'yyyy-MM-dd');
           const items = byDay.get(key) ?? [];
@@ -140,6 +142,9 @@ export default async function CalendarPage() {
                       b.status === 'confirmed' ? 'border-s-moss' : 'border-s-clay'
                     )}
                   >
+                    <span className="sr-only">
+                      {b.status === 'confirmed' ? t('status.confirmed') : t('status.awaitingDeposit')}:{' '}
+                    </span>
                     <p className="font-mono text-[11px] font-medium tabular-nums text-ink">
                       {formatInZone(b.scheduled_at, tz, 'h:mm a')}
                     </p>
@@ -150,7 +155,7 @@ export default async function CalendarPage() {
                   </li>
                 ))}
                 {items.length === 0 && (
-                  <li className="flex flex-1 items-center justify-center pb-4 text-[11px] text-ink-subtle/60">
+                  <li className="flex flex-1 items-center justify-center pb-4 text-[11px] text-ink-subtle">
                     {isPast ? '' : t('calendar.open')}
                   </li>
                 )}
@@ -166,9 +171,10 @@ export default async function CalendarPage() {
         })}
       </div>
 
-      {/* Mobile: compact agenda — one row per day, expanding only where there's
-          something booked, so an empty week doesn't become a wall of tall cards. */}
-      <div className="mt-4 space-y-2.5 md:hidden">
+      {/* Tablet + mobile: compact agenda — one row per day, expanding only where
+          there's something booked, so an empty week doesn't become a wall of tall
+          cards. */}
+      <div className="mt-4 space-y-2.5 lg:hidden">
         {days.map((day) => {
           const key = formatInZone(day, tz, 'yyyy-MM-dd');
           const items = byDay.get(key) ?? [];
@@ -228,6 +234,9 @@ export default async function CalendarPage() {
                           b.status === 'confirmed' ? 'bg-moss' : 'bg-clay'
                         )}
                       />
+                      <span className="sr-only">
+                        {b.status === 'confirmed' ? t('status.confirmed') : t('status.awaitingDeposit')}:{' '}
+                      </span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-ink">
                           {b.profiles?.full_name ?? b.guest_name}

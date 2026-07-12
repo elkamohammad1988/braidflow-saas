@@ -109,7 +109,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
               max={24}
               value={hours}
               onChange={(e) => setHours(Math.max(0, Number(e.target.value)))}
-              className={cn(fieldSurface, 'mt-1 h-11 w-full px-3.5')}
+              className={cn(fieldSurface, 'mt-1 h-10 w-full px-3.5')}
             />
           </label>
           <label className="block">
@@ -118,7 +118,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
               <select
                 value={minutes}
                 onChange={(e) => setMinutes(Number(e.target.value))}
-                className={cn(fieldSurface, 'h-11 w-full cursor-pointer appearance-none px-3.5 pe-10')}
+                className={cn(fieldSurface, 'h-10 w-full cursor-pointer appearance-none px-3.5 pe-10')}
               >
                 {[0, 15, 30, 45].map((m) => (
                   <option key={m} value={m}>
@@ -212,7 +212,7 @@ function DollarInput({
           onChange={(e) => onChange(e.target.value)}
           required={required}
           placeholder="0.00"
-          className={cn(fieldSurface, 'h-11 w-full ps-7 pe-3.5')}
+          className={cn(fieldSurface, 'h-10 w-full ps-7 pe-3.5')}
         />
       </div>
       {hint && <span className="mt-1 block text-xs text-ink-muted">{hint}</span>}

@@ -28,11 +28,12 @@ export const STUDIO_PHOTOS = {
   serviceInAction: unsplash('1695527081848-1e46c06e6458') // stylist at work by a window
 } as const;
 
-// A soft, warm low-res blur used as the next/image placeholder so photos fade
-// in instead of popping. A pre-encoded warm-cream → clay gradient (client-safe:
-// no Buffer, so this module can be imported from client components too).
-export const WARM_BLUR =
-  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjEwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNlN2Q4YmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjOTlhNWYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSIxMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==';
+// A soft, dark low-res blur used as the next/image placeholder so photos fade in
+// from the card surface instead of popping. A pre-encoded onyx → near-black
+// violet gradient tuned to the dark theme, so loading images never flash a light
+// rectangle (client-safe: no Buffer, so this module imports into client too).
+export const IMAGE_BLUR =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjEwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyNDFjM2QiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwZTBhMWMiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSIxMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==';
 
 // The full pool of craft + studio shots the profile "recent work" gallery draws
 // from.

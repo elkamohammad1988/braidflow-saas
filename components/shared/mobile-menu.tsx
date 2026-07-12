@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 type Props = {
@@ -73,7 +72,7 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
   // locked with no visible way to close it. Close on cross so the effect above
   // runs its cleanup and restores scrolling.
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 768px)');
+    const desktop = window.matchMedia('(min-width: 1024px)');
     const sync = () => {
       if (desktop.matches) setOpen(false);
     };
@@ -83,7 +82,7 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
   }, []);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={triggerRef}
         type="button"
@@ -160,10 +159,6 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
             <div className="mt-3 flex items-center justify-between border-t border-line px-1 pt-3">
               <span className="text-sm font-medium text-ink-muted">{t('common.language')}</span>
               <LanguageSwitcher />
-            </div>
-            <div className="mt-3 flex items-center justify-between px-1">
-              <span className="text-sm font-medium text-ink-muted">{t('common.theme')}</span>
-              <ThemeToggle />
             </div>
           </div>
         </>

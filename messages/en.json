@@ -7,7 +7,6 @@
     "myBookings": "My bookings",
     "viewSite": "View site",
     "language": "Language",
-    "theme": "Theme",
     "menu": "Menu",
     "copied": "Copied",
     "copy": "Copy",
@@ -26,12 +25,6 @@
     "imBraider": "I'm a braider",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
-  },
-  "theme": {
-    "label": "Color theme",
-    "light": "Light",
-    "system": "System",
-    "dark": "Dark"
   },
   "dashboardNav": {
     "workspace": "Workspace",
@@ -387,7 +380,8 @@
         "client": "Client",
         "service": "Service",
         "status": "Status",
-        "total": "Total"
+        "total": "Total",
+        "actions": "Actions"
       }
     },
     "calendar": {
@@ -913,6 +907,7 @@
   },
   "profile": {
     "workHeading": "Recent work",
+    "galleryAlt": "Braiding work by {name}",
     "bookHeading": "Book an appointment",
     "bookSubtitle": "Pick a service and a time that works. Deposit holds your slot.",
     "cancel": "Cancel",
@@ -931,7 +926,8 @@
     "seeAvailableTimes": "See available times",
     "servicesHeading": "Services",
     "starAria": "{count, plural, one {# star} other {# stars}}",
-    "starsAriaLabel": "Rated {rating} out of 5"
+    "starsAriaLabel": "Rated {rating} out of 5",
+    "opensInNewTab": "(opens in new tab)"
   },
   "connect": {
     "connect": "Connect Stripe",

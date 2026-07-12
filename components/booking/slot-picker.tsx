@@ -78,7 +78,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
       {activeSlots.length === 0 ? (
         <div
           key={activeKey}
-          className="motion-safe:animate-fade-in rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
+          className="rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
         >
           <p className="text-sm font-medium text-ink">{t('noOpenings')}</p>
           <p className="mt-1 text-sm text-ink-muted">{t('tryOtherDates')}</p>
@@ -86,7 +86,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
       ) : (
         <div
           key={activeKey}
-          className="motion-safe:animate-fade-in grid grid-cols-3 gap-2 sm:grid-cols-4"
+          className="grid grid-cols-3 gap-2 sm:grid-cols-4"
         >
           {activeSlots.map((slot) => {
             const isSelected = selected && +selected === +slot.start;
@@ -97,7 +97,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
                 onClick={() => onSelect(slot.start)}
                 aria-pressed={Boolean(isSelected)}
                 className={cn(
-                  'rounded-lg border py-2.5 text-center text-sm font-medium tabular-nums transition-all duration-200 ease-spring active:scale-[0.96]',
+                  'rounded-xl border py-2.5 text-center text-sm font-medium tabular-nums transition-all duration-200 ease-spring active:scale-[0.96]',
                   isSelected
                     ? 'border-transparent bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
                     : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.05] hover:shadow-card'

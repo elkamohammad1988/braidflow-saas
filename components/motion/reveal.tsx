@@ -1,67 +1,24 @@
-'use client';
-
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react';
+import { type ElementType, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 type Props = {
   children: ReactNode;
   className?: string;
-  /** Stagger offset in ms — pass index * step for a woven cascade. */
+  /** Kept for source compatibility; no longer applies a motion delay. */
   delay?: number;
-  /** How far into the viewport before it settles (0–1). */
-  threshold?: number;
   as?: ElementType;
-  once?: boolean;
 };
 
 /**
- * The house reveal: an element settles up into place with a taut spring the
- * first time it crosses into view. Falls back to fully visible when the
- * IntersectionObserver isn't available or motion is reduced (handled in CSS).
+ * Passthrough wrapper. This used to hide its children with `opacity:0` + a
+ * transform until an IntersectionObserver scrolled them into view — which meant
+ * critical, above-the-fold content (hero, cards, pricing) was invisible until JS
+ * ran, and appeared late on slow devices. Readability now always wins: children
+ * render in the initial HTML and are visible on first paint, with no dependence
+ * on JavaScript, opacity, or transforms. The `delay` prop is still accepted (some
+ * call sites pass it) but ignored, so existing markup keeps working untouched.
  */
-export function Reveal({
-  children,
-  className,
-  delay = 0,
-  threshold = 0.18,
-  as,
-  once = true
-}: Props) {
+export function Reveal({ children, className, as }: Props) {
   const Tag = (as ?? 'div') as ElementType;
-  const ref = useRef<HTMLElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setShown(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setShown(true);
-            if (once) io.disconnect();
-          } else if (!once) {
-            setShown(false);
-          }
-        }
-      },
-      { threshold, rootMargin: '0px 0px -8% 0px' }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [threshold, once]);
-
-  return (
-    <Tag
-      ref={ref}
-      data-shown={shown}
-      className={cn('reveal', className)}
-      style={{ ['--reveal-delay' as string]: `${delay}ms` }}
-    >
-      {children}
-    </Tag>
-  );
+  return <Tag className={cn(className)}>{children}</Tag>;
 }

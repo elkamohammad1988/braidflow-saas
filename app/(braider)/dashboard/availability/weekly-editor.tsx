@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
@@ -65,7 +65,7 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="text-sm font-medium text-ink hover:underline underline-offset-4"
+            className="shrink-0 text-sm font-medium text-ink hover:underline underline-offset-4"
           >
             {t('availability.addRange')}
           </button>
@@ -107,6 +107,13 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
   const [end, setEnd] = useState('17:00');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const firstRef = useRef<HTMLInputElement>(null);
+
+  // Opening the form unmounts the "Add range" trigger, so move focus into the
+  // form instead of letting it fall back to <body>.
+  useEffect(() => {
+    firstRef.current?.focus();
+  }, []);
 
   function save() {
     const startMinute = timeStringToMinutes(start);
@@ -132,6 +139,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
       <label className="text-xs text-ink-muted">
         {t('availability.from')}
         <input
+          ref={firstRef}
           type="time"
           value={start}
           onChange={(e) => setStart(e.target.value)}

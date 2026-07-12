@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { WARM_BLUR, galleryForBraider } from '@/lib/media';
+import { IMAGE_BLUR, galleryForBraider } from '@/lib/media';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
@@ -124,8 +124,8 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <JsonLd data={jsonLd} />
-      <div className="grid gap-8 md:grid-cols-[1fr_340px]">
-        <div>
+      <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
           <div className="relative mb-6 aspect-[16/10] overflow-hidden rounded-xl2 shadow-lifted ring-1 ring-line">
             {braider.hero_image_url ? (
               <>
@@ -136,7 +136,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                   sizes="(min-width: 768px) 60vw, 100vw"
                   priority
                   placeholder="blur"
-                  blurDataURL={WARM_BLUR}
+                  blurDataURL={IMAGE_BLUR}
                   className="object-cover"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/30 via-transparent to-transparent" />
@@ -171,7 +171,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[13px] text-ink-muted">
             {reviewCount > 0 && (
               <a href="#reviews" className="flex items-center gap-1 text-ink transition-colors hover:text-clay">
-                <Star className="h-4 w-4 fill-gold text-gold" />
+                <Star aria-hidden strokeWidth={1.5} className="h-4 w-4 fill-gold text-gold" />
                 <span className="font-medium">{avgRating.toFixed(1)}</span>
                 <span className="text-ink-muted">
                   · {t('reviewCount', { count: reviewCount })}
@@ -194,6 +194,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                   className="hover:text-ink"
                 >
                   @{braider.instagram_handle}
+                  <span className="sr-only"> {t('opensInNewTab')}</span>
                 </a>
               </>
             )}
@@ -216,12 +217,12 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                 >
                   <Image
                     src={src}
-                    alt=""
+                    alt={t('galleryAlt', { name: braider.business_name })}
                     fill
                     sizes="(min-width: 768px) 18vw, 30vw"
                     placeholder="blur"
-                    blurDataURL={WARM_BLUR}
-                    className="object-cover transition-transform duration-500 ease-spring group-hover:scale-[1.06]"
+                    blurDataURL={IMAGE_BLUR}
+                    className="object-cover transition-transform duration-300 ease-spring group-hover:scale-[1.06]"
                   />
                 </div>
               ))}
@@ -239,10 +240,10 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                   key={s.id}
                   className="group flex items-start justify-between gap-4 py-5 transition-colors"
                 >
-                  <div>
-                    <p className="font-display text-lg font-medium text-ink">{s.name}</p>
+                  <div className="min-w-0">
+                    <p className="break-words font-display text-lg font-medium text-ink">{s.name}</p>
                     {s.description && (
-                      <p className="mt-1 text-sm leading-relaxed text-ink-muted">{s.description}</p>
+                      <p className="mt-1 break-words text-sm leading-relaxed text-ink-muted">{s.description}</p>
                     )}
                     <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
                       {t('durationDeposit', {
@@ -264,7 +265,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
 
         <aside className="md:sticky md:top-24 md:self-start">
           <div className="relative overflow-hidden rounded-xl2 border border-line bg-paper p-6 shadow-lifted">
-            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_70%)]" />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_70%)]" />
             <p className="relative font-display text-xl font-medium text-ink">{t('bookHeading')}</p>
             <p className="relative mt-1.5 text-sm leading-relaxed text-ink-muted">
               {t('bookSubtitle')}
@@ -289,7 +290,8 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                       className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
                     >
                       {t('reachInstagram')}
-                      <ArrowUpRight className="h-3.5 w-3.5" />
+                      <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
+                      <span className="sr-only"> {t('opensInNewTab')}</span>
                     </a>
                   )}
                 </div>

@@ -64,7 +64,7 @@ export function CancelBookingButton({ bookingId, label, className, token }: Prop
   }
 
   return (
-    <div className="motion-safe:animate-fade-in-up flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1">
       <div className="inline-flex items-center gap-3 text-sm">
         <span className="text-ink-muted">{t('cancelConfirm')}</span>
         <button

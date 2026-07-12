@@ -5,7 +5,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main id="main-content" className="flex-1 motion-safe:animate-fade-in-up">
+      <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer />

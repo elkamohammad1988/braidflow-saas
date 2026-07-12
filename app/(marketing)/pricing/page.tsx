@@ -53,7 +53,7 @@ export default function PricingPage() {
 
       <section className="mx-auto max-w-2xl px-6 pb-20">
         <Reveal>
-          <div className="relative overflow-hidden rounded-xl3 border border-onyx-line bg-night p-6 text-ivory shadow-lifted md:p-8">
+          <div className="relative overflow-hidden rounded-xl3 border border-line bg-night p-6 text-ivory shadow-lifted md:p-8">
             <AtelierBackdrop className="absolute inset-0 opacity-70" />
             <div className="relative">
               <p className="absolute -top-3 start-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
@@ -79,7 +79,7 @@ export default function PricingPage() {
                 </Link>
               </Magnetic>
 
-              <div className="mt-8 border-t border-onyx-line pt-6">
+              <div className="mt-8 border-t border-line pt-6">
                 <ul className="grid gap-3 text-sm sm:grid-cols-2">
                   {(t.raw('included') as string[]).map((feature) => (
                     <li key={feature} className="flex items-start gap-3">

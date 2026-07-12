@@ -89,7 +89,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
               className={cn(
                 'h-7 w-7 transition-colors duration-150',
                 star <= active
-                  ? 'fill-gold text-gold [filter:drop-shadow(0_1px_6px_rgba(224,163,63,0.5))]'
+                  ? 'fill-gold text-gold [filter:drop-shadow(0_1px_6px_rgba(139,92,246,0.5))]'
                   : 'fill-transparent text-ink/25'
               )}
             />
@@ -102,6 +102,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         onChange={(e) => setBody(e.target.value)}
         rows={3}
         maxLength={1000}
+        aria-label={t('reviewPlaceholder')}
         placeholder={t('reviewPlaceholder')}
         className={cn(fieldSurface, 'mt-3 min-h-[80px] w-full resize-y px-3.5 py-2.5 leading-relaxed')}
       />

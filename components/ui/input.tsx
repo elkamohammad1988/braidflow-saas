@@ -31,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={descId}
-        className={cn(fieldSurface, 'h-11 w-full px-3.5', error && fieldInvalid, className)}
+        className={cn(fieldSurface, 'h-10 w-full px-3.5', error && fieldInvalid, className)}
         {...rest}
       />
       {(hint || error) && (

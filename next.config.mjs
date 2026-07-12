@@ -3,8 +3,8 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
-// Content-Security-Policy. Next's inline runtime + next-themes' pre-hydration
-// script need 'unsafe-inline' for scripts/styles (a nonce-based policy would need
+// Content-Security-Policy. Next's inline runtime needs 'unsafe-inline' for
+// scripts/styles (a nonce-based policy would need
 // per-request middleware injection); the value here still meaningfully hardens the
 // app: it pins where scripts/frames/images/connections may come from, forbids
 // framing (clickjacking) and plugins, and locks <base>/form targets. Stripe and

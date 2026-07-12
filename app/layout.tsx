@@ -1,21 +1,21 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Fraunces, Space_Mono } from 'next/font/google';
+import { Inter, Space_Mono } from 'next/font/google';
 import { JsonLd } from '@/components/shared/json-ld';
 import { RouteAnnouncer } from '@/components/shared/route-announcer';
 import { DemoBadge } from '@/components/demo/demo-badge';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
-import { ThemeProvider } from '@/components/theme/theme-provider';
 import { isRtl } from '@/i18n/config';
 import { isDemoMode } from '@/lib/demo';
 import './globals.css';
 
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const display = Fraunces({
+// Headings share the Inter family (Linear/Vercel house style), set apart by
+// weight + tight optical tracking rather than a decorative serif.
+const display = Inter({
   subsets: ['latin'],
   variable: '--font-display',
-  weight: ['300', '400', '500', '600', '700'],
-  style: ['normal', 'italic'],
+  weight: ['500', '600', '700'],
   display: 'swap'
 });
 const mono = Space_Mono({
@@ -67,10 +67,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f5eee3' },
-    { media: '(prefers-color-scheme: dark)', color: '#16100b' }
-  ],
+  // Single dark experience — the browser chrome matches the page background.
+  themeColor: '#04030A',
   width: 'device-width',
   initialScale: 1
 };
@@ -84,21 +82,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       dir={dir}
-      className={`${sans.variable} ${display.variable} ${mono.variable}`}
+      // Dark-only product: pin `.dark` in the SSR markup so `dark:` variants apply
+      // from the first paint. It never changes — there is no theme toggle.
+      className={`dark ${sans.variable} ${display.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
       <body>
         <a
           href="#main-content"
-          className="sr-only rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-cream shadow-lifted focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200]"
+          className="sr-only rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-lifted focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200]"
         >
           {t('skipToContent')}
         </a>
-        {/* Flag JS on before first paint so scroll-reveal content is hidden only
-            when we can actually animate it in — without JS it stays visible. */}
-        <script
-          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
-        />
+        {/* Ambient key-light — a fixed violet wash from the top so the whole app
+            reads as lit from above. Sits behind content; pointer-transparent. */}
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-ambient-top" />
         {/* Site-wide film grain — fixed, pointer-transparent, barely there. */}
         <div
           aria-hidden
@@ -130,13 +128,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             ]
           }}
         />
-        <ThemeProvider>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            {children}
-            <RouteAnnouncer />
-            {isDemoMode() && <DemoBadge />}
-          </NextIntlClientProvider>
-        </ThemeProvider>
+        {/* Single dark experience — `.dark` is pinned statically on <html> above,
+            so there is no theme context to provide and no toggle to drive. */}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+          <RouteAnnouncer />
+          {isDemoMode() && <DemoBadge />}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

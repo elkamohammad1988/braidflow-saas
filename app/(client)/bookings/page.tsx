@@ -86,69 +86,73 @@ export default async function MyBookings() {
           return (
             <div
               key={b.id}
-              className="flex items-start justify-between gap-4 rounded-card border border-line bg-paper p-5 shadow-soft transition-colors duration-300 hover:border-clay/25"
+              className="rounded-card border border-line bg-paper p-5 shadow-soft transition-colors duration-300 hover:border-clay/25"
             >
-              <div>
-                <p className="font-medium text-ink">{b.services?.name}</p>
-                <p className="mt-1 text-sm text-ink-muted">
-                  {t('with')}{' '}
-                  <Link
-                    href={`/braiders/${b.braiders?.slug}`}
-                    className="text-ink hover:underline underline-offset-4"
-                  >
-                    {b.braiders?.business_name}
-                  </Link>
-                </p>
-                <p className="mt-2 text-sm text-ink-muted">
-                  {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
-                </p>
-              </div>
-              <div className="text-end">
-                <Badge tone={status.tone}>{t(status.label)}</Badge>
-                {showDepositBadge && (
-                  <div className="mt-1">
-                    <Badge
-                      tone={
-                        deposit === 'refunded'
-                          ? 'success'
-                          : deposit === 'refund_failed'
-                          ? 'danger'
-                          : 'warning'
-                      }
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-ink">{b.services?.name}</p>
+                  <p className="mt-1 text-sm text-ink-muted">
+                    {t('with')}{' '}
+                    <Link
+                      href={`/braiders/${b.braiders?.slug}`}
+                      className="text-ink hover:underline underline-offset-4"
                     >
-                      {td(DEPOSIT_LABEL_KEY[deposit])}
-                    </Badge>
-                  </div>
-                )}
-                <p className="mt-2 text-sm tabular-nums text-ink-muted">{formatMoney(b.price_cents)}</p>
-                {b.status === 'pending_payment' && (
-                  <Link
-                    href={`/bookings/${b.id}/pay`}
-                    className="mt-2 inline-block text-sm font-medium text-ink hover:underline underline-offset-4"
-                  >
-                    {t('completeDeposit')}
-                  </Link>
-                )}
-                {(b.status === 'pending_payment' || b.status === 'confirmed') &&
-                  new Date(b.scheduled_at) > new Date() && (
-                    <div className="mt-3 flex items-center justify-end gap-3 text-sm">
-                      <Link
-                        href={`/bookings/${b.id}/reschedule`}
-                        className="font-medium text-ink-muted hover:text-ink"
+                      {b.braiders?.business_name}
+                    </Link>
+                  </p>
+                  <p className="mt-2 text-sm text-ink-muted">
+                    {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
+                  </p>
+                </div>
+                <div className="text-end">
+                  <Badge tone={status.tone}>{t(status.label)}</Badge>
+                  {showDepositBadge && (
+                    <div className="mt-1">
+                      <Badge
+                        tone={
+                          deposit === 'refunded'
+                            ? 'success'
+                            : deposit === 'refund_failed'
+                            ? 'danger'
+                            : 'warning'
+                        }
                       >
-                        {t('reschedule')}
-                      </Link>
-                      <span aria-hidden className="text-ink/20">·</span>
-                      <CancelBookingButton bookingId={b.id} />
+                        {td(DEPOSIT_LABEL_KEY[deposit])}
+                      </Badge>
                     </div>
                   )}
-                {b.status === 'completed' &&
-                  (reviewedBookingIds.has(b.id) ? (
+                  <p className="mt-2 text-sm tabular-nums text-ink-muted">{formatMoney(b.price_cents)}</p>
+                  {b.status === 'pending_payment' && (
+                    <Link
+                      href={`/bookings/${b.id}/pay`}
+                      className="mt-2 inline-block text-sm font-medium text-ink hover:underline underline-offset-4"
+                    >
+                      {t('completeDeposit')}
+                    </Link>
+                  )}
+                  {(b.status === 'pending_payment' || b.status === 'confirmed') &&
+                    new Date(b.scheduled_at) > new Date() && (
+                      <div className="mt-3 flex items-center justify-end gap-3 text-sm">
+                        <Link
+                          href={`/bookings/${b.id}/reschedule`}
+                          className="font-medium text-ink-muted hover:text-ink"
+                        >
+                          {t('reschedule')}
+                        </Link>
+                        <span aria-hidden className="text-ink/20">·</span>
+                        <CancelBookingButton bookingId={b.id} />
+                      </div>
+                    )}
+                  {b.status === 'completed' && reviewedBookingIds.has(b.id) && (
                     <p className="mt-2 text-sm text-ink-muted">{t('reviewed')}</p>
-                  ) : (
-                    <ReviewForm bookingId={b.id} />
-                  ))}
+                  )}
+                </div>
               </div>
+              {/* Full-width so the star row + comment box never crush the details
+                  column on a narrow phone (they used to share the right cell). */}
+              {b.status === 'completed' && !reviewedBookingIds.has(b.id) && (
+                <ReviewForm bookingId={b.id} />
+              )}
             </div>
           );
         })}

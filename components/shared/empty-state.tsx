@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import { GlassIcon } from '@/components/ui/glass-icon';
 
 type Props = {
   title: string;
@@ -29,11 +30,8 @@ export function EmptyState({ title, description, action, icon: Icon }: Props) {
 
       <div className="relative">
         {Icon && (
-          <div className="relative mx-auto mb-5 w-fit">
-            <span className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle,rgba(224,163,63,0.3),transparent_70%)] blur-lg" />
-            <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-onyx-soft to-night text-gold shadow-[0_10px_28px_-12px_rgba(35,24,16,0.6),inset_0_1px_0_rgba(242,196,100,0.18)] ring-1 ring-gold/25">
-              <Icon className="h-6 w-6" strokeWidth={1.6} />
-            </span>
+          <div className="mx-auto mb-5 w-fit">
+            <GlassIcon icon={Icon} tone="accent" size="lg" />
           </div>
         )}
         <p className="font-display text-xl font-medium text-ink">{title}</p>

@@ -7,7 +7,6 @@
     "myBookings": "我的预约",
     "viewSite": "查看网站",
     "language": "语言",
-    "theme": "主题",
     "menu": "菜单",
     "copied": "已复制",
     "copy": "复制",
@@ -26,12 +25,6 @@
     "imBraider": "我是编发师",
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单"
-  },
-  "theme": {
-    "label": "配色主题",
-    "light": "浅色",
-    "system": "跟随系统",
-    "dark": "深色"
   },
   "dashboardNav": {
     "workspace": "工作区",
@@ -387,7 +380,8 @@
         "client": "客户",
         "service": "服务",
         "status": "状态",
-        "total": "合计"
+        "total": "合计",
+        "actions": "操作"
       }
     },
     "calendar": {
@@ -913,6 +907,7 @@
   },
   "profile": {
     "workHeading": "近期作品",
+    "galleryAlt": "{name} 的编发作品",
     "bookHeading": "预约服务",
     "bookSubtitle": "选择合适的服务和时间。定金会锁定你的时段。",
     "cancel": "取消",
@@ -931,7 +926,8 @@
     "seeAvailableTimes": "查看可预约时间",
     "servicesHeading": "服务",
     "starAria": "{count, plural, other {# 星}}",
-    "starsAriaLabel": "5 星中评为 {rating} 星"
+    "starsAriaLabel": "5 星中评为 {rating} 星",
+    "opensInNewTab": "(在新标签页中打开)"
   },
   "connect": {
     "connect": "连接 Stripe",

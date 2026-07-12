@@ -7,7 +7,6 @@
     "myBookings": "حجوزاتي",
     "viewSite": "عرض الموقع",
     "language": "اللغة",
-    "theme": "المظهر",
     "menu": "القائمة",
     "copied": "تم النسخ",
     "copy": "نسخ",
@@ -26,12 +25,6 @@
     "imBraider": "أنا مصفِّفة",
     "openMenu": "افتحي القائمة",
     "closeMenu": "أغلقي القائمة"
-  },
-  "theme": {
-    "label": "سمة الألوان",
-    "light": "فاتح",
-    "system": "النظام",
-    "dark": "داكن"
   },
   "dashboardNav": {
     "workspace": "مساحة العمل",
@@ -387,7 +380,8 @@
         "client": "العميلة",
         "service": "الخدمة",
         "status": "الحالة",
-        "total": "الإجمالي"
+        "total": "الإجمالي",
+        "actions": "الإجراءات"
       }
     },
     "calendar": {
@@ -913,6 +907,7 @@
   },
   "profile": {
     "workHeading": "أعمال حديثة",
+    "galleryAlt": "أعمال تجديل من {name}",
     "bookHeading": "احجزي موعدًا",
     "bookSubtitle": "اختاري خدمة ووقتًا يناسبك. يحجز العربون موعدك.",
     "cancel": "إلغاء",
@@ -931,7 +926,8 @@
     "seeAvailableTimes": "عرض الأوقات المتاحة",
     "servicesHeading": "الخدمات",
     "starAria": "{count, plural, zero {لا نجوم} one {نجمة واحدة} two {نجمتان} few {# نجوم} many {# نجمة} other {# نجمة}}",
-    "starsAriaLabel": "التقييم {rating} من 5"
+    "starsAriaLabel": "التقييم {rating} من 5",
+    "opensInNewTab": "(يفتح في علامة تبويب جديدة)"
   },
   "connect": {
     "connect": "ربط Stripe",

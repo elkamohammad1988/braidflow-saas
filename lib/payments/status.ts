@@ -32,17 +32,8 @@ export function depositStateFromPayments(payments: PaymentRow[] | null | undefin
   return 'refunded';
 }
 
-export const DEPOSIT_LABEL: Record<DepositState, string> = {
-  no_deposit: 'No deposit',
-  deposit_pending: 'Awaiting deposit',
-  deposit_held: 'Deposit held',
-  refund_pending: 'Refund pending',
-  refunded: 'Deposit refunded',
-  refund_failed: 'Refund failed'
-};
-
 // i18n key per deposit state, under the shared `deposit` message namespace.
-// Kept separate from DEPOSIT_LABEL (English fallbacks) so badges localize.
+// Badges render these through next-intl so every deposit state localizes.
 export const DEPOSIT_LABEL_KEY: Record<DepositState, string> = {
   no_deposit: 'depositNone',
   deposit_pending: 'depositPending',

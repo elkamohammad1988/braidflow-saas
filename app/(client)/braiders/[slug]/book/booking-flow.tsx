@@ -42,7 +42,7 @@ function StepHeader({ n, label, done }: { n: number; label: string; done: boolea
           done ? 'bg-moss text-cream' : 'bg-ink/[0.06] text-ink-subtle'
         )}
       >
-        {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : n}
+        {done ? <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} /> : n}
       </span>
       <h2 className="text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">{label}</h2>
     </div>
@@ -210,7 +210,7 @@ export function BookingFlow({
               before paying a deposit. Visible at every breakpoint. */}
           <ul className="space-y-2.5 rounded-card border border-line bg-paper/70 p-5 text-sm text-ink-muted">
             <li className="flex items-start gap-2.5">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
+              <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
               <span>
                 {t.rich('trustCancellation', {
                   hours: CANCELLATION_REFUND_WINDOW_HOURS,
@@ -219,7 +219,7 @@ export function BookingFlow({
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
+              <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-moss" strokeWidth={2.5} />
               <span>
                 {t.rich('trustDeposit', {
                   name: businessName,
@@ -228,7 +228,7 @@ export function BookingFlow({
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" strokeWidth={2} />
+              <Lock aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" strokeWidth={2} />
               <span>{t('trustCard')}</span>
             </li>
           </ul>
@@ -279,7 +279,7 @@ export function BookingFlow({
             </Button>
 
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-subtle">
-              <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2} />
+              <ShieldCheck aria-hidden className="h-3.5 w-3.5" strokeWidth={2} />
               {t('noChargeUntilConfirm')}
             </p>
           </div>

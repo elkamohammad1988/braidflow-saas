@@ -14,10 +14,11 @@ import {
   Wallet
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GlassIcon } from '@/components/ui/glass-icon';
 import { Reveal } from '@/components/motion/reveal';
 import { Magnetic } from '@/components/motion/magnetic';
 import { CountUp } from '@/components/motion/count-up';
-import { BRAID_PHOTOS, STUDIO_PHOTOS, WARM_BLUR } from '@/lib/media';
+import { BRAID_PHOTOS, STUDIO_PHOTOS, IMAGE_BLUR } from '@/lib/media';
 import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
 import { useTranslations } from 'next-intl';
 import type { Metadata } from 'next';
@@ -78,13 +79,13 @@ export default function Home() {
           <div>
             <Reveal delay={0}>
               <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/[0.07] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold-bright backdrop-blur-sm">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgba(242,196,100,0.9)]" />
+                <span className="flex h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgba(196,181,253,0.9)]" />
                 {t('eyebrow')}
               </span>
             </Reveal>
 
             <Reveal delay={90}>
-              <h1 className="mt-6 max-w-xl font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
+              <h1 className="mt-6 max-w-xl break-words font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
                 {t.rich('title', {
                   br: () => <br />,
                   em: (chunks) => (
@@ -126,7 +127,7 @@ export default function Home() {
               <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
                   <div key={p.key} className="flex items-center gap-2 text-sm text-ivory/75">
-                    <p.icon className="h-4 w-4 text-gold" strokeWidth={1.9} />
+                    <p.icon aria-hidden className="h-4 w-4 text-gold" strokeWidth={1.9} />
                     <span>{t(`proof.${p.key}`)}</span>
                   </div>
                 ))}
@@ -134,7 +135,7 @@ export default function Home() {
             </Reveal>
           </div>
 
-          <Reveal delay={240} className="[--reveal-delay:240ms]">
+          <Reveal>
             <HeroPreview />
           </Reveal>
         </div>
@@ -217,11 +218,9 @@ export default function Home() {
                 className={i === 1 ? 'md:mt-10' : i === 2 ? 'md:mt-20' : ''}
               >
                 <div className="group relative h-full overflow-hidden rounded-card border border-line bg-paper p-6 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1.5 hover:shadow-lifted">
-                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.14),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="flex items-center justify-between">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-onyx-soft to-night text-gold ring-1 ring-gold/20">
-                      <step.icon className="h-5 w-5" strokeWidth={1.8} />
-                    </span>
+                    <GlassIcon icon={step.icon} tone="accent" size="md" />
                     <span className="font-mono text-2xl text-clay/70">{step.n}</span>
                   </div>
                   <p className="mt-6 font-display text-xl font-medium text-ink">
@@ -258,8 +257,8 @@ export default function Home() {
                 fill
                 sizes="(min-width: 768px) 25vw, 50vw"
                 placeholder="blur"
-                blurDataURL={WARM_BLUR}
-                className="object-cover transition-transform duration-[1200ms] ease-spring hover:scale-[1.05]"
+                blurDataURL={IMAGE_BLUR}
+                className="object-cover transition-transform duration-300 ease-spring hover:scale-[1.05]"
               />
             </div>
           ))}
@@ -285,7 +284,7 @@ export default function Home() {
                 <div>
                   <div className="flex gap-0.5 text-gold">
                     {Array.from({ length: 5 }).map((_, s) => (
-                      <Star key={s} className="h-[15px] w-[15px] fill-current" strokeWidth={0} />
+                      <Star key={s} aria-hidden className="h-[15px] w-[15px] fill-current" strokeWidth={0} />
                     ))}
                   </div>
                   <blockquote className="mt-5 font-display text-[1.35rem] font-medium leading-[1.28] tracking-[-0.01em] text-ink">
@@ -326,26 +325,26 @@ export default function Home() {
 
           <Reveal delay={120}>
             <div className="mt-10 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
-              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50">
+              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50 sm:gap-4">
                 <div>{t('comparison.feature')}</div>
-                <div className="w-24 text-center text-gold">BraidFlow</div>
-                <div className="w-24 text-center">{t('comparison.genericTools')}</div>
+                <div className="w-16 text-center text-gold-bright sm:w-24">BraidFlow</div>
+                <div className="w-16 text-center sm:w-24">{t('comparison.genericTools')}</div>
               </div>
               {comparisons.map((row, i) => (
                 <div
                   key={row.key}
-                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-4 px-6 py-4 text-sm transition-colors hover:bg-ink/[0.04] ${
+                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-3 px-6 py-4 text-sm transition-colors hover:bg-ink/[0.04] sm:gap-4 ${
                     i !== comparisons.length - 1 ? 'border-b border-line' : ''
                   }`}
                 >
                   <div className="text-ink">{t(`comparison.features.${row.key}`)}</div>
-                  <div className="flex w-24 justify-center">
+                  <div className="flex w-16 justify-center sm:w-24">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
                       <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />
                       <span className="sr-only">{t('comparison.included')}</span>
                     </span>
                   </div>
-                  <div className="flex w-24 justify-center text-center text-xs text-ink-muted">
+                  <div className="flex w-16 justify-center text-center text-xs text-ink-muted sm:w-24">
                     {row.them === false ? (
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink/[0.05]">
                         <X aria-hidden className="h-3.5 w-3.5 text-ink-subtle" strokeWidth={2.25} />
@@ -414,7 +413,7 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={90}>
-            <p className="mx-auto mt-6 max-w-2xl font-display text-[3rem] font-medium leading-[1.02] tracking-[-0.035em] md:text-[4.5rem]">
+            <p className="mx-auto mt-6 max-w-2xl break-words font-display text-[3rem] font-medium leading-[1.02] tracking-[-0.035em] md:text-[4.5rem]">
               {t.rich('finalCta.title', {
                 br: () => <br />,
                 em: (chunks) => <span className="italic text-gilt">{chunks}</span>
@@ -456,9 +455,9 @@ function HeroPreview() {
   const t = useTranslations('landing');
   return (
     // The preview is a snapshot of the product's own UI, so it keeps LTR even in RTL locales.
-    <div dir="ltr" className="relative mx-auto w-full max-w-sm animate-float md:max-w-none">
-      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,rgba(224,163,63,0.35),transparent_70%)] blur-2xl" aria-hidden />
-      <div className="overflow-hidden rounded-xl2 border border-cream/12 bg-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7),0_0_0_1px_rgba(242,196,100,0.06)]">
+    <div dir="ltr" className="relative mx-auto w-full max-w-sm md:max-w-none">
+      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,rgba(139,92,246,0.35),transparent_70%)] blur-2xl" aria-hidden />
+      <div className="overflow-hidden rounded-xl2 border border-line bg-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7),0_0_0_1px_rgba(196,181,253,0.06)]">
         {/* window chrome */}
         <div className="flex items-center gap-1.5 border-b border-line bg-cream-deep/60 px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />

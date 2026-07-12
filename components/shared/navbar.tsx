@@ -5,7 +5,6 @@ import { Logo } from './logo';
 import { getTranslations } from 'next-intl/server';
 import { SignOutLink } from './sign-out';
 import { MobileMenu } from './mobile-menu';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { LanguageSwitcher } from '@/components/i18n/language-switcher';
 
 export async function Navbar() {
@@ -18,12 +17,12 @@ export async function Navbar() {
       {/* Three tracks — logo | centered nav | controls — so the nav is truly
           centered yet can never overlap the right cluster the way an absolutely
           positioned nav did once the labels got long (e.g. French). */}
-      <div className="mx-auto grid h-[68px] max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-6">
+      <div className="mx-auto grid h-[60px] max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-6">
         <Link href="/" className="justify-self-start transition-opacity hover:opacity-80">
           <Logo />
         </Link>
 
-        <nav className="hidden items-center justify-self-center gap-0.5 text-sm font-medium text-ink-muted md:flex">
+        <nav className="hidden items-center justify-self-center gap-0.5 text-sm font-medium text-ink-muted lg:flex">
           {[
             { href: '/braiders', label: t('nav.findBraider') },
             { href: '/pricing', label: t('nav.pricing') },
@@ -44,29 +43,25 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center justify-self-end gap-3">
-          <LanguageSwitcher className="hidden md:inline-flex" />
-          {/* Extra breathing room (logical, so it mirrors in RTL) sets the locale
-              selector clearly apart from the appearance controls — ~20px total,
-              never attached, whatever width "Français" needs. */}
-          <ThemeToggle className="hidden md:ms-2 md:inline-flex" />
+          <LanguageSwitcher className="hidden lg:inline-flex" />
           {session ? (
             <>
-              <Link href={isBraider ? '/dashboard' : '/bookings'} className="hidden md:inline-flex">
+              <Link href={isBraider ? '/dashboard' : '/bookings'} className="hidden lg:inline-flex">
                 <Button variant="secondary" size="sm">
                   {isBraider ? t('common.dashboard') : t('common.myBookings')}
                 </Button>
               </Link>
-              <SignOutLink className="hidden md:inline-flex" />
+              <SignOutLink className="hidden lg:inline-flex" />
             </>
           ) : (
             <>
               <Link
                 href="/login"
-                className="hidden whitespace-nowrap text-sm font-medium text-ink-muted transition-colors hover:text-ink md:block"
+                className="hidden whitespace-nowrap text-sm font-medium text-ink-muted transition-colors hover:text-ink lg:block"
               >
                 {t('common.logIn')}
               </Link>
-              <Link href="/signup" className="hidden md:inline-flex">
+              <Link href="/signup" className="hidden lg:inline-flex">
                 <Button size="sm">{t('common.getStarted')}</Button>
               </Link>
             </>

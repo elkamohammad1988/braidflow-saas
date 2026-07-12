@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { Check } from 'lucide-react';
+import { SuccessCheck } from '@/components/motion/success-check';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -78,14 +78,11 @@ export function RescheduleFlow({
     return (
       <div
         role="status"
-        className="motion-safe:animate-fade-in-up rounded-card border border-line bg-paper p-6 text-center shadow-soft"
+        className="rounded-card border border-line bg-paper p-6 text-center shadow-soft"
       >
-        <span
-          aria-hidden="true"
-          className="motion-safe:animate-pop-in mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15"
-        >
-          <Check className="h-6 w-6" strokeWidth={2.2} />
-        </span>
+        <div className="mb-4 flex justify-center">
+          <SuccessCheck />
+        </div>
         <p className="font-display text-2xl text-ink">{t('moved')}</p>
         <p className="mt-2 text-sm text-ink-muted">
           {t('movedBody', { business: businessName, time: fmt(selectedSlot) })}
@@ -96,8 +93,8 @@ export function RescheduleFlow({
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1fr_320px]">
-      <div className="space-y-6">
+    <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="min-w-0 space-y-6">
         <div className="rounded-card border border-line bg-paper px-5 py-4 shadow-soft">
           <p className="text-xs uppercase tracking-wider text-ink-muted">{t('currentlyScheduled')}</p>
           <p className="mt-1 font-medium text-ink">{fmt(currentTime)}</p>
@@ -131,7 +128,7 @@ export function RescheduleFlow({
           )}
 
           {error && (
-            <Alert tone="danger" className="motion-safe:animate-fade-in-up mt-4">
+            <Alert tone="danger" className="mt-4">
               {error}
             </Alert>
           )}

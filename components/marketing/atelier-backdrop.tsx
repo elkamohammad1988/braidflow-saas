@@ -31,7 +31,7 @@ const STRANDS = [
 type Props = { className?: string };
 
 /**
- * The living braid: warm aurora glows behind six golden strands that breathe
+ * The living braid: violet aurora glows behind six luminous strands that breathe
  * and weave, with a light travelling along them. Leans gently toward the
  * cursor. Fills its (relative) parent.
  */
@@ -86,9 +86,9 @@ export function AtelierBackdrop({ className }: Props) {
     <div className={className} aria-hidden>
       {/* Aurora mesh */}
       <div ref={auroraRef} className="absolute inset-0 will-change-transform">
-        <div className="absolute -left-[10%] top-[-14%] h-[46vh] w-[46vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.45),transparent_66%)] blur-3xl" />
-        <div className="absolute right-[2%] top-[6%] h-[52vh] w-[52vh] animate-aurora-2 rounded-full bg-[radial-gradient(circle,rgba(106,47,82,0.55),transparent_64%)] blur-3xl" />
-        <div className="absolute bottom-[-18%] left-[38%] h-[48vh] w-[48vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(198,90,60,0.32),transparent_66%)] blur-3xl [animation-delay:-6s]" />
+        <div className="absolute -left-[10%] top-[-14%] h-[46vh] w-[46vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.45),transparent_66%)] blur-3xl" />
+        <div className="absolute right-[2%] top-[6%] h-[52vh] w-[52vh] animate-aurora-2 rounded-full bg-[radial-gradient(circle,rgba(91,33,182,0.55),transparent_64%)] blur-3xl" />
+        <div className="absolute bottom-[-18%] left-[38%] h-[48vh] w-[48vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.32),transparent_66%)] blur-3xl [animation-delay:-6s]" />
       </div>
 
       {/* Woven strands */}
@@ -100,9 +100,9 @@ export function AtelierBackdrop({ className }: Props) {
       >
         <defs>
           <linearGradient id="strandGold" x1="0" y1="0" x2="1" y2="0.3">
-            <stop offset="0" stopColor="#b47a24" stopOpacity="0.1" />
-            <stop offset="0.5" stopColor="#f2c464" />
-            <stop offset="1" stopColor="#b47a24" stopOpacity="0.1" />
+            <stop offset="0" stopColor="#6D28D9" stopOpacity="0.1" />
+            <stop offset="0.5" stopColor="#C4B5FD" />
+            <stop offset="1" stopColor="#6D28D9" stopOpacity="0.1" />
           </linearGradient>
           <filter id="strandGlow" x="-20%" y="-40%" width="140%" height="180%">
             <feGaussianBlur stdDeviation="6" result="b" />
@@ -125,8 +125,9 @@ export function AtelierBackdrop({ className }: Props) {
         </g>
       </svg>
 
-      {/* Travelling light */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 animate-shimmer bg-[linear-gradient(100deg,transparent,rgba(255,243,214,0.14),transparent)] mix-blend-screen" />
+      {/* A static sheen of light on the strands (no travelling sweep — a moving
+          highlight behind the hero was gratuitous motion, not enhancement). */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(100deg,transparent,rgba(196,181,253,0.10),transparent)] mix-blend-screen" />
     </div>
   );
 }

@@ -24,10 +24,12 @@ import { requireBraider } from '@/lib/auth/session';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardBody } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { GlassIcon } from '@/components/ui/glass-icon';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { ActivationChecklist } from '@/components/braider/activation-checklist';
-import { formatMoney, initials } from '@/lib/utils';
+import { formatMoney } from '@/lib/utils';
+import { InitialsAvatar } from '@/components/shared/initials-avatar';
 import { formatAppointment, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { getTranslations } from 'next-intl/server';
@@ -132,8 +134,8 @@ export default async function DashboardOverview({
       />
 
       {searchParams.connect === 'done' && (
-        <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-moss/30 bg-moss/5 p-4">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-moss" />
+        <div className="mt-6 flex items-start gap-3 rounded-card border border-moss/30 bg-moss/5 p-4">
+          <CheckCircle2 aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-moss" />
           <p className="text-sm text-ink">
             <span className="font-medium">{t('overview.connectDone.title')}</span>{' '}
             {t('overview.connectDone.body')}
@@ -141,8 +143,8 @@ export default async function DashboardOverview({
         </div>
       )}
       {searchParams.connect === 'pending' && (
-        <div className="motion-safe:animate-fade-in mt-6 flex items-start gap-3 rounded-card border border-clay/30 bg-clay/5 p-4">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-clay-text" />
+        <div className="mt-6 flex items-start gap-3 rounded-card border border-clay/30 bg-clay/5 p-4">
+          <Info aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-clay-text" />
           <p className="text-sm text-ink">
             <span className="font-medium">{t('overview.connectPending.title')}</span>{' '}
             {t('overview.connectPending.body')}
@@ -215,9 +217,7 @@ export default async function DashboardOverview({
                 href="/dashboard/appointments"
                 className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-ink/[0.04] focus-visible:[outline-offset:-2px]"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-clay/12 text-sm font-semibold text-clay-text">
-                  {initials(b.profiles?.full_name ?? b.guest_name ?? '') || '—'}
-                </span>
+                <InitialsAvatar name={b.profiles?.full_name ?? b.guest_name ?? ''} size="md" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-ink">
                     {b.profiles?.full_name ?? b.guest_name}
@@ -252,10 +252,10 @@ export default async function DashboardOverview({
   );
 }
 
-const statTones: Record<'ink' | 'moss' | 'clay', string> = {
-  ink: 'bg-ink/[0.06] text-ink ring-1 ring-ink/[0.06]',
-  moss: 'bg-moss/10 text-moss ring-1 ring-moss/15',
-  clay: 'bg-clay/15 text-clay-text ring-1 ring-clay/20'
+const statGlassTone: Record<'ink' | 'moss' | 'clay', 'neutral' | 'success' | 'accent'> = {
+  ink: 'neutral',
+  moss: 'success',
+  clay: 'accent'
 };
 
 function Stat({
@@ -273,18 +273,14 @@ function Stat({
 }) {
   return (
     <Card interactive className="group relative overflow-hidden">
-      {/* gold corner glow on hover — the marketing tell, carried into the app */}
-      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      {/* violet corner glow on hover — the marketing tell, carried into the app */}
+      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <CardBody className="relative">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
             {label}
           </p>
-          <span
-            className={`flex h-9 w-9 items-center justify-center rounded-xl ${statTones[tone]}`}
-          >
-            <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
-          </span>
+          <GlassIcon icon={Icon} tone={statGlassTone[tone]} size="sm" glow={false} />
         </div>
         <p className="mt-3 font-display text-[2rem] font-medium leading-none tracking-tight tabular-nums text-ink">
           {value}

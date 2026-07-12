@@ -49,7 +49,7 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                           : 'border-line-strong group-hover:border-clay/50'
                       )}
                     >
-                      {active && <Check className="h-3 w-3" strokeWidth={3} />}
+                      {active && <Check aria-hidden className="h-3 w-3" strokeWidth={2.5} />}
                     </span>
                     <p className="font-medium text-ink">{s.name}</p>
                   </div>

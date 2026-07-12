@@ -15,17 +15,17 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#140d08'
+          background: '#090414'
         }}
       >
         <svg width="112" height="112" viewBox="0 0 32 32" fill="none">
           <path
             d="M11 8 C 17 8, 22 11, 22 14.5 C 22 17, 19 18, 16 18 M11 24 C 17 24, 22 21, 22 17.5 C 22 15, 19 14, 16 14 M11 8 L 11 24"
-            stroke="#e0a33f"
+            stroke="#8B5CF6"
             strokeWidth="2.2"
             strokeLinecap="round"
           />
-          <circle cx="22" cy="9" r="1.6" fill="#f2c464" />
+          <circle cx="22" cy="9" r="1.6" fill="#C4B5FD" />
         </svg>
       </div>
     ),

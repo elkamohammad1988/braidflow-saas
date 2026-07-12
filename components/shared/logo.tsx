@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils';
 
 /**
- * Braid-inspired mark: three interwoven strands. Pairs with the Fraunces
- * wordmark. Uses currentColor so it inherits ink / cream depending on context.
+ * Braid-inspired mark: three interwoven strands. Pairs with the Inter wordmark.
+ * Uses currentColor so it inherits ink / ivory depending on context.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -43,7 +43,7 @@ export function Logo({
 }) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-[11px] bg-gradient-to-br from-onyx-soft to-night text-gold shadow-[0_2px_10px_-3px_rgba(35,24,16,0.5),inset_0_1px_0_rgba(242,196,100,0.18)] ring-1 ring-gold/25">
+      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-onyx-soft to-night text-gold shadow-[0_2px_10px_-3px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(196,181,253,0.18)] ring-1 ring-gold/25">
         <LogoMark className={cn('h-[19px] w-[19px]', markClassName)} />
       </span>
       {wordmark && (

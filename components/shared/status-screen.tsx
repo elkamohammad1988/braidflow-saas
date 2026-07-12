@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * Full-screen status page (404, uncaught error). Standalone — no navbar — so it
- * carries its own brand anchor, a warm woven backdrop, and a gilt glyph. Shared
+ * carries its own brand anchor, a woven violet backdrop, and a gradient glyph. Shared
  * by the server `not-found` and the client `error` boundary.
  */
 export function StatusScreen({ code, title, description, children, reference }: Props) {
@@ -37,7 +37,7 @@ export function StatusScreen({ code, title, description, children, reference }: 
           ))}
         </g>
       </svg>
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(224,163,63,0.16),transparent_68%)] blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_68%)] blur-3xl" />
 
       <header className="relative z-10 py-8">
         <Link href="/" className="inline-flex transition-opacity hover:opacity-80">

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 // Shared shell for the static legal pages (Privacy, Terms) so they render with
-// one consistent typographic treatment. Links inside the body inherit the warm
+// one consistent typographic treatment. Links inside the body inherit the violet
 // underline style via the arbitrary-variant selectors below.
 export function LegalShell({
   title,

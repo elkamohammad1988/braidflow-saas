@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { TZDate } from '@date-fns/tz';
 import { Button } from '@/components/ui/button';
@@ -79,15 +79,17 @@ function OverrideRow({ override, timeZone }: { override: Override; timeZone: str
 
   return (
     <li className="flex items-center justify-between gap-4 rounded-card border border-line bg-paper px-5 py-3 shadow-card">
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-medium text-ink">{label}</p>
-        {override.note && <p className="mt-0.5 text-xs text-ink-muted">{override.note}</p>}
+        {override.note && (
+          <p className="mt-0.5 break-words text-xs text-ink-muted">{override.note}</p>
+        )}
       </div>
       <button
         type="button"
         disabled={pending}
         onClick={() => startTransition(() => removeOverrideAction(override.id))}
-        className="text-sm text-ink-muted hover:text-ink disabled:opacity-50"
+        className="shrink-0 text-sm text-ink-muted hover:text-ink disabled:opacity-50"
       >
         {pending ? <Spinner /> : t('availability.remove')}
       </button>
@@ -120,6 +122,13 @@ function AddOverrideForm({ timeZone, onDone }: { timeZone: string; onDone: () =>
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const firstRef = useRef<HTMLInputElement>(null);
+
+  // Opening the form unmounts the "Add block" trigger, so move focus into the
+  // form instead of letting it fall back to <body>.
+  useEffect(() => {
+    firstRef.current?.focus();
+  }, []);
 
   function save() {
     setError(null);
@@ -148,6 +157,7 @@ function AddOverrideForm({ timeZone, onDone }: { timeZone: string; onDone: () =>
         <label className="text-xs text-ink-muted">
           {t('availability.date')}
           <input
+            ref={firstRef}
             type="date"
             value={date}
             min={today}

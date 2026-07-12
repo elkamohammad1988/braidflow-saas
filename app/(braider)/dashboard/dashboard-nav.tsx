@@ -53,7 +53,10 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
                   : 'text-ink-muted hover:bg-ink/[0.05] hover:text-ink'
               )}
             >
-              <Icon className={cn('h-4 w-4', active && 'text-gold')} />
+              <Icon
+                className={cn('h-[18px] w-[18px]', active && 'text-gold')}
+                strokeWidth={active ? 2 : 1.75}
+              />
               {t(l.key)}
             </Link>
           );
@@ -76,7 +79,7 @@ export function DashboardNav({ orientation = 'vertical' }: { orientation?: 'vert
                 className={cn(
                   'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all duration-200 ease-spring',
                   active
-                    ? 'bg-gradient-to-br from-onyx-soft to-night text-ivory shadow-[0_8px_22px_-10px_rgba(35,24,16,0.55)] ring-1 ring-gold/15'
+                    ? 'bg-gradient-to-br from-onyx-soft to-night text-ivory shadow-[0_8px_22px_-10px_rgba(0,0,0,0.55)] ring-1 ring-gold/15'
                     : 'text-ink-muted hover:bg-ink/[0.05] hover:text-ink'
                 )}
               >

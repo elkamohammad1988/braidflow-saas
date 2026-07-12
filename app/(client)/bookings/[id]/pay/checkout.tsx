@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useTheme } from 'next-themes';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import {
   Elements,
@@ -22,60 +21,16 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-// Tuned to the atelier palette so Stripe's fields feel like part of the page,
-// not a cold iframe dropped into warm paper. Two registers — light-paper and
-// warm-midnight — so the card form matches the page instead of glowing white on
-// the dark stage (the single most important conversion moment).
-const lightAppearance: Appearance = {
-  theme: 'stripe',
-  variables: {
-    colorPrimary: '#c78a3a',
-    colorText: '#231810',
-    colorTextSecondary: '#6d5c4e',
-    colorBackground: '#fdfaf4',
-    colorDanger: '#dc2626',
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fontSizeBase: '15px',
-    borderRadius: '12px',
-    spacingUnit: '4px'
-  },
-  rules: {
-    '.Input': {
-      border: '1px solid rgba(35,24,16,0.15)',
-      boxShadow: 'inset 0 1px 2px rgba(35,24,16,0.04)',
-      padding: '11px 14px'
-    },
-    '.Input:focus': {
-      border: '1px solid rgba(199,138,58,0.55)',
-      boxShadow: '0 0 0 4px rgba(224,163,63,0.15)'
-    },
-    '.Label': {
-      fontWeight: '500',
-      fontSize: '13px',
-      color: '#6d5c4e',
-      marginBottom: '6px'
-    },
-    '.Tab': {
-      border: '1px solid rgba(35,24,16,0.15)',
-      boxShadow: 'none'
-    },
-    '.Tab:hover': {
-      borderColor: 'rgba(199,138,58,0.5)'
-    },
-    '.Tab--selected': {
-      borderColor: '#c78a3a',
-      boxShadow: '0 0 0 1px #c78a3a'
-    }
-  }
-};
-
-const darkAppearance: Appearance = {
+// Purple-dark register so Stripe's fields feel native to the page, not a cold
+// iframe dropped onto the violet surface (the single most important conversion
+// moment). The app is dark-only, so there is one appearance.
+const appearance: Appearance = {
   theme: 'night',
   variables: {
-    colorPrimary: '#e0a33f',
-    colorText: '#f0e9de',
-    colorTextSecondary: '#b4a898',
-    colorBackground: '#211912',
+    colorPrimary: '#8B5CF6',
+    colorText: '#F3F0FF',
+    colorTextSecondary: '#A89CCF',
+    colorBackground: '#141022',
     colorDanger: '#f87171',
     fontFamily: 'Inter, system-ui, sans-serif',
     fontSizeBase: '15px',
@@ -84,30 +39,30 @@ const darkAppearance: Appearance = {
   },
   rules: {
     '.Input': {
-      border: '1px solid rgba(245,238,227,0.17)',
-      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.25)',
+      border: '1px solid rgba(139,92,246,0.22)',
+      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.35)',
       padding: '11px 14px'
     },
     '.Input:focus': {
-      border: '1px solid rgba(224,163,63,0.6)',
-      boxShadow: '0 0 0 4px rgba(224,163,63,0.18)'
+      border: '1px solid rgba(139,92,246,0.6)',
+      boxShadow: '0 0 0 4px rgba(139,92,246,0.18)'
     },
     '.Label': {
       fontWeight: '500',
       fontSize: '13px',
-      color: '#b4a898',
+      color: '#A89CCF',
       marginBottom: '6px'
     },
     '.Tab': {
-      border: '1px solid rgba(245,238,227,0.17)',
+      border: '1px solid rgba(139,92,246,0.22)',
       boxShadow: 'none'
     },
     '.Tab:hover': {
-      borderColor: 'rgba(224,163,63,0.5)'
+      borderColor: 'rgba(139,92,246,0.5)'
     },
     '.Tab--selected': {
-      borderColor: '#e0a33f',
-      boxShadow: '0 0 0 1px #e0a33f'
+      borderColor: '#8B5CF6',
+      boxShadow: '0 0 0 1px #8B5CF6'
     }
   }
 };
@@ -122,17 +77,7 @@ type Props = {
 };
 
 export function Checkout({ clientSecret, bookingId, depositCents, returnQuery = '' }: Props) {
-  // `resolvedTheme` collapses "system" to light|dark; undefined until mounted, so
-  // default to light. react-stripe-js applies the new appearance via
-  // elements.update() when this memo changes, so the fields recolour in place.
-  const { resolvedTheme } = useTheme();
-  const options = useMemo(
-    () => ({
-      clientSecret,
-      appearance: resolvedTheme === 'dark' ? darkAppearance : lightAppearance
-    }),
-    [clientSecret, resolvedTheme]
-  );
+  const options = useMemo(() => ({ clientSecret, appearance }), [clientSecret]);
 
   return (
     <Elements stripe={stripePromise} options={options}>

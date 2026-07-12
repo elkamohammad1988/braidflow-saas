@@ -7,9 +7,11 @@ export function Card({ className, interactive, ...rest }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-card border border-line bg-paper shadow-card',
+        // `glass-edge` traces a lit hairline along the top so the card reads as a
+        // physical glass panel, not a flat rectangle.
+        'glass-edge rounded-card border border-line bg-paper shadow-card',
         interactive &&
-          'transition-all duration-300 ease-spring hover:-translate-y-1 hover:border-clay/30 hover:shadow-lifted active:translate-y-0 active:shadow-card active:duration-100',
+          'transition-all duration-300 ease-spring hover:-translate-y-1 hover:border-clay/40 hover:shadow-lifted active:translate-y-0 active:shadow-card active:duration-100',
         className
       )}
       {...rest}
@@ -17,14 +19,7 @@ export function Card({ className, interactive, ...rest }: CardProps) {
   );
 }
 
-export function CardHeader({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('px-6 pt-6', className)} {...rest} />;
-}
-
+// Padding compacted ~20% for a denser, more premium rhythm.
 export function CardBody({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('px-6 py-5', className)} {...rest} />;
-}
-
-export function CardFooter({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('px-6 pb-6 pt-2', className)} {...rest} />;
+  return <div className={cn('px-5 py-4', className)} {...rest} />;
 }

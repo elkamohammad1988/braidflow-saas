@@ -138,17 +138,21 @@ export default async function AppointmentsPage() {
           />
         ) : (
           <>
-            {/* Desktop: table */}
-            <div className="hidden overflow-hidden rounded-card border border-line bg-paper shadow-soft md:block">
+            {/* Desktop (lg+): table. Below lg the 240px sidebar mounts and would
+                leave the table too little room, so tablet-portrait uses the cards.
+                overflow-x-auto keeps long locales scrollable inside the card. */}
+            <div className="hidden overflow-x-auto rounded-card border border-line bg-paper shadow-soft lg:block">
               <table className="w-full text-sm">
                 <thead className="bg-ink/[0.03] text-start text-xs uppercase tracking-wider text-ink-muted">
                   <tr>
-                    <th className="px-5 py-3">{t('appointments.table.when')}</th>
-                    <th className="px-5 py-3">{t('appointments.table.client')}</th>
-                    <th className="px-5 py-3">{t('appointments.table.service')}</th>
-                    <th className="px-5 py-3">{t('appointments.table.status')}</th>
-                    <th className="px-5 py-3 text-end">{t('appointments.table.total')}</th>
-                    <th className="px-5 py-3" />
+                    <th scope="col" className="px-5 py-3">{t('appointments.table.when')}</th>
+                    <th scope="col" className="px-5 py-3">{t('appointments.table.client')}</th>
+                    <th scope="col" className="px-5 py-3">{t('appointments.table.service')}</th>
+                    <th scope="col" className="px-5 py-3">{t('appointments.table.status')}</th>
+                    <th scope="col" className="px-5 py-3 text-end">{t('appointments.table.total')}</th>
+                    <th scope="col" className="px-5 py-3">
+                      <span className="sr-only">{t('appointments.table.actions')}</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -190,8 +194,8 @@ export default async function AppointmentsPage() {
               </table>
             </div>
 
-            {/* Mobile: stacked cards */}
-            <ul className="space-y-3 md:hidden">
+            {/* Tablet + mobile: stacked cards */}
+            <ul className="space-y-3 lg:hidden">
               {appointments.map((a) => {
                 const status = a.status as Status;
                 const upcoming = !isPast(new Date(a.scheduled_at));

@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       'The booking platform built for braiders — take deposits, manage your schedule, and stop chasing down DMs.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#f5eee3',
-    theme_color: '#f5eee3',
+    background_color: '#04030A',
+    theme_color: '#04030A',
     icons: [{ src: '/icon.svg', type: 'image/svg+xml', sizes: 'any' }]
   };
 }

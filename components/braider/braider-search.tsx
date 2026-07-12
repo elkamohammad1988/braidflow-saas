@@ -13,7 +13,7 @@ const SORTS = [
 ];
 
 const pillFocus =
-  'focus-visible:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/50';
+  'focus-visible:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45';
 
 export function BraiderSearch({
   defaultQuery,

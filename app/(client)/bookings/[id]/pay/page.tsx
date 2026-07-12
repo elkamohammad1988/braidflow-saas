@@ -113,7 +113,7 @@ export default async function PayPage({
         {t('slotHeld')}
       </div>
 
-      <div className="mt-6 grid gap-8 md:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_320px]">
         {demo ? (
           <DemoCheckout
             bookingId={booking.id}
