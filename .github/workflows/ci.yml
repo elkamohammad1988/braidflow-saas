@@ -32,7 +32,7 @@ jobs:
       # Restore Next's build cache so incremental CI builds are fast (Next prints a
       # warning without it). Keyed on source so it invalidates when code changes.
       - name: Cache Next.js build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
