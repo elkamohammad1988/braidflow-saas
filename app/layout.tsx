@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Space_Mono } from 'next/font/google';
+import { Inter, Space_Mono, IBM_Plex_Sans_Arabic } from 'next/font/google';
 import { JsonLd } from '@/components/shared/json-ld';
 import { RouteAnnouncer } from '@/components/shared/route-announcer';
+import { ThemeScript } from '@/components/theme/theme-script';
 import { DemoBadge } from '@/components/demo/demo-badge';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -9,20 +10,31 @@ import { isRtl } from '@/i18n/config';
 import { isDemoMode } from '@/lib/demo';
 import './globals.css';
 
+// Inter is a variable font: this single instance carries the full 100–900 weight
+// range, so headings (font-medium/semibold/bold, Linear/Vercel house style) share
+// it — no second font file. `--font-display` is aliased to `--font-sans` in
+// globals.css so the Tailwind `display` stack still resolves.
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-// Headings share the Inter family (Linear/Vercel house style), set apart by
-// weight + tight optical tracking rather than a decorative serif.
-const display = Inter({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['500', '600', '700'],
-  display: 'swap'
-});
 const mono = Space_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   weight: ['400', '700'],
   display: 'swap'
+});
+// Arabic script webfont. Inter/Space Mono carry no Arabic glyphs, so without this
+// every RTL screen fell back to a generic OS font. IBM Plex Sans Arabic is drawn
+// to harmonise with Latin grotesques (Inter). It sits AFTER the Latin faces in the
+// family stack (globals.css / tailwind.config), so per-glyph fallback keeps Latin
+// on Inter and only Arabic characters resolve here — the font's own Latin subset
+// is therefore never used, so we drop it. `preload: false` keeps this off the four
+// LTR locales (en/fr/es/zh-CN) that never paint an Arabic glyph; browsers fetch it
+// lazily only when Arabic actually renders.
+const arabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
+  variable: '--font-arabic',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  preload: false
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://braidflow.app';
@@ -67,8 +79,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Single dark experience — the browser chrome matches the page background.
-  themeColor: '#04030A',
+  // Browser chrome matches the active page background. The manual toggle keeps
+  // this meta in sync at runtime; these entries cover the initial system-matched
+  // paint (light = premium purple, dark = luxury charcoal).
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FAF7FF' },
+    { media: '(prefers-color-scheme: dark)', color: '#07030F' }
+  ],
   width: 'device-width',
   initialScale: 1
 };
@@ -82,15 +99,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       dir={dir}
-      // Dark-only product: pin `.dark` in the SSR markup so `dark:` variants apply
-      // from the first paint. It never changes — there is no theme toggle.
-      className={`dark ${sans.variable} ${display.variable} ${mono.variable}`}
+      // No theme class in the SSR markup: the blocking ThemeScript (first child of
+      // <body>) sets `.dark` + `color-scheme` from the stored/OS preference before
+      // paint, so both registers are flash-free. `suppressHydrationWarning` lets
+      // React tolerate the class the script adds.
+      className={`${sans.variable} ${mono.variable} ${arabic.variable}`}
       suppressHydrationWarning
     >
       <body>
+        <ThemeScript />
         <a
           href="#main-content"
-          className="sr-only rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-lifted focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200]"
+          className="sr-only rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent shadow-lifted focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200]"
         >
           {t('skipToContent')}
         </a>
@@ -128,8 +148,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             ]
           }}
         />
-        {/* Single dark experience — `.dark` is pinned statically on <html> above,
-            so there is no theme context to provide and no toggle to drive. */}
+        {/* The blocking ThemeScript above sets the active register before paint;
+            the ThemeToggle in the chrome flips `.dark` on <html> at runtime, so
+            both themes are driven purely by that class — no React theme context. */}
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
           <RouteAnnouncer />

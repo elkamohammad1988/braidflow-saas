@@ -39,7 +39,12 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4">
+      {/* Announce the in-flight submit to screen readers (the button-label swap
+          alone lives in no live region and the disabled button drops focus). */}
+      <span role="status" className="sr-only">
+        {pending ? t('signup.creatingAccount') : ''}
+      </span>
       <fieldset>
         <legend className="mb-2 text-sm font-medium text-ink">{t('signup.roleLegend')}</legend>
         <div className="grid grid-cols-2 gap-2">
@@ -52,7 +57,7 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
               className={cn(
                 'rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ease-spring active:scale-[0.98]',
                 role === r
-                  ? 'border-transparent bg-gradient-to-br from-onyx-soft to-night text-ivory shadow-soft ring-1 ring-gold/25'
+                  ? 'border-transparent bg-gradient-to-br from-night to-night-deep text-ivory shadow-soft ring-1 ring-gold/25'
                   : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.03]'
               )}
             >
@@ -75,7 +80,7 @@ export function SignupForm({ defaultRole }: { defaultRole: Role }) {
       />
 
       {error && (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

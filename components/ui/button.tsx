@@ -10,18 +10,17 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants: Record<Variant, string> = {
-  // Violet, lit from within — the signature action.
-  // Gradient starts at `gold` (#7C3AED), not the lighter `gold-bright` (#8B5CF6):
-  // white label text clears WCAG AA (≥4.5:1) across the whole face — the brighter
-  // top stop landed at ~4.2:1. Still the signature lit-violet CTA, a shade deeper.
+  // The signature violet CTA — a purple gradient lit from within by the glow.
+  // The gradient runs `gold`→`gold-deep` (both violet: #7C3AED→#6D28D9), tuned so
+  // white label text clears WCAG AA (≥4.5:1) across the whole face.
   primary:
-    'bg-gradient-to-b from-gold to-gold-deep text-white shadow-glow-gold hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0 active:brightness-95 disabled:from-onyx-soft disabled:to-onyx-soft disabled:text-ink-subtle disabled:shadow-none disabled:hover:translate-y-0',
-  // Layered surface with a violet hairline that warms on hover.
+    'bg-gradient-to-b from-gold to-gold-deep text-on-accent shadow-glow-gold hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0 active:brightness-95 disabled:from-onyx-soft disabled:to-onyx-soft disabled:text-ink-subtle disabled:shadow-none disabled:hover:translate-y-0',
+  // Layered surface with an accent hairline that warms on hover.
   secondary:
     'bg-paper text-ink border border-line-strong shadow-card hover:-translate-y-[1px] hover:border-clay/45 hover:bg-onyx-soft hover:shadow-lifted active:translate-y-0',
-  ghost: 'text-ink-muted hover:bg-clay/10 hover:text-white',
+  ghost: 'text-ink-muted hover:bg-clay/10 hover:text-ink',
   danger:
-    'bg-gradient-to-b from-red-500 to-red-600 text-white shadow-[0_1px_0_rgba(255,235,230,0.25)_inset,0_8px_24px_-8px_rgba(220,38,38,0.5),0_2px_8px_-2px_rgba(185,28,28,0.45)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0'
+    'bg-gradient-to-b from-danger-strong to-danger-bright text-white shadow-[0_1px_0_rgba(255,235,230,0.25)_inset,0_8px_24px_-8px_rgb(var(--color-danger-bright)/0.5),0_2px_8px_-2px_rgb(var(--color-danger)/0.45)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0'
 };
 
 // Compacted ~20%: tighter horizontal padding, 40px default target.

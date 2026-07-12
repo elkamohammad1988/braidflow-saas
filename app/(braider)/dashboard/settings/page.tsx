@@ -40,7 +40,9 @@ export default async function SettingsPage() {
               <p className="text-xs uppercase tracking-wider text-ink-muted">{t('settings.bookingLinkLabel')}</p>
               <p className="mt-1 truncate text-sm text-ink">{bookingUrl}</p>
             </div>
-            <CopyButton value={bookingUrl} label={t('settings.copyLink')} />
+            <div className="shrink-0">
+              <CopyButton value={bookingUrl} label={t('settings.copyLink')} />
+            </div>
           </CardBody>
         </Card>
       )}

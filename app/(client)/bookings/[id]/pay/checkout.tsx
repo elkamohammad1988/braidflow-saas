@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import {
@@ -21,17 +21,20 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-// Purple-dark register so Stripe's fields feel native to the page, not a cold
-// iframe dropped onto the violet surface (the single most important conversion
-// moment). The app is dark-only, so there is one appearance.
-const appearance: Appearance = {
+// Stripe Elements render in a cross-origin iframe, so they can't read the app's
+// CSS variables — the appearance must be handed over as literal values mirroring
+// the design tokens. We ship one per theme so the fields feel native at this
+// critical conversion moment, both driven by the signature violet primary:
+//   • DARK  → violet primary on purple-noir (#140C26 fields, purple glow)
+//   • LIGHT → violet primary on lavender-white
+const darkAppearance: Appearance = {
   theme: 'night',
   variables: {
     colorPrimary: '#8B5CF6',
-    colorText: '#F3F0FF',
-    colorTextSecondary: '#A89CCF',
-    colorBackground: '#141022',
-    colorDanger: '#f87171',
+    colorText: '#FFFFFF',
+    colorTextSecondary: '#B7B0C8',
+    colorBackground: '#140C26',
+    colorDanger: '#F87171',
     fontFamily: 'Inter, system-ui, sans-serif',
     fontSizeBase: '15px',
     borderRadius: '12px',
@@ -39,31 +42,48 @@ const appearance: Appearance = {
   },
   rules: {
     '.Input': {
-      border: '1px solid rgba(139,92,246,0.22)',
-      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.35)',
+      border: '1px solid rgba(139,92,246,0.28)',
+      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.4)',
+      padding: '11px 14px'
+    },
+    '.Input:focus': {
+      border: '1px solid rgba(139,92,246,0.7)',
+      boxShadow: '0 0 0 4px rgba(139,92,246,0.22)'
+    },
+    '.Label': { fontWeight: '500', fontSize: '13px', color: '#B7B0C8', marginBottom: '6px' },
+    '.Tab': { border: '1px solid rgba(139,92,246,0.28)', boxShadow: 'none' },
+    '.Tab:hover': { borderColor: 'rgba(139,92,246,0.55)' },
+    '.Tab--selected': { borderColor: '#8B5CF6', boxShadow: '0 0 0 1px #8B5CF6' }
+  }
+};
+
+const lightAppearance: Appearance = {
+  theme: 'stripe',
+  variables: {
+    colorPrimary: '#7C3AED',
+    colorText: '#18181B',
+    colorTextSecondary: '#6E6880',
+    colorBackground: '#FFFFFF',
+    colorDanger: '#DC2626',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    fontSizeBase: '15px',
+    borderRadius: '12px',
+    spacingUnit: '4px'
+  },
+  rules: {
+    '.Input': {
+      border: '1px solid rgba(139,92,246,0.2)',
+      boxShadow: '0 1px 2px rgba(76,65,104,0.06)',
       padding: '11px 14px'
     },
     '.Input:focus': {
       border: '1px solid rgba(139,92,246,0.6)',
-      boxShadow: '0 0 0 4px rgba(139,92,246,0.18)'
+      boxShadow: '0 0 0 4px rgba(139,92,246,0.16)'
     },
-    '.Label': {
-      fontWeight: '500',
-      fontSize: '13px',
-      color: '#A89CCF',
-      marginBottom: '6px'
-    },
-    '.Tab': {
-      border: '1px solid rgba(139,92,246,0.22)',
-      boxShadow: 'none'
-    },
-    '.Tab:hover': {
-      borderColor: 'rgba(139,92,246,0.5)'
-    },
-    '.Tab--selected': {
-      borderColor: '#8B5CF6',
-      boxShadow: '0 0 0 1px #8B5CF6'
-    }
+    '.Label': { fontWeight: '500', fontSize: '13px', color: '#6E6880', marginBottom: '6px' },
+    '.Tab': { border: '1px solid rgba(139,92,246,0.2)', boxShadow: 'none' },
+    '.Tab:hover': { borderColor: 'rgba(139,92,246,0.5)' },
+    '.Tab--selected': { borderColor: '#7C3AED', boxShadow: '0 0 0 1px #7C3AED' }
   }
 };
 
@@ -77,7 +97,17 @@ type Props = {
 };
 
 export function Checkout({ clientSecret, bookingId, depositCents, returnQuery = '' }: Props) {
-  const options = useMemo(() => ({ clientSecret, appearance }), [clientSecret]);
+  // Read the live theme so the iframe matches the page. Defaults to dark (the
+  // signature) for the first paint, then corrects after mount; Stripe applies the
+  // updated appearance in place without re-creating the (fixed) clientSecret.
+  const [isDark, setIsDark] = useState(true);
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+  const options = useMemo(
+    () => ({ clientSecret, appearance: isDark ? darkAppearance : lightAppearance }),
+    [clientSecret, isDark]
+  );
 
   return (
     <Elements stripe={stripePromise} options={options}>
@@ -126,7 +156,12 @@ function CheckoutForm({
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} aria-busy={submitting}>
+      {/* Announce the multi-second charge round-trip to screen readers (the button
+          label change alone lives in no live region, and the disabling drops focus). */}
+      <span role="status" className="sr-only">
+        {submitting ? t('charging') : ''}
+      </span>
       <div className="rounded-card border border-line bg-paper p-6 shadow-soft">
         {!ready && (
           <div className="flex items-center justify-center py-8 text-ink-muted">

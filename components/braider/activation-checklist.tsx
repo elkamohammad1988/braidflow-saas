@@ -52,7 +52,7 @@ export function ActivationChecklist({
           aria-label={t('title')}
         >
           <div
-            className="h-full rounded-full bg-gradient-to-r from-gold-bright to-clay shadow-[0_0_10px_rgba(139,92,246,0.5)] transition-all duration-300 ease-spring"
+            className="h-full rounded-full bg-gradient-to-r from-gold-bright to-clay shadow-[0_0_10px_rgb(var(--accent-glow)/0.5)] transition-all duration-300 ease-spring"
             style={{ width: `${(done / 3) * 100}%` }}
           />
         </div>
@@ -107,15 +107,17 @@ function Step({
   action: React.ReactNode;
 }) {
   return (
-    <li className="flex items-center gap-4 px-6 py-4">
-      <StatusIcon done={done} icon={icon} />
-      <div className="min-w-0 flex-1">
-        <p className={cn('font-medium', done ? 'text-ink-muted line-through' : 'text-ink')}>
-          {title}
-        </p>
-        {!done && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
+    <li className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <StatusIcon done={done} icon={icon} />
+        <div className="min-w-0 flex-1">
+          <p className={cn('font-medium', done ? 'text-ink-muted line-through' : 'text-ink')}>
+            {title}
+          </p>
+          {!done && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
+        </div>
       </div>
-      {!done && <div className="shrink-0">{action}</div>}
+      {!done && <div className="shrink-0 ps-[3.25rem] sm:ps-0">{action}</div>}
     </li>
   );
 }
@@ -144,27 +146,29 @@ function StripeStep({
   }
 
   return (
-    <li className="flex items-center gap-4 px-6 py-4">
-      <StatusIcon done={done} icon={CreditCard} />
-      <div className="min-w-0 flex-1">
-        <p className={cn('font-medium', done ? 'text-ink-muted line-through' : 'text-ink')}>
-          {t('stripe.title')}
-        </p>
-        {!done && (
-          <p className="mt-0.5 text-sm text-ink-muted">
-            {onboardingComplete
-              ? t('stripe.reviewDescription')
-              : t('stripe.description')}
+    <li className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <StatusIcon done={done} icon={CreditCard} />
+        <div className="min-w-0 flex-1">
+          <p className={cn('font-medium', done ? 'text-ink-muted line-through' : 'text-ink')}>
+            {t('stripe.title')}
           </p>
-        )}
-        {error && (
-          <p role="alert" className="mt-1 text-sm text-red-700 dark:text-red-400">
-            {error}
-          </p>
-        )}
+          {!done && (
+            <p className="mt-0.5 text-sm text-ink-muted">
+              {onboardingComplete
+                ? t('stripe.reviewDescription')
+                : t('stripe.description')}
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="mt-1 text-sm text-danger">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
       {!done && (
-        <div className="shrink-0">
+        <div className="shrink-0 ps-[3.25rem] sm:ps-0">
           <Button
             size="sm"
             variant={onboardingComplete ? 'secondary' : 'primary'}

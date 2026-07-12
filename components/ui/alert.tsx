@@ -7,22 +7,22 @@ type Tone = 'danger' | 'info' | 'success' | 'warning';
 /**
  * Inline banner for errors and contextual notices. One tone map, one padding,
  * one radius — so the same "callout" role never renders five different ways
- * across the app, and every tone flips correctly in dark mode (the hand-rolled
- * `bg-red-50` boxes did not). Mirrors the semantics of `Badge`'s tone map.
+ * across the app, and every tone flips correctly in dark mode through the design
+ * tokens (danger / info / success / warning). Mirrors `Badge`'s tone map.
  */
 const tones: Record<Tone, string> = {
-  danger:
-    'border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200',
+  danger: 'border-danger-line bg-danger-soft text-danger',
   info: 'border-clay/25 bg-clay/[0.07] text-ink',
   success: 'border-moss/30 bg-moss/[0.07] text-ink',
-  warning: 'border-gold/30 bg-gold/[0.08] text-ink'
+  // Attention — the champagne-gold highlight, distinct from the violet info tone.
+  warning: 'border-champagne/30 bg-champagne/[0.08] text-ink'
 };
 
 const iconTones: Record<Tone, string> = {
-  danger: 'text-red-700 dark:text-red-300',
+  danger: 'text-danger',
   info: 'text-clay-text',
   success: 'text-moss',
-  warning: 'text-clay-text'
+  warning: 'text-champagne-text'
 };
 
 type Props = HTMLAttributes<HTMLDivElement> & {

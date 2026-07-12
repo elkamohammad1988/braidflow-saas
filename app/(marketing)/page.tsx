@@ -78,14 +78,14 @@ export default function Home() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-24 pt-20 md:grid-cols-[1.08fr_0.92fr] md:pb-32 md:pt-28">
           <div>
             <Reveal delay={0}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/[0.07] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold-bright backdrop-blur-sm">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgba(196,181,253,0.9)]" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/[0.07] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-clay-soft backdrop-blur-sm dark:text-gold-bright">
+                <span className="flex h-1.5 w-1.5 rounded-full bg-gold-bright shadow-[0_0_8px_rgb(var(--accent-glow-3)/0.9)]" />
                 {t('eyebrow')}
               </span>
             </Reveal>
 
             <Reveal delay={90}>
-              <h1 className="mt-6 max-w-xl break-words font-display text-[3.4rem] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
+              <h1 className="mt-6 max-w-xl break-words font-display text-[clamp(2.5rem,10vw,3.4rem)] font-medium leading-[0.98] tracking-[-0.035em] text-ivory sm:text-[4.25rem] md:text-[5.25rem]">
                 {t.rich('title', {
                   br: () => <br />,
                   em: (chunks) => (
@@ -127,7 +127,7 @@ export default function Home() {
               <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:gap-x-7">
                 {proofPoints.map((p) => (
                   <div key={p.key} className="flex items-center gap-2 text-sm text-ivory/75">
-                    <p.icon aria-hidden className="h-4 w-4 text-gold" strokeWidth={1.9} />
+                    <p.icon aria-hidden className="h-4 w-4 text-clay-soft dark:text-gold" strokeWidth={1.9} />
                     <span>{t(`proof.${p.key}`)}</span>
                   </div>
                 ))}
@@ -218,7 +218,7 @@ export default function Home() {
                 className={i === 1 ? 'md:mt-10' : i === 2 ? 'md:mt-20' : ''}
               >
                 <div className="group relative h-full overflow-hidden rounded-card border border-line bg-paper p-6 shadow-card transition-all duration-300 ease-spring hover:-translate-y-1.5 hover:shadow-lifted">
-                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.14),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.14),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="flex items-center justify-between">
                     <GlassIcon icon={step.icon} tone="accent" size="md" />
                     <span className="font-mono text-2xl text-clay/70">{step.n}</span>
@@ -325,15 +325,15 @@ export default function Home() {
 
           <Reveal delay={120}>
             <div className="mt-10 overflow-hidden rounded-card border border-line bg-paper shadow-lifted">
-              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-line bg-night px-6 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ivory/50 sm:gap-4">
+              <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-line bg-night px-4 py-4 font-mono text-[10px] uppercase tracking-normal text-ivory/70 sm:gap-4 sm:px-6 sm:text-[11px] sm:tracking-[0.14em]">
                 <div>{t('comparison.feature')}</div>
-                <div className="w-16 text-center text-gold-bright sm:w-24">BraidFlow</div>
+                <div className="w-16 text-center text-clay-soft sm:w-24 dark:text-gold-bright">BraidFlow</div>
                 <div className="w-16 text-center sm:w-24">{t('comparison.genericTools')}</div>
               </div>
               {comparisons.map((row, i) => (
                 <div
                   key={row.key}
-                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-3 px-6 py-4 text-sm transition-colors hover:bg-ink/[0.04] sm:gap-4 ${
+                  className={`grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-4 text-sm transition-colors hover:bg-ink/[0.04] sm:gap-4 sm:px-6 ${
                     i !== comparisons.length - 1 ? 'border-b border-line' : ''
                   }`}
                 >
@@ -407,13 +407,13 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-cream to-transparent" aria-hidden />
         <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-28">
           <Reveal>
-            <p className="label mx-auto flex w-fit items-center gap-2 text-gold-bright">
+            <p className="label mx-auto flex w-fit items-center gap-2 text-clay-soft dark:text-gold-bright">
               <span className="h-1 w-1 rounded-full bg-gold-bright" />
               {t('finalCta.badge')}
             </p>
           </Reveal>
           <Reveal delay={90}>
-            <p className="mx-auto mt-6 max-w-2xl break-words font-display text-[3rem] font-medium leading-[1.02] tracking-[-0.035em] md:text-[4.5rem]">
+            <p className="mx-auto mt-6 max-w-2xl break-words font-display text-[clamp(2.25rem,9vw,3rem)] font-medium leading-[1.02] tracking-[-0.035em] md:text-[4.5rem]">
               {t.rich('finalCta.title', {
                 br: () => <br />,
                 em: (chunks) => <span className="italic text-gilt">{chunks}</span>
@@ -437,7 +437,7 @@ export default function Home() {
               </Magnetic>
               <Link
                 href="/pricing"
-                className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-ivory/75 underline-offset-4 transition-colors hover:text-gold-bright"
+                className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-ivory/75 underline-offset-4 transition-colors hover:text-clay-soft dark:hover:text-gold-bright"
               >
                 {t('finalCta.seePricing')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -456,8 +456,8 @@ function HeroPreview() {
   return (
     // The preview is a snapshot of the product's own UI, so it keeps LTR even in RTL locales.
     <div dir="ltr" className="relative mx-auto w-full max-w-sm md:max-w-none">
-      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,rgba(139,92,246,0.35),transparent_70%)] blur-2xl" aria-hidden />
-      <div className="overflow-hidden rounded-xl2 border border-line bg-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7),0_0_0_1px_rgba(196,181,253,0.06)]">
+      <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_50%_40%,rgb(var(--accent-glow)/0.35),transparent_70%)] blur-2xl" aria-hidden />
+      <div className="overflow-hidden rounded-xl2 border border-line bg-paper shadow-[0_40px_80px_-30px_rgba(0,0,0,0.45),0_0_0_1px_rgb(var(--accent-glow-3)/0.08)]">
         {/* window chrome */}
         <div className="flex items-center gap-1.5 border-b border-line bg-cream-deep/60 px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-ink/15" />
@@ -508,7 +508,7 @@ function HeroPreview() {
                 key={slot}
                 className={`rounded-lg border px-2 py-2 text-center font-mono text-[11px] font-medium ${
                   i === 1
-                    ? 'border-gold bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                    ? 'border-gold bg-gradient-to-b from-gold-bright to-gold text-on-accent shadow-glow-gold'
                     : 'border-line bg-paper text-ink-muted'
                 }`}
               >
@@ -525,7 +525,7 @@ function HeroPreview() {
               </p>
               <p className="font-display text-lg font-medium leading-tight">$40.00</p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3.5 py-1.5 text-xs font-semibold text-night">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3.5 py-1.5 text-xs font-semibold text-on-accent">
               <CreditCard className="h-3.5 w-3.5" />
               {t('preview.payButton')}
             </span>

@@ -15,8 +15,11 @@ export function DemoBadge() {
   if (dismissed) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-[60] -translate-x-1/2 print:hidden md:left-auto md:end-5 md:translate-x-0">
-      <div className="flex items-center gap-2 rounded-full border border-gold/25 bg-gradient-to-br from-onyx-soft to-night px-3.5 py-2 text-ivory shadow-[0_10px_30px_-12px_rgba(0,0,0,0.65)] ring-1 ring-gold/10">
+    // z-30 sits above page content but BELOW the booking route's mobile sticky
+    // action bar (z-40), so the deposit + Continue CTA is never covered there; on
+    // every other page (no bottom bar) the badge shows normally.
+    <div className="fixed bottom-4 left-1/2 z-30 -translate-x-1/2 print:hidden md:left-auto md:end-5 md:translate-x-0">
+      <div className="flex items-center gap-2 rounded-full border border-gold/25 bg-gradient-to-br from-night to-night-deep px-3.5 py-2 text-ivory shadow-[0_10px_30px_-12px_rgba(0,0,0,0.65)] ring-1 ring-gold/10">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -24,7 +27,7 @@ export function DemoBadge() {
           aria-expanded={open}
           aria-controls="demo-badge-info"
         >
-          <Sparkles className="h-4 w-4 text-gold" strokeWidth={2} />
+          <Sparkles className="h-4 w-4 text-clay-soft dark:text-clay" strokeWidth={2} />
           {t('demoBadge.label')}
         </button>
         <button

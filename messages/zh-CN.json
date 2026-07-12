@@ -7,6 +7,10 @@
     "myBookings": "我的预约",
     "viewSite": "查看网站",
     "language": "语言",
+    "theme": {
+      "switchToDark": "切换到深色模式",
+      "switchToLight": "切换到浅色模式"
+    },
     "menu": "菜单",
     "copied": "已复制",
     "copy": "复制",

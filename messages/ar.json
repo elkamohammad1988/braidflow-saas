@@ -7,6 +7,10 @@
     "myBookings": "حجوزاتي",
     "viewSite": "عرض الموقع",
     "language": "اللغة",
+    "theme": {
+      "switchToDark": "التبديل إلى الوضع الداكن",
+      "switchToLight": "التبديل إلى الوضع الفاتح"
+    },
     "menu": "القائمة",
     "copied": "تم النسخ",
     "copy": "نسخ",

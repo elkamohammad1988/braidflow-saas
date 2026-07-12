@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { TZDate } from '@date-fns/tz';
-import { addDays, startOfDay } from 'date-fns';
+import { addDays, startOfDay, subDays } from 'date-fns';
 import { getTranslations } from 'next-intl/server';
 import { dbAdmin, db } from '@/lib/db/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
@@ -82,13 +82,20 @@ export default async function BookPage({ params }: { params: { slug: string } })
   const today = startOfDay(TZDate.tz(tz));
   const horizon = addDays(today, WINDOW_DAYS);
 
+  // Pad the fetch a full day on each side of the visible window. The bounds are
+  // braider-zone midnights; a booking near either edge (or one that spills across
+  // the boundary in a zone offset from UTC) can sit just outside [today, horizon)
+  // yet still overlap a first/last-day slot. computeSlotsForDay does the precise
+  // per-slot overlap, so over-fetching is free — under-fetching would let the
+  // picker offer an already-taken edge slot that then fails at submit. Mirrors the
+  // padded window in create.ts / reschedule.ts.
   const { data: bookings } = await admin
     .from('bookings')
     .select('scheduled_at, duration_minutes, status')
     .eq('braider_id', braider.id)
     .in('status', ['pending_payment', 'confirmed'])
-    .gte('scheduled_at', today.toISOString())
-    .lt('scheduled_at', horizon.toISOString());
+    .gte('scheduled_at', subDays(today, 1).toISOString())
+    .lt('scheduled_at', addDays(horizon, 1).toISOString());
 
   const slotsByDayForService = (durationMinutes: number) =>
     Array.from({ length: WINDOW_DAYS }, (_, i) => {

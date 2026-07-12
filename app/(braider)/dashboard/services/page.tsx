@@ -67,7 +67,7 @@ export default async function ServicesPage() {
                   <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents)}</p>
                   <Link
                     href={`/dashboard/services/${s.id}`}
-                    className="mt-2 inline-block text-sm text-ink-muted hover:text-ink"
+                    className="mt-2 inline-flex min-h-[44px] items-center text-sm text-ink-muted hover:text-ink"
                   >
                     {t('services.edit')}
                   </Link>

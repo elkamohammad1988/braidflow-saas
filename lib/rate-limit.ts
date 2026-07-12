@@ -64,11 +64,21 @@ export function rateLimit(
 }
 
 // Best-effort client IP for rate-limit keying, read from the request headers.
-// Vercel (and most proxies) set `x-forwarded-for`; the left-most entry is the
-// original client. Unknown clients collapse into one shared bucket rather than
-// each getting their own unlimited allowance.
+//
+// Trust model: a client can send its own `X-Forwarded-For`, and the platform
+// *appends* the real peer IP to it (Vercel's behaviour), so the LEFT-most XFF
+// entry is attacker-controlled — keying off it lets an attacker mint a fresh
+// bucket per request by rotating a spoofed value, defeating every IP limit.
+// We therefore trust only proxy-set signals: `x-real-ip` (set by Vercel/most
+// proxies to the true peer, not forwardable) first, then the RIGHT-most XFF
+// entry (the hop adjacent to our proxy — the real client under the append
+// model). Unknown clients collapse into one shared bucket rather than each
+// getting their own unlimited allowance.
 export function clientIpKey(): string {
   const h = headers();
+  const realIp = h.get('x-real-ip')?.trim();
+  if (realIp) return realIp;
   const forwarded = h.get('x-forwarded-for');
-  return forwarded?.split(',')[0]?.trim() || h.get('x-real-ip') || 'unknown';
+  const parts = forwarded?.split(',').map((p) => p.trim()).filter(Boolean);
+  return parts?.[parts.length - 1] || 'unknown';
 }

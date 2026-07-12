@@ -8,6 +8,7 @@ import { notifyCancellation } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
 import { captureException } from '@/lib/monitoring';
 import { createLogger, errorInfo } from '@/lib/log';
+import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { issueDepositRefund } from './refund';
 import { decideDepositRefund, type RefundDecision } from './cancellation-policy';
 import { authorizeBookingMutation } from './access';
@@ -17,6 +18,15 @@ const log = createLogger('booking.cancel');
 export async function cancelBookingAction(bookingId: string, token?: string) {
   const database = db();
   const { data: { user } } = await database.auth.getUser();
+
+  // Cancellation moves money (refund / PI cancel) and sends mail, so throttle it.
+  // Keyed per user when signed in, else per IP for the guest-token path.
+  const limit = user
+    ? rateLimit(`booking:cancel:${user.id}`, { limit: 15, windowMs: 10 * 60_000 })
+    : rateLimit(`booking:cancel:ip:${clientIpKey()}`, { limit: 10, windowMs: 15 * 60_000 });
+  if (!limit.ok) {
+    return { error: 'You\'re doing that very quickly. Please wait a moment and try again.' };
+  }
 
   const admin = dbAdmin();
   const { data: booking } = await admin

@@ -1,11 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 import { db, dbAdmin } from '@/lib/db/server';
 import { notifyReschedule } from '@/lib/email/notifications';
 import { recordAuditLog } from '@/lib/audit/log';
+import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { isSlotBookable } from './slot-check';
+import { fetchOverlapBookings } from './overlap';
 import { authorizeBookingMutation } from './access';
 
 type Result =
@@ -19,6 +20,15 @@ export async function rescheduleBookingAction(
 ): Promise<Result> {
   const database = db();
   const { data: { user } } = await database.auth.getUser();
+
+  // Re-runs full slot re-derivation + a guarded write + mail, so throttle it.
+  // Keyed per user when signed in, else per IP for the guest-token path.
+  const limit = user
+    ? rateLimit(`booking:reschedule:${user.id}`, { limit: 15, windowMs: 10 * 60_000 })
+    : rateLimit(`booking:reschedule:ip:${clientIpKey()}`, { limit: 10, windowMs: 15 * 60_000 });
+  if (!limit.ok) {
+    return { error: 'You\'re doing that very quickly. Please wait a moment and try again.' };
+  }
 
   const newTime = new Date(newScheduledAt);
   if (Number.isNaN(newTime.getTime())) return { error: 'Invalid time.' };
@@ -72,19 +82,14 @@ export async function rescheduleBookingAction(
     return { error: 'This braider isn\'t accepting bookings right now.' };
   }
 
-  // Pad the window a full day on each side: the day boundaries are in the runtime
-  // zone (UTC) but the braider's day is in their zone, so an evening booking can
-  // land past UTC midnight. isSlotBookable does the precise overlap. (See create.ts.)
-  const windowStart = subDays(startOfDay(newTime), 1).toISOString();
-  const windowEnd = endOfDay(addDays(newTime, 1)).toISOString();
-  const { data: dayBookings } = await admin
-    .from('bookings')
-    .select('scheduled_at, duration_minutes')
-    .eq('braider_id', booking.braider_id)
-    .in('status', ['pending_payment', 'confirmed'])
-    .neq('id', booking.id)
-    .gte('scheduled_at', windowStart)
-    .lt('scheduled_at', windowEnd);
+  // Same padded-window overlap fetch as create.ts, excluding this booking so it
+  // can't block its own move (see fetchOverlapBookings).
+  const dayBookings = await fetchOverlapBookings(
+    admin,
+    booking.braider_id,
+    newTime,
+    booking.id
+  );
 
   const bookable = isSlotBookable(
     newTime,
@@ -92,7 +97,7 @@ export async function rescheduleBookingAction(
     booking.duration_minutes,
     braider.availability_rules ?? [],
     braider.availability_overrides ?? [],
-    dayBookings ?? []
+    dayBookings
   );
   if (!bookable) {
     return { error: 'That time isn\'t available. Pick another slot.' };

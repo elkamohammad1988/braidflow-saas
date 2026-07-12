@@ -10,11 +10,9 @@ const POLL_MS = 1500;
 const TIMEOUT_MS = 30_000;
 
 export function ConfirmationPoller({
-  bookingId: _id,
   fallbackHref = '/bookings',
   fallbackLabel = 'Go to my bookings'
 }: {
-  bookingId: string;
   // Where to send the customer if confirmation is slow. Guests have no /bookings
   // list, so they get a link back to the braider instead.
   fallbackHref?: string;

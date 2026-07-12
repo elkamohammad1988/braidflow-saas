@@ -150,7 +150,6 @@ export default async function ConfirmationPage({
             {t('finalizingBody')}
           </p>
           <ConfirmationPoller
-            bookingId={booking.id}
             fallbackHref={isGuest ? `/braiders/${booking.braiders?.slug}` : '/bookings'}
             fallbackLabel={isGuest ? t('backToBraider') : t('goToMyBookings')}
           />

@@ -121,6 +121,44 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
     ]
   };
 
+  // Booking CTA — rendered inline high on mobile (so it isn't buried below the
+  // bio, gallery, services and reviews) and as a sticky sidebar on desktop.
+  // Defined once, placed twice; the two wrappers gate which one is visible.
+  const bookingCta = (
+    <div className="relative overflow-hidden rounded-xl2 border border-line bg-paper p-6 shadow-lifted">
+      <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.16),transparent_70%)]" />
+      <p className="relative font-display text-xl font-medium text-ink">{t('bookHeading')}</p>
+      <p className="relative mt-1.5 text-sm leading-relaxed text-ink-muted">{t('bookSubtitle')}</p>
+      <div className="relative mt-5">
+        {open ? (
+          <Link href={`/braiders/${braider.slug}/book`}>
+            <Button size="lg" className="w-full">
+              {t('seeAvailableTimes')}
+            </Button>
+          </Link>
+        ) : (
+          <div className="rounded-xl border border-line bg-cream-deep/40 px-4 py-4 text-center">
+            <p className="text-sm text-ink-muted">
+              {t('notBookingOnline', { name: braider.business_name })}
+            </p>
+            {braider.instagram_handle && (
+              <a
+                href={`https://instagram.com/${braider.instagram_handle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
+              >
+                {t('reachInstagram')}
+                <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
+                <span className="sr-only"> {t('opensInNewTab')}</span>
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <JsonLd data={jsonLd} />
@@ -200,6 +238,10 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
             )}
           </div>
 
+          {/* Mobile-only booking CTA, high in the page so it isn't buried. The
+              desktop sticky sidebar version is hidden below md. */}
+          <div className="mt-6 md:hidden">{bookingCta}</div>
+
           {braider.bio && (
             <p className="mt-6 max-w-prose text-[17px] leading-relaxed text-ink-muted">{braider.bio}</p>
           )}
@@ -252,7 +294,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                       })}
                     </p>
                   </div>
-                  <p className="shrink-0 font-display text-xl font-medium text-ink">
+                  <p className="shrink-0 font-display text-xl font-medium tabular-nums text-ink">
                     {formatMoney(s.price_cents)}
                   </p>
                 </li>
@@ -263,41 +305,8 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           <BraiderReviews braiderId={braider.id} avg={avgRating} count={reviewCount} />
         </div>
 
-        <aside className="md:sticky md:top-24 md:self-start">
-          <div className="relative overflow-hidden rounded-xl2 border border-line bg-paper p-6 shadow-lifted">
-            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_70%)]" />
-            <p className="relative font-display text-xl font-medium text-ink">{t('bookHeading')}</p>
-            <p className="relative mt-1.5 text-sm leading-relaxed text-ink-muted">
-              {t('bookSubtitle')}
-            </p>
-            <div className="relative mt-5">
-              {open ? (
-                <Link href={`/braiders/${braider.slug}/book`}>
-                  <Button size="lg" className="w-full">
-                    {t('seeAvailableTimes')}
-                  </Button>
-                </Link>
-              ) : (
-                <div className="rounded-xl border border-line bg-cream-deep/40 px-4 py-4 text-center">
-                  <p className="text-sm text-ink-muted">
-                    {t('notBookingOnline', { name: braider.business_name })}
-                  </p>
-                  {braider.instagram_handle && (
-                    <a
-                      href={`https://instagram.com/${braider.instagram_handle}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-clay"
-                    >
-                      {t('reachInstagram')}
-                      <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
-                      <span className="sr-only"> {t('opensInNewTab')}</span>
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+        <aside className="hidden md:sticky md:top-24 md:block md:self-start">
+          {bookingCta}
         </aside>
       </div>
     </div>

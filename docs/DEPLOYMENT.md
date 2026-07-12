@@ -62,6 +62,7 @@ browser — never put a secret there.
 | Variable | For | Notes |
 |---|---|---|
 | `AUTH_SECRET` | Auth | Signs the session cookie (HMAC). **Set this for any deployment with real users** — unset, the app signs with a world-readable committed fallback, so anyone could forge a session cookie (account takeover). The zero-config demo runs on the fallback (nothing to protect); boot **hard-fails** if live Stripe keys are set without it. `openssl rand -hex 32`. |
+| `I_REPLACED_DEMO_AUTH` | Auth | **Only for a live-money deployment.** BraidFlow ships with demo persona-auth (`lib/auth/personas.ts`) that accepts any password and grants a fixed braider session — safe for the demo, account-takeover-grade against real money. Boot **hard-fails with live Stripe keys** until you replace that auth with a real credential store and set this to `true` to acknowledge it. Never set it while the demo stub is still in place. |
 | `NEXT_PUBLIC_SITE_URL` | Links | Production URL, e.g. `https://app.braidflow.app` (no trailing slash). Used for absolute links only. |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Payments | Stripe → Developers → API keys (`pk_live_…`). |
 | `STRIPE_SECRET_KEY` | Payments | Stripe (`sk_live_…`). Secret. |
@@ -84,6 +85,9 @@ browser — never put a secret there.
 Skip this entire section to run the app without payments. With no Stripe keys,
 the booking flow surfaces up to the pay step but can't collect a live deposit.
 
+- [ ] **Replace the demo persona-auth** (`lib/auth/personas.ts`) with a real
+      credential store, then set `I_REPLACED_DEMO_AUTH=true` — boot hard-fails with
+      live keys otherwise (the demo auth grants a fixed braider session to anyone).
 - [ ] Activate **live mode** and use `pk_live_…` / `sk_live_…` keys (step 2).
 - [ ] Create a webhook endpoint (Developers → Webhooks → Add endpoint):
       `https://<your-domain>/api/stripe/webhook`.

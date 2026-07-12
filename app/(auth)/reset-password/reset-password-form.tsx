@@ -54,7 +54,7 @@ export function ResetPasswordForm() {
         required
       />
       {error && (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

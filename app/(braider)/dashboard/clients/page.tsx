@@ -103,7 +103,7 @@ export default async function ClientsPage() {
                     <p className="truncate text-sm tabular-nums text-ink-muted">{c.phone}</p>
                   )}
                 </div>
-                <div className="shrink-0 text-end text-sm text-ink-muted">
+                <div className="min-w-0 text-end text-sm text-ink-muted">
                   {c.visits > 0 ? (
                     <>
                       <p className="tabular-nums">

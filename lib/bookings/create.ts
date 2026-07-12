@@ -1,7 +1,6 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { addDays, endOfDay, startOfDay, subDays } from 'date-fns';
 import { stripe } from '@/lib/stripe/client';
 import { isStripeConfigured } from '@/lib/stripe/config';
 import { signBookingSnapshot } from './demo-snapshot';
@@ -12,6 +11,7 @@ import { createLogger, errorInfo } from '@/lib/log';
 import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { CURRENCY } from '@/lib/constants';
 import { isSlotBookable } from './slot-check';
+import { fetchOverlapBookings } from './overlap';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 import { generateGuestToken } from './guest-token';
 
@@ -96,21 +96,9 @@ export async function createBookingAction(input: CreateBookingInput) {
   }
   const connectedAccountId = braider.stripe_account_id;
 
-  // Pull the braider's bookings around the requested day for the overlap check.
-  // These day boundaries are in the RUNTIME zone (UTC on Vercel), but the braider's
-  // day is in THEIR zone, so an evening appointment can fall past UTC midnight.
-  // Pad a full day on each side so such bookings are still fetched — isSlotBookable
-  // does the precise overlap, so over-fetching is free; under-fetching would
-  // false-accept an already-taken slot.
-  const windowStart = subDays(startOfDay(requestedStart), 1).toISOString();
-  const windowEnd = endOfDay(addDays(requestedStart, 1)).toISOString();
-  const { data: dayBookings } = await admin
-    .from('bookings')
-    .select('scheduled_at, duration_minutes')
-    .eq('braider_id', service.braider_id)
-    .in('status', ['pending_payment', 'confirmed'])
-    .gte('scheduled_at', windowStart)
-    .lt('scheduled_at', windowEnd);
+  // Pull the braider's bookings around the requested day for the overlap check
+  // (see fetchOverlapBookings for the zone-boundary padding rationale).
+  const dayBookings = await fetchOverlapBookings(admin, service.braider_id, requestedStart);
 
   const bookable = isSlotBookable(
     requestedStart,
@@ -118,7 +106,7 @@ export async function createBookingAction(input: CreateBookingInput) {
     service.duration_minutes,
     braider.availability_rules ?? [],
     braider.availability_overrides ?? [],
-    dayBookings ?? []
+    dayBookings
   );
   if (!bookable) {
     return { error: 'That time isn\'t available. Pick another slot.' };
@@ -166,8 +154,8 @@ export async function createBookingAction(input: CreateBookingInput) {
         automatic_payment_methods: { enabled: true },
         // Destination charge: the braider is the merchant of record and receives
         // the full deposit in their connected account. No application_fee_amount —
-        // the platform takes no cut during beta (see lib/constants PLATFORM_FEE_BPS
-        // for the future model). Refunds reverse this transfer (see refund.ts).
+        // the platform takes no cut during beta. Refunds reverse this transfer
+        // (see refund.ts).
         on_behalf_of: connectedAccountId,
         transfer_data: { destination: connectedAccountId },
         metadata: { booking_id: booking.id, kind: 'deposit' },

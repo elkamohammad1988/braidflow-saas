@@ -101,7 +101,12 @@ export default async function DashboardOverview({
   ]);
 
   const firstError =
-    upcomingRes.error || monthRevenueRes.error || pendingRes.error || distinctClientsRes.error;
+    upcomingRes.error ||
+    monthRevenueRes.error ||
+    pendingRes.error ||
+    distinctClientsRes.error ||
+    serviceCountRes.error ||
+    hoursCountRes.error;
   if (firstError) throw firstError;
 
   const upcomingThisWeek = upcomingRes.data ?? [];
@@ -274,7 +279,7 @@ function Stat({
   return (
     <Card interactive className="group relative overflow-hidden">
       {/* violet corner glow on hover — the marketing tell, carried into the app */}
-      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.16),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <CardBody className="relative">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">

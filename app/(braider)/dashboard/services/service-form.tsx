@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,8 +78,13 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
         e.preventDefault();
         submit();
       }}
+      aria-busy={pending}
       className="space-y-5"
     >
+      {/* Announce the in-flight save to screen readers without stealing focus. */}
+      <span role="status" className="sr-only">
+        {pending ? t('services.form.saving') : ''}
+      </span>
       <Input
         name="name"
         label={t('services.form.nameLabel')}
@@ -171,7 +177,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
             </>
           ) : editing ? t('services.form.saveChanges') : t('services.form.create')}
         </Button>
-        <a
+        <Link
           href="/dashboard/services"
           className={cn(
             'inline-flex items-center text-sm font-medium text-ink-muted hover:text-ink',
@@ -179,7 +185,7 @@ export function ServiceForm({ initial }: { initial?: Initial }) {
           )}
         >
           {t('services.form.cancel')}
-        </a>
+        </Link>
       </div>
     </form>
   );

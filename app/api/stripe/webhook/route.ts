@@ -50,6 +50,7 @@ export async function POST(req: Request) {
   const { error: dedupeError } = await admin
     .from('stripe_webhook_events')
     .insert({ id: event.id, type: event.type });
+  let deduped = false;
   if (dedupeError) {
     if (dedupeError.code === '23505') {
       return NextResponse.json({ received: true, duplicate: true });
@@ -57,8 +58,38 @@ export async function POST(req: Request) {
     // A non-duplicate dedupe failure shouldn't drop the event — log and proceed
     // (the per-handler guards below are themselves idempotent).
     log.error('dedupe insert failed', { eventId: event.id, code: dedupeError.code });
+  } else {
+    deduped = true;
   }
 
+  // Process inside a guard: if a handler throws part-way (a transient store/Stripe
+  // failure), roll back the dedupe row before surfacing the 500 so Stripe's retry
+  // is actually re-processed rather than skipped as a "duplicate". Every handler
+  // is safe to re-run — transitions/refunds/account syncs are idempotent, and the
+  // dispute handler's single record is protected by the (re-inserted) dedupe row —
+  // so this yields exactly-once processing without losing events on failure.
+  try {
+    await handleEvent(admin, event);
+  } catch (err) {
+    if (deduped) {
+      const { error: rollbackError } = await admin
+        .from('stripe_webhook_events')
+        .delete()
+        .eq('id', event.id);
+      if (rollbackError) {
+        log.error('dedupe rollback failed after handler error', {
+          eventId: event.id,
+          code: rollbackError.code
+        });
+      }
+    }
+    throw err;
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+async function handleEvent(admin: ReturnType<typeof dbAdmin>, event: Stripe.Event) {
   switch (event.type) {
     case 'payment_intent.succeeded': {
       const pi = event.data.object;
@@ -208,6 +239,4 @@ export async function POST(req: Request) {
       break;
     }
   }
-
-  return NextResponse.json({ received: true });
 }

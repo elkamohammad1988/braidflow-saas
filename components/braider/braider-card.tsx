@@ -97,7 +97,7 @@ export function BraiderCard({
               )}
             </div>
           </div>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/[0.05] text-ink-muted transition-all duration-300 ease-spring group-hover:bg-gradient-to-b group-hover:from-gold-bright group-hover:to-gold group-hover:text-night group-hover:shadow-glow-gold">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink/[0.05] text-ink-muted transition-all duration-300 ease-spring group-hover:bg-gradient-to-b group-hover:from-gold-bright group-hover:to-gold group-hover:text-on-accent group-hover:shadow-glow-gold">
             <ArrowUpRight aria-hidden className="h-4 w-4 transition-transform duration-300 ease-spring group-hover:rotate-45" />
           </span>
         </div>

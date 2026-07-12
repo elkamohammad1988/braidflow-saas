@@ -70,7 +70,7 @@ export function BraiderSearch({
             setSort(e.target.value);
             push(query, e.target.value);
           }}
-          className={`h-12 rounded-full border border-line-strong bg-paper px-4 text-sm text-ink shadow-card transition-colors ${pillFocus}`}
+          className={`h-12 min-w-0 flex-1 rounded-full border border-line-strong bg-paper px-4 text-sm text-ink shadow-card transition-colors sm:flex-none ${pillFocus}`}
         >
           {SORTS.map((s) => (
             <option key={s.value} value={s.value}>

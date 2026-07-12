@@ -39,22 +39,29 @@ const toneRing: Record<Tone, string> = {
   neutral: 'ring-line-strong'
 };
 
+// The crystal body is always the dark `night` furniture (in both themes), so every
+// glyph must be light to read on it — `ivory` stays light in both (white / warm
+// champagne), unlike `ink` which flips dark in the light theme and disappears.
 const toneGlyph: Record<Tone, string> = {
   accent: 'text-clay-soft',
-  success: 'text-moss',
-  neutral: 'text-ink'
+  // champagne-soft is a light gold in BOTH themes; `moss` flips to a dark gold
+  // (#7A5C12) in light and vanishes on the always-dark tile — hence not used here.
+  success: 'text-champagne-soft',
+  neutral: 'text-ivory'
 };
 
+// Accent glow/refraction: the primary tone follows the violet --accent-glow
+// channel; success pools the champagne gold; neutral a soft ink wash.
 const toneGlow: Record<Tone, string> = {
-  accent: 'bg-[radial-gradient(circle,rgba(139,92,246,0.38),transparent_70%)]',
-  success: 'bg-[radial-gradient(circle,rgba(52,211,153,0.26),transparent_70%)]',
-  neutral: 'bg-[radial-gradient(circle,rgba(168,156,207,0.20),transparent_70%)]'
+  accent: 'bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.38),transparent_70%)]',
+  success: 'bg-[radial-gradient(circle,rgb(var(--color-champagne)/0.28),transparent_70%)]',
+  neutral: 'bg-[radial-gradient(circle,rgb(var(--color-ink-subtle)/0.22),transparent_70%)]'
 };
 
 const toneRefraction: Record<Tone, string> = {
-  accent: 'bg-[radial-gradient(ellipse_at_bottom,rgba(167,139,250,0.45),transparent_70%)]',
-  success: 'bg-[radial-gradient(ellipse_at_bottom,rgba(52,211,153,0.4),transparent_70%)]',
-  neutral: 'bg-[radial-gradient(ellipse_at_bottom,rgba(168,156,207,0.3),transparent_70%)]'
+  accent: 'bg-[radial-gradient(ellipse_at_bottom,rgb(var(--accent-glow-3)/0.5),transparent_70%)]',
+  success: 'bg-[radial-gradient(ellipse_at_bottom,rgb(var(--color-champagne)/0.42),transparent_70%)]',
+  neutral: 'bg-[radial-gradient(ellipse_at_bottom,rgb(var(--color-ink-subtle)/0.3),transparent_70%)]'
 };
 
 type Props = {
@@ -88,7 +95,7 @@ export function GlassIcon({
       )}
       <span
         className={cn(
-          'relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-onyx-soft to-night ring-1',
+          'relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-night to-night-deep ring-1',
           // Lit top edge (glass catching light) + inner floor-shadow (depth).
           'shadow-[0_12px_30px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-10px_20px_-16px_rgba(0,0,0,0.6)]',
           tileSizes[size],

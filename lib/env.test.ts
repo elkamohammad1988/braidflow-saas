@@ -9,6 +9,7 @@ const KEYS = [
   'STRIPE_WEBHOOK_SECRET',
   'RESEND_API_KEY',
   'AUTH_SECRET',
+  'I_REPLACED_DEMO_AUTH',
   'NEXT_PUBLIC_SITE_URL'
 ] as const;
 
@@ -71,19 +72,31 @@ describe('assertRuntimeEnv', () => {
     await expect(assertEnv()).rejects.toThrow(/NEXT_PUBLIC_SITE_URL/);
   });
 
-  it('requires AUTH_SECRET once LIVE Stripe keys are configured', async () => {
-    process.env.STRIPE_SECRET_KEY = 'sk_live_x';
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
-    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
-    // No AUTH_SECRET → forgeable session cookies while real money moves.
-    await expect(assertEnv()).rejects.toThrow(/AUTH_SECRET/);
-  });
-
-  it('accepts LIVE Stripe keys when a real AUTH_SECRET is set', async () => {
+  it('rejects LIVE Stripe keys while the demo auth stub is unacknowledged', async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_live_x';
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
     process.env.AUTH_SECRET = 'a-sufficiently-long-random-secret';
+    // Demo persona-auth (any password → fixed braider session) must not run
+    // against real money without an explicit acknowledgement it's been replaced.
+    await expect(assertEnv()).rejects.toThrow(/demo persona-auth|I_REPLACED_DEMO_AUTH/);
+  });
+
+  it('requires AUTH_SECRET once LIVE Stripe keys are configured', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_live_x';
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
+    process.env.I_REPLACED_DEMO_AUTH = 'true';
+    // No AUTH_SECRET → forgeable session cookies while real money moves.
+    await expect(assertEnv()).rejects.toThrow(/AUTH_SECRET/);
+  });
+
+  it('accepts LIVE Stripe keys with a real AUTH_SECRET and acknowledged auth', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_live_x';
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_live_x';
+    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_x';
+    process.env.AUTH_SECRET = 'a-sufficiently-long-random-secret';
+    process.env.I_REPLACED_DEMO_AUTH = 'true';
     await expect(assertEnv()).resolves.toBeUndefined();
   });
 

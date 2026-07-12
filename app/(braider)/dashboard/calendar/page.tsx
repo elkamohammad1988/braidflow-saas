@@ -63,7 +63,7 @@ export default async function CalendarPage() {
         action={
           <div className="flex items-center gap-6">
             <div>
-              <p className="font-display text-2xl font-medium leading-none text-ink">
+              <p className="font-display text-2xl font-medium leading-none tabular-nums text-ink">
                 {bookedCount}
               </p>
               <p className="mt-1.5 text-xs text-ink-muted">
@@ -72,7 +72,7 @@ export default async function CalendarPage() {
             </div>
             <div className="h-9 w-px bg-line" aria-hidden />
             <div>
-              <p className="font-display text-2xl font-medium leading-none text-ink">
+              <p className="font-display text-2xl font-medium leading-none tabular-nums text-ink">
                 {formatMoney(weekTotal)}
               </p>
               <p className="mt-1.5 text-xs text-ink-muted">{t('calendar.bookedValue')}</p>
@@ -123,7 +123,7 @@ export default async function CalendarPage() {
                   className={cn(
                     'flex h-7 w-7 items-center justify-center rounded-full font-display text-sm font-medium leading-none',
                     isToday
-                      ? 'bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                      ? 'bg-gradient-to-b from-gold-bright to-gold text-on-accent shadow-glow-gold'
                       : isPast
                         ? 'text-ink-subtle'
                         : 'text-ink'
@@ -131,6 +131,9 @@ export default async function CalendarPage() {
                 >
                   {formatInZone(day, tz, 'd')}
                 </span>
+                {/* "Today" is signalled visually by the ring + gold pill only;
+                    give SR/low-vision users the same cue on the 7-column grid. */}
+                {isToday && <span className="sr-only">{t('calendar.today')}</span>}
               </div>
 
               <ul className="mt-2.5 flex flex-1 flex-col gap-1.5">
@@ -200,7 +203,7 @@ export default async function CalendarPage() {
                     className={cn(
                       'flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-base font-medium leading-none',
                       isToday
-                        ? 'bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                        ? 'bg-gradient-to-b from-gold-bright to-gold text-on-accent shadow-glow-gold'
                         : 'bg-ink/[0.05] text-ink'
                     )}
                   >

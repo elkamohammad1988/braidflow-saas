@@ -84,11 +84,11 @@ export function AtelierBackdrop({ className }: Props) {
 
   return (
     <div className={className} aria-hidden>
-      {/* Aurora mesh */}
+      {/* Aurora mesh — accent glow follows the theme (violet in light, gold in dark) */}
       <div ref={auroraRef} className="absolute inset-0 will-change-transform">
-        <div className="absolute -left-[10%] top-[-14%] h-[46vh] w-[46vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.45),transparent_66%)] blur-3xl" />
-        <div className="absolute right-[2%] top-[6%] h-[52vh] w-[52vh] animate-aurora-2 rounded-full bg-[radial-gradient(circle,rgba(91,33,182,0.55),transparent_64%)] blur-3xl" />
-        <div className="absolute bottom-[-18%] left-[38%] h-[48vh] w-[48vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.32),transparent_66%)] blur-3xl [animation-delay:-6s]" />
+        <div className="absolute -left-[10%] top-[-14%] h-[46vh] w-[46vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.45),transparent_66%)] blur-3xl" />
+        <div className="absolute right-[2%] top-[6%] h-[52vh] w-[52vh] animate-aurora-2 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow-2)/0.55),transparent_64%)] blur-3xl" />
+        <div className="absolute bottom-[-18%] left-[38%] h-[48vh] w-[48vh] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow-3)/0.32),transparent_66%)] blur-3xl [animation-delay:-6s]" />
       </div>
 
       {/* Woven strands */}
@@ -100,9 +100,9 @@ export function AtelierBackdrop({ className }: Props) {
       >
         <defs>
           <linearGradient id="strandGold" x1="0" y1="0" x2="1" y2="0.3">
-            <stop offset="0" stopColor="#6D28D9" stopOpacity="0.1" />
-            <stop offset="0.5" stopColor="#C4B5FD" />
-            <stop offset="1" stopColor="#6D28D9" stopOpacity="0.1" />
+            <stop offset="0" style={{ stopColor: 'rgb(var(--color-clay-deep))' }} stopOpacity="0.1" />
+            <stop offset="0.5" style={{ stopColor: 'rgb(var(--color-clay-soft))' }} />
+            <stop offset="1" style={{ stopColor: 'rgb(var(--color-clay-deep))' }} stopOpacity="0.1" />
           </linearGradient>
           <filter id="strandGlow" x="-20%" y="-40%" width="140%" height="180%">
             <feGaussianBlur stdDeviation="6" result="b" />
@@ -127,7 +127,7 @@ export function AtelierBackdrop({ className }: Props) {
 
       {/* A static sheen of light on the strands (no travelling sweep — a moving
           highlight behind the hero was gratuitous motion, not enhancement). */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(100deg,transparent,rgba(196,181,253,0.10),transparent)] mix-blend-screen" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(100deg,transparent,rgb(var(--accent-glow-3)/0.1),transparent)] mix-blend-screen" />
     </div>
   );
 }

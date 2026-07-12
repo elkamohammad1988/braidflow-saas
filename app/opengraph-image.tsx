@@ -16,7 +16,7 @@ export default async function OG() {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '80px',
-          backgroundColor: '#090414',
+          backgroundColor: '#07030F',
           backgroundImage:
             'radial-gradient(60% 80% at 12% 0%, rgba(139,92,246,0.30), transparent 60%), radial-gradient(60% 80% at 100% 30%, rgba(91,33,182,0.45), transparent 60%)',
           fontFamily: 'sans-serif'

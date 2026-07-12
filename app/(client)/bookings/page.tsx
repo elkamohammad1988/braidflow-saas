@@ -63,7 +63,7 @@ export default async function MyBookings() {
         }
       />
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-6">
         {(!bookings || bookings.length === 0) && (
           <EmptyState
             icon={CalendarHeart}
@@ -77,18 +77,20 @@ export default async function MyBookings() {
           />
         )}
 
-        {bookings?.map((b) => {
+        {bookings && bookings.length > 0 && (
+          <ul className="space-y-3">
+            {bookings.map((b) => {
           const status = STATUS_TONE[b.status as keyof typeof STATUS_TONE];
           const deposit = depositStateFromPayments(b.payments);
           const showDepositBadge =
             b.status === 'cancelled' &&
             (deposit === 'refund_pending' || deposit === 'refunded' || deposit === 'refund_failed');
           return (
-            <div
+            <li
               key={b.id}
               className="rounded-card border border-line bg-paper p-5 shadow-soft transition-colors duration-300 hover:border-clay/25"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="min-w-0">
                   <p className="truncate font-medium text-ink">{b.services?.name}</p>
                   <p className="mt-1 text-sm text-ink-muted">
@@ -104,7 +106,7 @@ export default async function MyBookings() {
                     {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
                   </p>
                 </div>
-                <div className="text-end">
+                <div className="text-start sm:text-end">
                   <Badge tone={status.tone}>{t(status.label)}</Badge>
                   {showDepositBadge && (
                     <div className="mt-1">
@@ -132,10 +134,10 @@ export default async function MyBookings() {
                   )}
                   {(b.status === 'pending_payment' || b.status === 'confirmed') &&
                     new Date(b.scheduled_at) > new Date() && (
-                      <div className="mt-3 flex items-center justify-end gap-3 text-sm">
+                      <div className="mt-3 flex items-center justify-start gap-3 text-sm sm:justify-end">
                         <Link
                           href={`/bookings/${b.id}/reschedule`}
-                          className="font-medium text-ink-muted hover:text-ink"
+                          className="inline-flex min-h-[44px] items-center font-medium text-ink-muted hover:text-ink"
                         >
                           {t('reschedule')}
                         </Link>
@@ -153,9 +155,11 @@ export default async function MyBookings() {
               {b.status === 'completed' && !reviewedBookingIds.has(b.id) && (
                 <ReviewForm bookingId={b.id} />
               )}
-            </div>
+            </li>
           );
-        })}
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );

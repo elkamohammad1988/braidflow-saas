@@ -45,7 +45,7 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                       className={cn(
                         'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
                         active
-                          ? 'border-transparent bg-gradient-to-b from-gold-bright to-gold text-night shadow-glow-gold'
+                          ? 'border-transparent bg-gradient-to-b from-gold-bright to-gold text-on-accent shadow-glow-gold'
                           : 'border-line-strong group-hover:border-clay/50'
                       )}
                     >

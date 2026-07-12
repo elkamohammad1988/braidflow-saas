@@ -37,7 +37,7 @@ export function StatusScreen({ code, title, description, children, reference }: 
           ))}
         </g>
       </svg>
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_68%)] blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.16),transparent_68%)] blur-3xl" />
 
       <header className="relative z-10 py-8">
         <Link href="/" className="inline-flex transition-opacity hover:opacity-80">
@@ -45,7 +45,7 @@ export function StatusScreen({ code, title, description, children, reference }: 
         </Link>
       </header>
 
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center pb-24 text-center">
+      <main id="main-content" className="relative z-10 flex flex-1 flex-col items-center justify-center pb-24 text-center">
         <p className="font-display text-[5rem] font-medium leading-none tracking-tight md:text-[7rem]">
           <span className="bg-gradient-to-br from-clay via-ember to-plum bg-clip-text text-transparent">
             {code}
@@ -59,7 +59,7 @@ export function StatusScreen({ code, title, description, children, reference }: 
           <p className="mt-3 font-mono text-xs text-ink-subtle">{reference}</p>
         )}
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">{children}</div>
-      </div>
+      </main>
     </div>
   );
 }

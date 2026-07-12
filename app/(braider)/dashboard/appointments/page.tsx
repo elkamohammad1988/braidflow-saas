@@ -70,10 +70,10 @@ function bookingActions(
 ): ReactNode {
   if ((status === 'pending_payment' || status === 'confirmed') && upcoming) {
     return (
-      <div className="inline-flex items-center gap-3 text-sm">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
         <Link
           href={`/bookings/${a.id}/reschedule`}
-          className="font-medium text-ink-muted hover:text-ink"
+          className="inline-flex min-h-[44px] items-center font-medium text-ink-muted hover:text-ink"
         >
           {t('appointments.reschedule')}
         </Link>

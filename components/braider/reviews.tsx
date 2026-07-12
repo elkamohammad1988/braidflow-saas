@@ -67,7 +67,7 @@ export async function BraiderReviews({
 function Stars({ rating }: { rating: number }) {
   const t = useTranslations('profile');
   return (
-    <div aria-label={t('starsAriaLabel', { rating })} className="flex gap-0.5">
+    <div role="img" aria-label={t('starsAriaLabel', { rating })} className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}

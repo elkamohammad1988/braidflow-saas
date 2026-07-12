@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/i18n/language-switcher';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 type Props = {
   isLoggedIn: boolean;
@@ -100,7 +101,7 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
         <>
           <div
             aria-hidden
-            className="fixed inset-0 top-16 z-40 bg-night/40 backdrop-blur-sm"
+            className="fixed inset-0 top-[60px] z-40 bg-night/40 backdrop-blur-sm"
             onClick={close}
           />
           <div
@@ -158,7 +159,10 @@ export function MobileMenu({ isLoggedIn, isBraider }: Props) {
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-line px-1 pt-3">
               <span className="text-sm font-medium text-ink-muted">{t('common.language')}</span>
-              <LanguageSwitcher />
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <LanguageSwitcher />
+              </div>
             </div>
           </div>
         </>

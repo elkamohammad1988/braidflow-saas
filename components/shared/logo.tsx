@@ -43,7 +43,7 @@ export function Logo({
 }) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-onyx-soft to-night text-gold shadow-[0_2px_10px_-3px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(196,181,253,0.18)] ring-1 ring-gold/25">
+      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-night to-night-deep text-clay shadow-[0_2px_10px_-3px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 ring-gold/25">
         <LogoMark className={cn('h-[19px] w-[19px]', markClassName)} />
       </span>
       {wordmark && (

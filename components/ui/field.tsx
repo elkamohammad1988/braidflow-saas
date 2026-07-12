@@ -22,7 +22,7 @@ export const fieldSurface =
 
 /** Error register — a red border + ring, layered over `fieldSurface`. */
 export const fieldInvalid =
-  'border-red-500/60 focus-visible:border-red-500 focus-visible:ring-red-500/30';
+  'border-danger-strong/60 focus-visible:border-danger-strong focus-visible:ring-danger-strong/30';
 
 /** Stable id for a field's hint/error description, tied via `aria-describedby`. */
 export function describedById(id: string | undefined, hasText: boolean): string | undefined {
@@ -57,7 +57,7 @@ function FieldShell({
           role={error ? 'alert' : undefined}
           className={cn(
             'mt-1.5 block text-xs',
-            error ? 'text-red-700 dark:text-red-400' : 'text-ink-muted'
+            error ? 'text-danger' : 'text-ink-muted'
           )}
         >
           {error ?? hint}

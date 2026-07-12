@@ -82,7 +82,22 @@ function splitTopLevel(input: string): string[] {
   return parts;
 }
 
+// Parsed select-strings are memoized: they're a small, fixed set of static
+// literals from feature code, and projectRow() runs once per row — without this,
+// a query embedding relations re-parses the same select (and each nested sub-
+// select) for every parent row. The returned Field[] is treated as immutable
+// (projectRow only reads it), so sharing the instance across calls is safe.
+const selectCache = new Map<string, Field[]>();
+
 function parseSelect(select: string): Field[] {
+  const cached = selectCache.get(select);
+  if (cached) return cached;
+  const parsed = parseSelectUncached(select);
+  selectCache.set(select, parsed);
+  return parsed;
+}
+
+function parseSelectUncached(select: string): Field[] {
   const normalized = select.replace(/\s+/g, '');
   if (!normalized || normalized === '*') return [];
   return splitTopLevel(normalized).map((token): Field => {

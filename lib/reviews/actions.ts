@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db/server';
+import { rateLimit } from '@/lib/rate-limit';
 import { submitReviewSchema, type SubmitReviewInput } from './validation';
 
 type Result = { ok: true } | { error: string };
@@ -18,6 +19,13 @@ export async function submitReviewAction(input: SubmitReviewInput): Promise<Resu
   const database = db();
   const { data: { user } } = await database.auth.getUser();
   if (!user) return { error: 'You need to be signed in to leave a review.' };
+
+  // Defense-in-depth throttle. Ownership + the one-review-per-booking constraint
+  // already bound abuse, but this caps write churn on the path per signed-in user.
+  const limit = rateLimit(`review:submit:${user.id}`, { limit: 10, windowMs: 10 * 60_000 });
+  if (!limit.ok) {
+    return { error: 'You\'re submitting reviews very quickly. Please wait a moment and try again.' };
+  }
 
   const { data: booking } = await database
     .from('bookings')

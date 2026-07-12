@@ -3,40 +3,213 @@
 @tailwind utilities;
 
 /* ============================================================================
-   BraidFlow — purple-only enterprise dark design system.
-   Dark is the single, primary experience. Tokens are defined on :root AND .dark
-   with identical values so the very first paint is already dark (no FOUC), and
-   the app can never fall back to a light register. Channels are space-separated
-   RGB so Tailwind's /opacity modifiers keep working (bg-ink/[0.06] etc.).
+   BraidFlow — premium purple design system (dual theme).
+
+   ONE signature hue drives the whole product in BOTH registers:
+   PURPLE is primary; GOLD is a restrained accent (badges, premium labels,
+   highlights, "paid/secured" states); RED is the tokenised danger channel.
+
+   LIGHT  →  Premium Purple on lavender-white. Soft #FAF7FF page, white cards,
+             violet primary, deep-violet "furniture" (hero/footer/auth/chips).
+   DARK   →  Luxury Purple-Noir. Near-black violet page (#07030F), deep-violet
+             glass cards (#1A1030), the SAME violet primary lit by a soft purple
+             glow, warm-gold accents reserved for highlights only.
+
+   Every theme-varying colour resolves through a CSS variable, so a single class
+   (`text-ink` / `bg-paper` / `border-line` / `text-clay`) flips with the theme,
+   and `/opacity` modifiers keep working (bg-clay/10, from-gold/25 …) because the
+   colour channels are space-separated RGB triplets. Families:
+     • Page       (cream/paper/onyx/ink/line) — flips fully light↔dark.
+     • Primary    (accent/clay/gold/plum/ember) — VIOLET in BOTH themes. The
+                  `gold*` tokens are the primary CTA-gradient family (violet), a
+                  legacy name kept so components don't churn — NOT literal gold.
+     • Champagne  (champagne*) — the real metallic gold, gold in BOTH themes,
+                  reserved for accents/badges/premium labels/highlights.
+     • Success    (moss*) — "paid / secured", rendered in the champagne gold.
+     • Danger     (danger*) — tokenised red for errors, red in both themes.
+     • Furniture  (night/ivory) — deep-violet slab + light text in both.
    ============================================================================ */
-:root,
-.dark {
+
+:root {
   --font-sans: 'Inter', system-ui, sans-serif;
-  /* Enterprise headings: the same grotesque as body (Linear/Vercel house style),
-     differentiated by weight + optical tracking, not a decorative serif. */
-  --font-display: 'Inter', system-ui, sans-serif;
+  /* Enterprise headings: the SAME self-hosted grotesque as body (Linear/Vercel
+     house style), differentiated by weight + optical tracking, not a decorative
+     serif. Aliased to --font-sans so headings reuse the one Inter variable font
+     next/font loads — no second font file. */
+  --font-display: var(--font-sans);
   --font-mono: 'Space Mono', ui-monospace, monospace;
 
-  color-scheme: dark;
+  /* ── LIGHT — Premium Purple ─────────────────────────────────────────────── */
+  color-scheme: light;
 
   /* Text */
-  --color-ink: 255 255 255; /* Text Primary   #FFFFFF */
-  --color-ink-muted: 214 208 245; /* Text Secondary #D6D0F5 */
-  --color-ink-subtle: 168 156 207; /* Muted          #A89CCF */
+  --color-ink: 24 24 27; /* #18181B */
+  --color-ink-muted: 74 68 88; /* #4A4458 (AA on white) */
+  --color-ink-subtle: 110 104 128; /* #6E6880 (AA on white) */
 
-  /* Surface register (page → cards) */
-  --color-cream: 4 3 10; /* Background            #04030A */
-  --color-cream-deep: 9 4 20; /* Secondary Background  #090414 */
-  --color-paper: 27 21 48; /* Cards                 #1B1530 */
+  /* Page surface register (page → secondary → cards → inputs) */
+  --color-cream: 250 247 255; /* #FAF7FF page */
+  --color-cream-deep: 243 238 252; /* #F3EEFC secondary */
+  --color-paper: 255 255 255; /* #FFFFFF cards / surface */
+  --color-onyx: 245 241 253; /* #F5F1FD recessed input */
+  --color-onyx-soft: 237 231 250; /* #EDE7FA elevated / hover / skeleton */
 
-  /* Accent text — a light violet that clears WCAG AA on the dark surfaces. */
-  --color-clay-text: 196 181 253; /* #C4B5FD */
-  /* Success text (the one sanctioned non-purple hue, for "paid/secured"). */
-  --color-moss: 110 231 183; /* emerald-300 #6EE7B7 */
+  /* Dark furniture — deep violet slab (hero/footer/auth/chips). Light text sits
+     on it in both themes, so it stays deep in light too. */
+  --color-night: 36 22 64; /* #241640 */
+  --color-night-deep: 22 12 44; /* #160C2C */
+  /* Text that sits on the dark furniture. */
+  --color-ivory: 255 255 255; /* #FFFFFF */
 
-  /* Hairlines — tinted with the brand violet, never flat gray. */
-  --color-line: rgba(124, 58, 237, 0.18);
-  --color-line-strong: rgba(139, 92, 246, 0.32);
+  /* Primary family — violet. */
+  --color-accent: 139 92 246; /* #8B5CF6 primary */
+  --color-primary: 139 92 246; /* #8B5CF6 */
+  --color-secondary: 124 58 237; /* #7C3AED */
+  --color-accent-hover: 124 58 237; /* #7C3AED primary hover */
+  --color-ember: 147 51 234; /* #9333EA */
+
+  /* Clay — the violet accent when used for text / tints. clay-text clears AA. */
+  --color-clay: 139 92 246; /* #8B5CF6 */
+  --color-clay-soft: 167 139 250; /* #A78BFA */
+  --color-clay-deep: 124 58 237; /* #7C3AED */
+  --color-clay-text: 109 40 217; /* #6D28D9 (AA on white) */
+
+  /* Primary CTA gradient family — VIOLET (buttons get a purple gradient). Named
+     `gold*` for legacy reasons only; tuned so white label text clears AA. */
+  --color-gold: 124 58 237; /* #7C3AED */
+  --color-gold-bright: 139 92 246; /* #8B5CF6 */
+  --color-gold-deep: 109 40 217; /* #6D28D9 */
+
+  /* Depth + aurora jewel tone. */
+  --color-plum: 109 40 217; /* #6D28D9 */
+  --color-plum-deep: 76 29 149; /* #4C1D95 */
+
+  /* Text / icons that sit on a saturated accent fill (CTA, selected chip). */
+  --color-on-accent: 255 255 255; /* white on violet */
+
+  /* Champagne — the real metallic gold. Accent ONLY: badges, premium labels,
+     highlights. `champagne-text` is a deep gold that clears AA on light. */
+  --color-champagne: 212 175 55; /* #D4AF37 */
+  --color-champagne-soft: 232 201 122; /* #E8C97A */
+  --color-champagne-deep: 168 130 30; /* #A8821E */
+  --color-champagne-text: 122 92 18; /* #7A5C12 (AA gold text on light) */
+
+  /* Success / paid / secured — rendered in the champagne gold. */
+  --color-moss: 122 92 18; /* #7A5C12 deep gold text (AA on light) */
+  --color-moss-bright: 212 175 55; /* #D4AF37 fill */
+  --color-moss-soft: rgba(212, 175, 55, 0.14);
+
+  /* Danger — tokenised red for errors (no raw Tailwind palette anywhere). */
+  --color-danger: 185 28 28; /* #B91C1C text (AA on white) */
+  --color-danger-bright: 220 38 38; /* #DC2626 fill */
+  --color-danger-strong: 239 68 68; /* #EF4444 */
+  --color-danger-soft: rgba(220, 38, 38, 0.08);
+  --color-danger-line: rgba(220, 38, 38, 0.28);
+
+  /* Hairlines — tinted with the violet primary, never flat gray. */
+  --color-line: rgba(139, 92, 246, 0.14);
+  --color-line-strong: rgba(139, 92, 246, 0.22);
+
+  /* Ambient glow channels (bg-ambient-top / aurora / grid / glass icons). */
+  --accent-glow: 139 92 246; /* #8B5CF6 */
+  --accent-glow-2: 124 58 237; /* #7C3AED */
+  --accent-glow-3: 167 139 250; /* #A78BFA */
+
+  /* Elevation — soft, violet-tinted shadows for the light register. */
+  --shadow-card: 0 1px 2px rgba(76, 65, 104, 0.06), 0 4px 14px -6px rgba(76, 65, 104, 0.12);
+  --shadow-soft: 0 2px 4px rgba(76, 65, 104, 0.06), 0 14px 30px -14px rgba(76, 65, 104, 0.18);
+  --shadow-lifted:
+    0 24px 50px -20px rgba(76, 29, 149, 0.24), 0 10px 24px -14px rgba(139, 92, 246, 0.18),
+    0 2px 6px -2px rgba(76, 65, 104, 0.1);
+  --shadow-ring: 0 0 0 1px rgba(139, 92, 246, 0.1);
+}
+
+.dark {
+  /* ── DARK — Luxury Purple-Noir ──────────────────────────────────────────── */
+  color-scheme: dark;
+
+  /* Text — clean white + a soft lilac-gray for secondary copy. */
+  --color-ink: 255 255 255; /* #FFFFFF */
+  --color-ink-muted: 183 176 200; /* #B7B0C8 */
+  --color-ink-subtle: 139 132 160; /* #8B84A0 (AA on the dark surfaces) */
+
+  /* Page surfaces — near-black violet, NOT pure black. */
+  --color-cream: 7 3 15; /* #07030F page / background */
+  --color-cream-deep: 18 10 34; /* #120A22 secondary / surface */
+  --color-paper: 26 16 48; /* #1A1030 glass cards */
+  --color-onyx: 20 12 38; /* #140C26 recessed input */
+  --color-onyx-soft: 36 22 64; /* #241640 elevated / hover / skeleton */
+
+  /* Dark furniture — deep-violet slab (a touch above the page). */
+  --color-night: 13 7 32; /* #0D0720 */
+  --color-night-deep: 7 3 15; /* #07030F */
+  /* Light text on the furniture. */
+  --color-ivory: 255 255 255; /* #FFFFFF */
+
+  /* Primary family — the SAME violet as light, lit by the purple glow. */
+  --color-accent: 139 92 246; /* #8B5CF6 primary */
+  --color-primary: 139 92 246; /* #8B5CF6 */
+  --color-secondary: 124 58 237; /* #7C3AED */
+  --color-accent-hover: 124 58 237; /* #7C3AED primary hover */
+  --color-ember: 167 139 250; /* #A78BFA */
+
+  /* Clay — the violet accent for text / tints (light violet for AA on dark). */
+  --color-clay: 139 92 246; /* #8B5CF6 */
+  --color-clay-soft: 196 181 253; /* #C4B5FD */
+  --color-clay-deep: 124 58 237; /* #7C3AED */
+  --color-clay-text: 196 181 253; /* #C4B5FD (high contrast on the dark cards) */
+
+  /* Primary CTA gradient family — VIOLET; white label text sits on it. */
+  --color-gold: 124 58 237; /* #7C3AED */
+  --color-gold-bright: 139 92 246; /* #8B5CF6 */
+  --color-gold-deep: 109 40 217; /* #6D28D9 */
+
+  /* Depth + aurora jewel. */
+  --color-plum: 124 58 237; /* #7C3AED */
+  --color-plum-deep: 76 29 149; /* #4C1D95 */
+
+  /* White text / icons on the violet accent fills. */
+  --color-on-accent: 255 255 255; /* white on violet */
+
+  /* Champagne — the real metallic gold. Accent ONLY: badges, premium, highlights. */
+  --color-champagne: 212 175 55; /* #D4AF37 */
+  --color-champagne-soft: 240 221 160; /* #F0DDA0 */
+  --color-champagne-deep: 184 145 43; /* #B8912B */
+  --color-champagne-text: 229 200 119; /* #E5C877 (AA gold text on dark) */
+
+  /* Success / paid / secured — champagne gold. */
+  --color-moss: 229 200 119; /* #E5C877 */
+  --color-moss-bright: 212 175 55; /* #D4AF37 fill */
+  --color-moss-soft: rgba(212, 175, 55, 0.16);
+
+  /* Danger — tokenised red, lifted for legibility on the dark surfaces. */
+  --color-danger: 248 113 113; /* #F87171 text */
+  --color-danger-bright: 239 68 68; /* #EF4444 fill */
+  --color-danger-strong: 248 113 113; /* #F87171 */
+  --color-danger-soft: rgba(248, 113, 113, 0.12);
+  --color-danger-line: rgba(248, 113, 113, 0.3);
+
+  /* Hairlines — violet-tinted per the spec (rgba(139,92,246,.18)). */
+  --color-line: rgba(139, 92, 246, 0.18);
+  --color-line-strong: rgba(139, 92, 246, 0.3);
+
+  /* Ambient glow channels — the soft purple glow. */
+  --accent-glow: 139 92 246; /* #8B5CF6 */
+  --accent-glow-2: 124 58 237; /* #7C3AED */
+  --accent-glow-3: 167 139 250; /* #A78BFA */
+
+  /* Elevation — near-black depth + a soft purple glow + a 1px top highlight so
+     cards read as lifted violet-glass panels (glassmorphism), not flat slabs. */
+  --shadow-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.45),
+    0 8px 22px -10px rgba(0, 0, 0, 0.7), 0 0 24px -6px rgba(139, 92, 246, 0.14);
+  --shadow-soft:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 14px 34px -14px rgba(0, 0, 0, 0.7), 0 0 32px -8px rgba(139, 92, 246, 0.18);
+  --shadow-lifted:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 24px 60px -20px rgba(0, 0, 0, 0.85),
+    0 10px 30px -12px rgba(139, 92, 246, 0.35), 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-ring: 0 0 0 1px rgba(139, 92, 246, 0.22);
 }
 
 html {
@@ -47,13 +220,17 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), var(--font-arabic), system-ui, sans-serif;
   font-feature-settings: 'cv05', 'ss01', 'ss03';
 }
 
 ::selection {
-  background-color: rgba(139, 92, 246, 0.38);
-  color: #ffffff;
+  background-color: rgb(var(--color-accent) / 0.28);
+  color: rgb(var(--color-ink));
+}
+.dark ::selection {
+  background-color: rgb(var(--color-accent) / 0.32);
+  color: rgb(var(--color-ink));
 }
 
 /* Display headings: tight tracking + optical sizing for a taut, modern voice. */
@@ -73,29 +250,29 @@ body {
 }
 
 * {
-  scrollbar-color: theme('colors.clay.DEFAULT') transparent;
+  scrollbar-color: rgb(var(--color-clay)) transparent;
 }
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(theme('colors.clay.DEFAULT'), theme('colors.plum.DEFAULT'));
+  background: linear-gradient(rgb(var(--color-clay)), rgb(var(--color-plum)));
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(theme('colors.accent'), theme('colors.clay.DEFAULT'));
+  background: linear-gradient(rgb(var(--color-accent)), rgb(var(--color-clay)));
   background-clip: content-box;
 }
 
-/* Keyboard focus: a crisp violet ring on every interactive element. Controls that
+/* Keyboard focus: a crisp accent ring on every interactive element. Controls that
    carry their own ring (Button, form fields) opt out with `focus-visible:outline-none`,
    which wins on specificity. `:where()` keeps this at zero specificity, and the
    outline follows each element's own border-radius. */
 :where(a, button, [role='button'], [role='tab'], [role='menuitem'], summary):focus-visible {
-  outline: 2px solid theme('colors.accent');
+  outline: 2px solid rgb(var(--color-accent));
   outline-offset: 2px;
 }
 
@@ -111,15 +288,36 @@ body {
   transform: scaleX(-1) !important;
 }
 
+/* ── Arabic script typographic hygiene ──────────────────────────────────────
+   The design system's type treatments are tuned for Latin (Inter): tight/negative
+   letter-spacing, wide-tracked mono eyebrows, and italic emphasis. Applied to
+   Arabic — a connected cursive script with no case and no true italic — every one
+   of these damages the glyph joins or triggers an ugly synthetic slant. Neutralise
+   them for the `ar` locale only; Latin locales are untouched. */
+[lang='ar'] * {
+  /* Arabic must never be letter-spaced — it severs the cursive connections. */
+  letter-spacing: 0 !important;
+}
+[lang='ar'] :is(i, em, .italic) {
+  /* No italic in Arabic; drop the synthetic oblique. Emphasis still reads via the
+     gilt gradient / weight it's paired with. */
+  font-style: normal;
+}
+[lang='ar'] .font-display {
+  /* Diacritics (tashkīl) and tall ascenders need more leading than a Latin
+     display line to avoid clipping/crowding. */
+  line-height: 1.3;
+}
+
 @layer utilities {
-  /* Soft ambient key-light: a violet glow washing down from the top of the
-     viewport so every page reads as lit from above (the depth cue premium dark
-     UIs share). Pointer-transparent, GPU-cheap, fixed behind all content. */
+  /* Soft ambient key-light: an accent glow washing down from the top of the
+     viewport so every page reads as lit from above (the depth cue premium UIs
+     share). Violet in light, gold in dark. Pointer-transparent, GPU-cheap. */
   .bg-ambient-top {
     background:
-      radial-gradient(58% 42% at 50% -6%, rgba(139, 92, 246, 0.16), transparent 68%),
-      radial-gradient(42% 34% at 84% 2%, rgba(88, 28, 182, 0.12), transparent 70%),
-      radial-gradient(50% 40% at 12% 6%, rgba(124, 58, 237, 0.08), transparent 72%);
+      radial-gradient(58% 42% at 50% -6%, rgb(var(--accent-glow) / 0.16), transparent 68%),
+      radial-gradient(42% 34% at 84% 2%, rgb(var(--accent-glow-2) / 0.12), transparent 70%),
+      radial-gradient(50% 40% at 12% 6%, rgb(var(--accent-glow) / 0.08), transparent 72%);
   }
 
   /* Glass reflection: a hairline of light traced along a surface's top edge, the
@@ -150,12 +348,30 @@ body {
     pointer-events: none;
     z-index: 2;
   }
+  /* On the light register a white rim is invisible on white cards — trace the
+     accent instead so cards keep their lifted-glass edge. */
+  :root .glass-edge::before {
+    background: linear-gradient(
+      160deg,
+      rgb(var(--accent-glow) / 0.22),
+      rgb(var(--accent-glow) / 0.05) 30%,
+      transparent 52%
+    );
+  }
+  .dark .glass-edge::before {
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.04) 26%,
+      transparent 50%
+    );
+  }
 
-  /* Fine violet grid backdrop for hero / marketing sections. */
+  /* Fine accent grid backdrop for hero / marketing sections. */
   .bg-grid-gold {
     background-image:
-      linear-gradient(to right, rgba(139, 92, 246, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(139, 92, 246, 0.06) 1px, transparent 1px);
+      linear-gradient(to right, rgb(var(--accent-glow) / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--accent-glow) / 0.08) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
@@ -164,17 +380,23 @@ body {
     mask-image: radial-gradient(ellipse 62% 54% at 50% 0%, #000 38%, transparent 100%);
   }
 
-  /* Violet aurora — layered radial glows for the elevated dark sections. */
+  /* Aurora — layered radial glows for the elevated furniture. Violet in light,
+     warm gold in dark; the furniture stays deep in both so this always reads. */
   .bg-aurora {
     background:
-      radial-gradient(48% 60% at 18% 12%, rgba(124, 58, 237, 0.30), transparent 62%),
-      radial-gradient(46% 56% at 84% 24%, rgba(139, 92, 246, 0.22), transparent 60%),
-      radial-gradient(60% 70% at 62% 96%, rgba(88, 28, 182, 0.32), transparent 66%);
+      radial-gradient(48% 60% at 18% 12%, rgb(var(--accent-glow-2) / 0.5), transparent 62%),
+      radial-gradient(46% 56% at 84% 24%, rgb(var(--accent-glow) / 0.32), transparent 60%),
+      radial-gradient(60% 70% at 62% 96%, rgb(var(--accent-glow-2) / 0.42), transparent 66%);
   }
 
-  /* Violet text that catches light — used for emphasis on the dark stage. */
+  /* Accent text that catches light — used for emphasis on the dark furniture. */
   .text-gilt {
-    background: linear-gradient(96deg, #c4b5fd 0%, #8b5cf6 44%, #7c3aed 100%);
+    background: linear-gradient(
+      96deg,
+      rgb(var(--color-clay-soft)) 0%,
+      rgb(var(--color-accent)) 44%,
+      rgb(var(--color-primary)) 100%
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

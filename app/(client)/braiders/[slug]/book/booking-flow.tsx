@@ -39,7 +39,7 @@ function StepHeader({ n, label, done }: { n: number; label: string; done: boolea
       <span
         className={cn(
           'flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors',
-          done ? 'bg-moss text-cream' : 'bg-ink/[0.06] text-ink-subtle'
+          done ? 'bg-moss text-on-accent' : 'bg-ink/[0.06] text-ink-subtle'
         )}
       >
         {done ? <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} /> : n}
@@ -116,6 +116,11 @@ export function BookingFlow({
 
   return (
     <>
+      {/* Announce the in-flight reserve to screen readers — the two CTAs only swap
+          their label and disable, which lives in no live region. */}
+      <span role="status" className="sr-only">
+        {isPending ? t('reserving') : ''}
+      </span>
       <div className="grid gap-8 pb-28 md:grid-cols-[minmax(0,1fr)_340px] md:pb-0">
         <div className="min-w-0 space-y-8">
           <section>
@@ -234,7 +239,7 @@ export function BookingFlow({
           </ul>
 
           {error && (
-            <p role="alert" className="text-sm text-red-700 dark:text-red-400 md:hidden">
+            <p role="alert" className="text-sm text-danger md:hidden">
               {error}
             </p>
           )}
@@ -269,7 +274,7 @@ export function BookingFlow({
             )}
 
             {error && (
-              <p role="alert" className="mt-4 text-sm text-red-700 dark:text-red-400">
+              <p role="alert" className="mt-4 text-sm text-danger">
                 {error}
               </p>
             )}
@@ -294,7 +299,7 @@ export function BookingFlow({
             <p className="text-xs text-ink-muted">
               {selectedService ? t('depositDueNow') : t('pickServiceTime')}
             </p>
-            <p className="font-display text-xl leading-tight text-ink">
+            <p className="font-display text-xl leading-tight tabular-nums text-ink">
               {selectedService ? formatMoney(selectedService.deposit_cents) : '—'}
             </p>
           </div>

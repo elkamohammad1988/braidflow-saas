@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { ShieldCheck, CreditCard, CalendarCheck, Star, Sparkles } from 'lucide-react';
 import { Logo } from '@/components/shared/logo';
 import { GlassIcon } from '@/components/ui/glass-icon';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 const highlights = [
   { icon: CreditCard, key: 'deposits' },
@@ -40,10 +41,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </ul>
         </div>
 
-        <div className="relative rounded-card border border-line bg-ivory/[0.04] p-5 backdrop-blur-sm">
+        <div className="relative rounded-card border border-ivory/10 bg-ivory/[0.04] p-5 backdrop-blur-sm">
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} aria-hidden strokeWidth={0} className="h-3.5 w-3.5 fill-gold text-gold" />
+              <Star key={i} aria-hidden strokeWidth={0} className="h-3.5 w-3.5 fill-clay-soft text-clay-soft dark:fill-gold dark:text-gold" />
             ))}
           </div>
           <p className="mt-3 text-sm leading-relaxed text-ivory/85">
@@ -57,10 +58,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Form area */}
       <div className="flex flex-1 flex-col">
-        <header className="px-6 py-6 lg:hidden">
-          <Link href="/">
+        {/* Logo shows on mobile (the brand panel carries it on desktop); the theme
+            toggle stays reachable on every breakpoint since auth has no navbar. */}
+        <header className="flex items-center justify-between px-6 py-6">
+          <Link href="/" className="lg:invisible">
             <Logo />
           </Link>
+          <ThemeToggle />
         </header>
         <main
           id="main-content"

@@ -1,80 +1,112 @@
 import type { Config } from 'tailwindcss';
 
+/** rgb(var(--x) / <alpha-value>) — a theme-var colour that still honours Tailwind
+ *  `/opacity` modifiers (bg-clay/10, from-gold/25, border-line-strong …). */
+const v = (name: string) => `rgb(var(${name}) / <alpha-value>)`;
+
 const config: Config = {
   darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        // `--font-arabic` sits after the Latin face in every stack: font-family
+        // fallback is per-glyph, so Latin characters render in Inter/Space Mono
+        // and only Arabic characters (which the Latin faces lack) resolve to the
+        // Arabic webfont. No locale branching needed.
+        sans: ['var(--font-sans)', 'var(--font-arabic)', 'system-ui', 'sans-serif'],
         // Headings share the Inter family (see globals.css) — the fallback chain
         // stays sans-serif so a font-swap never flashes a serif heading.
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'ui-monospace', 'monospace']
+        display: ['var(--font-display)', 'var(--font-arabic)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'var(--font-arabic)', 'ui-monospace', 'monospace']
       },
       colors: {
-        // ── Purple-only enterprise system ────────────────────────────────────
-        // Theme-able tokens resolve through CSS variables (globals.css); the app
-        // is dark-only, so they never flip — the indirection is kept so /opacity
-        // modifiers keep working (bg-ink/[0.06] etc.). Fixed brand tokens carry
-        // the layered violet surfaces and the accent family.
+        // ── Premium dual-theme system ─────────────────────────────────────────
+        // Every theme-varying colour resolves through a CSS variable (globals.css)
+        // so a single token flips between the LIGHT (premium purple) and DARK
+        // (luxury black & gold) registers. Channels are RGB triplets so /opacity
+        // modifiers keep working everywhere.
 
-        // Direct palette aliases (for new code that wants to name the role).
-        primary: '#6D28D9',
-        secondary: '#7C3AED',
-        accent: '#8B5CF6',
-        'accent-hover': '#9333EA',
-        focusring: 'rgba(139,92,246,0.45)',
+        // Primary — the signature violet in BOTH themes.
+        primary: {
+          DEFAULT: v('--color-primary'),
+          hover: v('--color-accent-hover')
+        },
+        secondary: v('--color-secondary'),
+        accent: v('--color-accent'),
+        'accent-hover': v('--color-accent-hover'),
+        focusring: 'rgb(var(--color-accent) / 0.45)',
 
         // Text.
         ink: {
-          DEFAULT: 'rgb(var(--color-ink) / <alpha-value>)', // #FFFFFF
-          muted: 'rgb(var(--color-ink-muted) / <alpha-value>)', // #D6D0F5
-          subtle: 'rgb(var(--color-ink-subtle) / <alpha-value>)' // #A89CCF
+          DEFAULT: v('--color-ink'),
+          muted: v('--color-ink-muted'),
+          subtle: v('--color-ink-subtle')
         },
-        // Deep-stage backgrounds (page / secondary bg).
+        // Dark furniture — deep-jewel slab in both themes (hero/footer/auth/chips).
         night: {
-          DEFAULT: '#090414', // Secondary Background
-          deep: '#04030A' // Background (deepest)
+          DEFAULT: v('--color-night'),
+          deep: v('--color-night-deep')
         },
-        // Layered surfaces above the page.
+        // Layered surfaces above the page (inputs / elevated / hover / skeleton).
         onyx: {
-          DEFAULT: '#141022', // Surface
-          soft: '#241C3D', // Elevated Cards
-          line: 'rgba(124,58,237,0.18)' // Borders
+          DEFAULT: v('--color-onyx'),
+          soft: v('--color-onyx-soft'),
+          line: 'var(--color-line)'
         },
-        // Page → card surface register.
+        // Page → secondary → card register.
         cream: {
-          DEFAULT: 'rgb(var(--color-cream) / <alpha-value>)', // #04030A
-          deep: 'rgb(var(--color-cream-deep) / <alpha-value>)' // #090414
+          DEFAULT: v('--color-cream'),
+          deep: v('--color-cream-deep')
         },
-        paper: 'rgb(var(--color-paper) / <alpha-value>)', // Cards #1B1530
-        // Primary text on the violet surfaces.
-        ivory: '#FFFFFF',
-        // Signature accent family (was gold). `text` is a light violet tuned for AA.
+        paper: v('--color-paper'),
+        // Light text that sits on the dark furniture (white / warm champagne).
+        ivory: v('--color-ivory'),
+        // Text / icons on a saturated accent fill (CTA, selected chip) — white on
+        // violet in light, near-black warm on gold in dark. Keeps CTAs at AA.
+        'on-accent': v('--color-on-accent'),
+        // Signature accent family (violet ↔ gold). `text` clears WCAG AA on the
+        // active page surface.
         clay: {
-          DEFAULT: '#8B5CF6', // Accent
-          soft: '#C4B5FD',
-          deep: '#6D28D9', // Primary
-          text: 'rgb(var(--color-clay-text) / <alpha-value>)' // #C4B5FD
+          DEFAULT: v('--color-clay'),
+          soft: v('--color-clay-soft'),
+          deep: v('--color-clay-deep'),
+          text: v('--color-clay-text')
         },
-        // The CTA gradient family (from-gold-bright to-gold → accent → secondary).
+        // The PRIMARY CTA gradient family (from-gold-bright to-gold-deep) —
+        // violet in both themes despite the legacy `gold` name.
         gold: {
-          DEFAULT: '#7C3AED', // Secondary
-          bright: '#8B5CF6', // Accent
-          deep: '#6D28D9' // Primary
+          DEFAULT: v('--color-gold'),
+          bright: v('--color-gold-bright'),
+          deep: v('--color-gold-deep')
         },
-        // Depth + aurora tones.
+        // Champagne — the real metallic gold. Accent ONLY: badges, premium
+        // labels, highlights. Gold in BOTH themes. `text` clears AA per theme.
+        champagne: {
+          DEFAULT: v('--color-champagne'),
+          soft: v('--color-champagne-soft'),
+          deep: v('--color-champagne-deep'),
+          text: v('--color-champagne-text')
+        },
+        // Depth + aurora tones (violet).
         plum: {
-          DEFAULT: '#5B21B6',
-          deep: '#3B0764'
+          DEFAULT: v('--color-plum'),
+          deep: v('--color-plum-deep')
         },
-        ember: '#9333EA', // Hover accent
-        // The ONLY sanctioned non-purple hue — success / paid / secured.
+        ember: v('--color-ember'),
+        // Success / paid / secured — rendered in the champagne gold.
         moss: {
-          DEFAULT: 'rgb(var(--color-moss) / <alpha-value>)', // #6EE7B7 (text)
-          soft: 'rgba(52,211,153,0.14)',
-          bright: '#34D399'
+          DEFAULT: v('--color-moss'),
+          soft: 'var(--color-moss-soft)',
+          bright: v('--color-moss-bright')
+        },
+        // Danger — tokenised red for errors (replaces every raw red-* class).
+        danger: {
+          DEFAULT: v('--color-danger'),
+          bright: v('--color-danger-bright'),
+          strong: v('--color-danger-strong'),
+          soft: 'var(--color-danger-soft)',
+          line: 'var(--color-danger-line)'
         },
         line: 'var(--color-line)',
         'line-strong': 'var(--color-line-strong)'
@@ -85,25 +117,22 @@ const config: Config = {
         xl3: '26px'
       },
       boxShadow: {
-        // Dark elevation — multi-layered near-black depth + a hair of violet,
-        // plus a 1px top highlight (inset, so overflow-hidden never clips it) so
-        // cards read as lifted glass panels rather than flat rectangles.
-        soft: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.5), 0 12px 32px -14px rgba(0,0,0,0.66)',
-        card: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.4), 0 6px 18px -8px rgba(0,0,0,0.6)',
-        lifted:
-          'inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 60px -20px rgba(0,0,0,0.82), 0 10px 24px -12px rgba(88,28,182,0.42), 0 2px 6px -2px rgba(0,0,0,0.5)',
-        ring: '0 0 0 1px rgba(124,58,237,0.18)',
-        // Violet glow for the primary CTA and focal moments.
+        // Elevation — defined per theme in globals.css (soft violet-tinted in
+        // light, near-black depth + gold hair + top highlight in dark).
+        soft: 'var(--shadow-soft)',
+        card: 'var(--shadow-card)',
+        lifted: 'var(--shadow-lifted)',
+        ring: 'var(--shadow-ring)',
+        // Accent glow for the primary CTA and focal moments (violet ↔ gold).
         'glow-gold':
-          '0 1px 0 rgba(255,255,255,0.14) inset, 0 8px 24px -8px rgba(124,58,237,0.6), 0 2px 10px -2px rgba(109,40,217,0.5)',
-        'glow-plum': '0 20px 60px -24px rgba(124,58,237,0.55)'
+          '0 1px 0 rgba(255,255,255,0.14) inset, 0 8px 24px -8px rgb(var(--accent-glow) / 0.6), 0 2px 10px -2px rgb(var(--accent-glow-2) / 0.5)',
+        'glow-plum': '0 20px 60px -24px rgb(var(--accent-glow) / 0.55)'
       },
       // Only ambient, non-content-hiding motion lives here. The entrance/reveal
-      // keyframes (weave-in, fade-in, fade-in-up, pop-in) and decorative flourishes
-      // (float, marquee, check-draw, ring-out, spark-out) were removed: each started
-      // from opacity:0 or a large transform, which was hiding critical UI until JS
-      // ran. Content must be readable on first paint — nothing here gates visibility.
-      // All of it is also frozen by the prefers-reduced-motion rule in globals.css.
+      // keyframes were removed: each started from opacity:0 or a large transform,
+      // which was hiding critical UI until JS ran. Content must be readable on
+      // first paint — nothing here gates visibility. All of it is also frozen by
+      // the prefers-reduced-motion rule in globals.css.
       keyframes: {
         // Ambient aurora drift for the hero mesh blobs — sits behind content, so it
         // can never affect readability.

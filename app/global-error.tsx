@@ -28,7 +28,7 @@ export default function GlobalError({
           justifyContent: 'center',
           fontFamily: 'Inter, system-ui, sans-serif',
           background:
-            'radial-gradient(60% 60% at 50% 0%, rgba(124,58,237,0.18), transparent 70%), #04030A',
+            'radial-gradient(60% 60% at 50% 0%, rgba(139,92,246,0.22), transparent 70%), #07030F',
           color: '#FFFFFF',
           textAlign: 'center',
           padding: '0 1.5rem',
@@ -38,7 +38,7 @@ export default function GlobalError({
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600, letterSpacing: '-0.02em' }}>
           Something went wrong
         </h1>
-        <p style={{ marginTop: '0.5rem', color: '#A89CCF', maxWidth: '28rem', lineHeight: 1.6 }}>
+        <p style={{ marginTop: '0.5rem', color: '#B7B0C8', maxWidth: '28rem', lineHeight: 1.6 }}>
           We&apos;ve been notified. Please refresh the page or try again in a moment.
         </p>
         <a
@@ -51,7 +51,7 @@ export default function GlobalError({
             color: '#FFFFFF',
             textDecoration: 'none',
             fontWeight: 600,
-            boxShadow: '0 8px 24px -8px rgba(124,58,237,0.6)'
+            boxShadow: '0 8px 24px -8px rgba(139,92,246,0.6)'
           }}
         >
           Back to home

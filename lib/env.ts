@@ -54,6 +54,10 @@ const envSchema = z
           'PENDING_BOOKING_TTL_MINUTES must be a positive number of minutes.'
         )
     ),
+    // Explicit acknowledgement that the demo persona-auth (lib/auth/personas.ts)
+    // has been replaced with a real credential store. Required to boot with live
+    // Stripe keys — see the superRefine below.
+    I_REPLACED_DEMO_AUTH: optional(z.string()),
     NEXT_PUBLIC_SITE_URL: optional(z.string().url('NEXT_PUBLIC_SITE_URL must be an absolute URL.')),
     NEXT_PUBLIC_SENTRY_DSN: optional(z.string().url('NEXT_PUBLIC_SENTRY_DSN must be a URL.')),
     SENTRY_DSN: optional(z.string().url('SENTRY_DSN must be a URL.')),
@@ -79,12 +83,28 @@ const envSchema = z
         message: 'STRIPE_WEBHOOK_SECRET is required when Stripe keys are set (webhook signature verification).'
       });
     }
-    // Live Stripe means real money moving — and real, distinct users. In that mode
-    // the committed AUTH_SECRET fallback (lib/crypto/signing.ts) is account-takeover
-    // grade: anyone who knows the public fallback could forge a braider session
-    // cookie and issue refunds or read client PII. So once live keys are present a
-    // real AUTH_SECRET becomes mandatory. The keyless demo and `sk_test_` setups
-    // keep booting on the fallback (which still logs a loud one-time warning).
+    // Live Stripe means real money moving — and real, distinct users. But BraidFlow
+    // ships with a DEMO auth layer: lib/auth/personas.ts maps ANY email+password to
+    // one of three fixed personas — there is no credential verification. Against
+    // live keys that is account-takeover-grade: any visitor signs in as the braider
+    // persona and can issue real refunds, read client PII, or change payout settings.
+    // A real AUTH_SECRET only makes the cookie unforgeable; it does NOT make login
+    // real. So refuse to boot with live keys unless the operator has replaced the
+    // demo auth with a real credential store AND explicitly acknowledges it.
+    // The keyless demo and `sk_test_` setups are unaffected.
+    if (env.STRIPE_SECRET_KEY?.startsWith('sk_live_') && env.I_REPLACED_DEMO_AUTH !== 'true') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['STRIPE_SECRET_KEY'],
+        message:
+          'Live Stripe keys (sk_live_) are configured, but BraidFlow ships with demo persona-auth ' +
+          '(lib/auth/personas.ts) that accepts any password and grants a fixed braider session — ' +
+          'account-takeover-grade against real money. Replace it with a real credential store, then ' +
+          'set I_REPLACED_DEMO_AUTH=true to acknowledge. Use sk_test_ keys for the demo.'
+      });
+    }
+    // Even with real auth wired, a live deployment must sign cookies with a real
+    // secret rather than the public demo fallback (lib/crypto/signing.ts).
     if (env.STRIPE_SECRET_KEY?.startsWith('sk_live_') && !env.AUTH_SECRET) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

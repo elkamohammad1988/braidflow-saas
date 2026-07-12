@@ -35,7 +35,7 @@ export function Footer() {
     <footer className="relative overflow-hidden bg-night text-ivory/80">
       {/* woven hairline + faint violet aurora */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-56 w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.16),transparent_70%)] blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/2 h-56 w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(var(--accent-glow)/0.16),transparent_70%)] blur-2xl" />
 
       <div className="relative mx-auto max-w-6xl px-6 py-12">
         <div className="grid gap-8 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
@@ -47,13 +47,13 @@ export function Footer() {
           </div>
           {columns.map((col) => (
             <div key={col.key}>
-              <p className="label text-gold/70">{t(`columns.${col.key}.heading`)}</p>
+              <p className="label text-clay-soft/85 dark:text-gold/70">{t(`columns.${col.key}.heading`)}</p>
               <ul className="mt-4 space-y-2.5 text-sm text-ivory/60">
                 {col.links.map((link) => (
                   <li key={link.key}>
                     <Link
                       href={link.href}
-                      className="transition-colors hover:text-gold-bright"
+                      className="transition-colors hover:text-clay-soft dark:hover:text-gold-bright"
                     >
                       {t(`columns.${col.key}.links.${link.key}`)}
                     </Link>
@@ -64,10 +64,10 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ivory/60 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-3 border-t border-ivory/10 pt-6 text-xs text-ivory/60 sm:flex-row sm:items-center sm:justify-between">
           <p>{t('copyright', { year: String(new Date().getFullYear()) })}</p>
           <p className="flex items-center gap-2 font-mono uppercase tracking-widest">
-            <span className="h-1.5 w-1.5 rounded-full bg-moss-bright shadow-[0_0_8px_rgba(52,211,153,0.85)]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-moss-bright shadow-[0_0_8px_rgb(var(--color-champagne)/0.75)]" />
             {t('securedByStripe')}
           </p>
         </div>

@@ -38,7 +38,7 @@ export default function PricingPage() {
           </span>
         </Reveal>
         <Reveal delay={90}>
-          <h1 className="mx-auto mt-6 max-w-3xl font-display text-[3.25rem] font-medium leading-[1.02] tracking-[-0.035em] text-ink md:text-[5rem]">
+          <h1 className="mx-auto mt-6 max-w-3xl break-words font-display text-[clamp(2.4rem,9.5vw,3.25rem)] font-medium leading-[1.02] tracking-[-0.035em] text-ink md:text-[5rem]">
             {t.rich('title', {
               em: (chunks) => <span className="italic text-clay-text">{chunks}</span>
             })}
@@ -56,7 +56,7 @@ export default function PricingPage() {
           <div className="relative overflow-hidden rounded-xl3 border border-line bg-night p-6 text-ivory shadow-lifted md:p-8">
             <AtelierBackdrop className="absolute inset-0 opacity-70" />
             <div className="relative">
-              <p className="absolute -top-3 start-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-night shadow-glow-gold">
+              <p className="absolute -top-3 start-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-on-accent shadow-glow-gold">
                 {t('card.badge')}
               </p>
               <p className="pt-3 font-display text-2xl font-medium">{t('card.title')}</p>
@@ -79,11 +79,11 @@ export default function PricingPage() {
                 </Link>
               </Magnetic>
 
-              <div className="mt-8 border-t border-line pt-6">
+              <div className="mt-8 border-t border-ivory/10 pt-6">
                 <ul className="grid gap-3 text-sm sm:grid-cols-2">
                   {(t.raw('included') as string[]).map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold-bright ring-1 ring-gold/25">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-clay-soft ring-1 ring-gold/25 dark:text-gold-bright">
                         <Check className="h-3 w-3" strokeWidth={2.5} />
                       </span>
                       <span className="text-ivory/85">{feature}</span>
@@ -129,7 +129,7 @@ export default function PricingPage() {
         <AtelierBackdrop className="absolute inset-0 opacity-90" />
         <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-24">
           <Reveal>
-            <h2 className="mx-auto max-w-2xl font-display text-[2.75rem] font-medium leading-[1.04] tracking-[-0.035em] md:text-[4rem]">
+            <h2 className="mx-auto max-w-2xl break-words font-display text-[clamp(2.15rem,8.5vw,2.75rem)] font-medium leading-[1.04] tracking-[-0.035em] md:text-[4rem]">
               {t.rich('cta.title', {
                 em: (chunks) => <span className="italic text-gilt">{chunks}</span>
               })}

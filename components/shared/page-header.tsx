@@ -15,7 +15,7 @@ export function PageHeader({ eyebrow, title, description, action }: Props) {
             {eyebrow}
           </p>
         )}
-        <h1 className="font-display text-[2rem] font-medium leading-[1.05] tracking-[-0.03em] text-ink md:text-[2.75rem]">
+        <h1 className="font-display text-[2rem] font-medium leading-[1.05] tracking-[-0.03em] text-ink break-words md:text-[2.75rem]">
           {title}
         </h1>
         {description && (

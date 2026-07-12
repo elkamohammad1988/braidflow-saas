@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Clock, Lock, Check } from 'lucide-react';
@@ -10,9 +11,14 @@ import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { formatInZone } from '@/lib/format-date';
 import { Button } from '@/components/ui/button';
-import { Checkout } from './checkout';
 import { DemoCheckout } from './demo-checkout';
 import { formatMoney } from '@/lib/utils';
+
+// Code-split the real Stripe checkout: it pulls @stripe/react-stripe-js +
+// @stripe/stripe-js into the client bundle, and the deployed keyless demo renders
+// DemoCheckout instead. As a lazy chunk it's only fetched when live Stripe keys
+// make the real Checkout actually render, keeping the /pay route lean in demo mode.
+const Checkout = dynamic(() => import('./checkout').then((m) => m.Checkout));
 
 export default async function PayPage({
   params,

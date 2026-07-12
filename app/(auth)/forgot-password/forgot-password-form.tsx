@@ -96,7 +96,7 @@ export function ForgotPasswordForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <Input name="email" type="email" label={t('forgot.form.email')} autoComplete="email" required />
       {error && (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

@@ -167,7 +167,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
         {t('availability.cancel')}
       </button>
       {error && (
-        <p role="alert" className="basis-full text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="basis-full text-sm text-danger">
           {error}
         </p>
       )}

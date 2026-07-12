@@ -10,6 +10,7 @@ import { InitialsAvatar } from '@/components/shared/initials-avatar';
 import { getTranslations } from 'next-intl/server';
 import { DashboardNav } from './dashboard-nav';
 import { LanguageSwitcher } from '@/components/i18n/language-switcher';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 // The dashboard is private application UI — keep it out of search indexes.
 export const metadata: Metadata = {
@@ -55,6 +56,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Logo />
           </Link>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <InitialsAvatar name={profile.full_name} size="sm" fallback="B" />
             <SignOutLink />
           </div>
@@ -90,9 +92,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Link>
               <SignOutLink className="text-xs" />
             </div>
-            <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-line pt-3">
               <span className="text-xs font-medium text-ink-muted">{t('common.language')}</span>
-              <LanguageSwitcher />
+              <div className="flex items-center gap-2">
+                <ThemeToggle className="h-9 w-9" />
+                <LanguageSwitcher />
+              </div>
             </div>
           </div>
         </aside>

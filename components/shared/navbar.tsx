@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import { SignOutLink } from './sign-out';
 import { MobileMenu } from './mobile-menu';
 import { LanguageSwitcher } from '@/components/i18n/language-switcher';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export async function Navbar() {
   const session = await getSession();
@@ -35,7 +36,7 @@ export async function Navbar() {
             >
               <span
                 aria-hidden
-                className="absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 bg-gradient-to-r from-clay to-transparent transition-transform duration-300 ease-spring group-hover:scale-x-100"
+                className="absolute inset-x-3 bottom-1 h-px origin-left scale-x-0 bg-gradient-to-r from-clay to-transparent transition-transform duration-300 ease-spring group-hover:scale-x-100 rtl:origin-right"
               />
               {item.label}
             </Link>
@@ -43,6 +44,7 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center justify-self-end gap-3">
+          <ThemeToggle className="hidden lg:inline-flex" />
           <LanguageSwitcher className="hidden lg:inline-flex" />
           {session ? (
             <>

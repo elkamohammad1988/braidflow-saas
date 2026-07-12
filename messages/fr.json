@@ -7,6 +7,10 @@
     "myBookings": "Mes réservations",
     "viewSite": "Voir le site",
     "language": "Langue",
+    "theme": {
+      "switchToDark": "Passer en mode sombre",
+      "switchToLight": "Passer en mode clair"
+    },
     "menu": "Menu",
     "copied": "Copié",
     "copy": "Copier",

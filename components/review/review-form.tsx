@@ -20,16 +20,23 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const firstStarRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
 
-  // When the form expands, the trigger button unmounts and focus would fall to
-  // <body>. Move it into the form so keyboard/SR users land on the rating control.
+  // Keep focus with the user across the expand/collapse: on open, move it onto the
+  // rating control (the trigger has unmounted); on close (Cancel or a successful
+  // post), return it to the trigger — mirroring cancel-button.tsx — so keyboard/SR
+  // users never get dropped to <body>.
   useEffect(() => {
     if (open) firstStarRef.current?.focus();
+    else if (wasOpen.current) triggerRef.current?.focus();
+    wasOpen.current = open;
   }, [open]);
 
   if (!open) {
     return (
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="mt-2 text-sm font-medium text-ink hover:underline underline-offset-4"
@@ -68,11 +75,16 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
         e.preventDefault();
         submit();
       }}
+      aria-busy={pending}
       className="mt-3 rounded-card border border-line bg-cream/50 p-4 text-start"
     >
       <p className="text-sm font-medium text-ink">{t('howWasAppointment')}</p>
+      {/* Announce the in-flight submit to screen readers without stealing focus. */}
+      <span role="status" className="sr-only">
+        {pending ? t('posting') : ''}
+      </span>
 
-      <div className="mt-2 flex gap-1.5" onMouseLeave={() => setHover(0)}>
+      <div className="mt-2 flex gap-0.5" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -82,14 +94,14 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
             aria-pressed={rating === star}
             onClick={() => setRating(star)}
             onMouseEnter={() => setHover(star)}
-            className="rounded-md transition-transform duration-150 ease-spring hover:scale-110 active:scale-95"
+            className="rounded-md p-1.5 transition-transform duration-150 ease-spring hover:scale-110 active:scale-95"
           >
             <Star
               strokeWidth={1.5}
               className={cn(
                 'h-7 w-7 transition-colors duration-150',
                 star <= active
-                  ? 'fill-gold text-gold [filter:drop-shadow(0_1px_6px_rgba(139,92,246,0.5))]'
+                  ? 'fill-gold text-gold [filter:drop-shadow(0_1px_6px_rgb(var(--accent-glow)/0.5))]'
                   : 'fill-transparent text-ink/25'
               )}
             />
@@ -108,7 +120,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
       />
 
       {error && (
-        <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="mt-2 text-sm text-danger">
           {error}
         </p>
       )}
