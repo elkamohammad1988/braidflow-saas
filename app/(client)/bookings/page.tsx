@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { CalendarHeart } from 'lucide-react';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
@@ -25,6 +25,7 @@ const STATUS_TONE = {
 export default async function MyBookings() {
   const t = await getTranslations('bookings');
   const td = await getTranslations('deposit');
+  const locale = await getLocale();
   const { user } = await requireSession();
   const database = db();
 
@@ -103,7 +104,7 @@ export default async function MyBookings() {
                     </Link>
                   </p>
                   <p className="mt-2 text-sm text-ink-muted">
-                    {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE)}
+                    {formatAppointment(b.scheduled_at, b.braiders?.timezone ?? DEFAULT_TIMEZONE, locale)}
                   </p>
                 </div>
                 <div className="text-start sm:text-end">
@@ -123,7 +124,7 @@ export default async function MyBookings() {
                       </Badge>
                     </div>
                   )}
-                  <p className="mt-2 text-sm tabular-nums text-ink-muted">{formatMoney(b.price_cents)}</p>
+                  <p className="mt-2 text-sm tabular-nums text-ink-muted">{formatMoney(b.price_cents, locale)}</p>
                   {b.status === 'pending_payment' && (
                     <Link
                       href={`/bookings/${b.id}/pay`}

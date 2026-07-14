@@ -1,3 +1,5 @@
+import { useLocale } from 'next-intl';
+
 type Props = {
   to: number;
   decimals?: number;
@@ -13,10 +15,11 @@ type Props = {
  * it now renders immediately and identically on the server and client.
  */
 export function CountUp({ to, decimals = 0, prefix = '', suffix = '', className }: Props) {
+  const locale = useLocale();
   return (
     <span className={className}>
       {prefix}
-      {to.toLocaleString('en-US', {
+      {to.toLocaleString(locale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       })}

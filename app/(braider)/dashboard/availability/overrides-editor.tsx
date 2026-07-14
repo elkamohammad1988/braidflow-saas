@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { TZDate } from '@date-fns/tz';
 import { Button } from '@/components/ui/button';
 import { fieldSurface } from '@/components/ui/field';
@@ -26,13 +26,24 @@ export function OverridesEditor({
 }) {
   const t = useTranslations('dashboard');
   const [adding, setAdding] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  // The add-form moves focus into itself on open; when it closes it unmounts and
+  // the trigger re-mounts, so return focus there instead of dropping to <body>.
+  // Guarded by a ref so it only fires after a close, never on initial mount.
+  const restoreFocus = useRef(false);
+  useEffect(() => {
+    if (!adding && restoreFocus.current) {
+      addButtonRef.current?.focus();
+      restoreFocus.current = false;
+    }
+  }, [adding]);
 
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-display text-xl text-ink">{t('availability.timeOff')}</h2>
         {!adding && (
-          <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
+          <Button ref={addButtonRef} size="sm" variant="secondary" onClick={() => setAdding(true)}>
             {t('availability.addBlock')}
           </Button>
         )}
@@ -41,11 +52,19 @@ export function OverridesEditor({
         {t('availability.timeOffDescription')}
       </p>
 
-      {adding && <AddOverrideForm timeZone={timeZone} onDone={() => setAdding(false)} />}
+      {adding && (
+        <AddOverrideForm
+          timeZone={timeZone}
+          onDone={() => {
+            restoreFocus.current = true;
+            setAdding(false);
+          }}
+        />
+      )}
 
       <ul className="mt-4 space-y-2">
         {overrides.length === 0 && !adding && (
-          <li className="rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-6 text-center text-sm text-ink-muted">
+          <li className="rounded-xl2 border border-dashed border-line-strong bg-cream/40 px-4 py-6 text-center text-sm text-ink-muted">
             {t('availability.nothingBlocked')}
           </li>
         )}
@@ -59,22 +78,25 @@ export function OverridesEditor({
 
 function OverrideRow({ override, timeZone }: { override: Override; timeZone: string }) {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
   const [pending, startTransition] = useTransition();
   // Format in the braider's zone so server and client render identical text
   // (raw date-fns `format` uses the runtime zone → hydration mismatch).
   const sameDay =
-    formatInZone(override.starts_at, timeZone, 'yyyy-MM-dd') ===
-    formatInZone(override.ends_at, timeZone, 'yyyy-MM-dd');
+    formatInZone(override.starts_at, timeZone, 'yyyy-MM-dd', locale) ===
+    formatInZone(override.ends_at, timeZone, 'yyyy-MM-dd', locale);
   const label = sameDay
-    ? `${formatInZone(override.starts_at, timeZone, 'EEE, MMM d')} · ${formatInZone(
+    ? `${formatInZone(override.starts_at, timeZone, 'EEE, MMM d', locale)} · ${formatInZone(
         override.starts_at,
         timeZone,
-        'h:mm a'
-      )} – ${formatInZone(override.ends_at, timeZone, 'h:mm a')}`
-    : `${formatInZone(override.starts_at, timeZone, 'MMM d, h:mm a')} – ${formatInZone(
+        'h:mm a',
+        locale
+      )} – ${formatInZone(override.ends_at, timeZone, 'h:mm a', locale)}`
+    : `${formatInZone(override.starts_at, timeZone, 'MMM d, h:mm a', locale)} – ${formatInZone(
         override.ends_at,
         timeZone,
-        'MMM d, h:mm a'
+        'MMM d, h:mm a',
+        locale
       )}`;
 
   return (
@@ -113,9 +135,10 @@ function zonedInstant(dateStr: string, timeStr: string, timeZone: string): Date 
 
 function AddOverrideForm({ timeZone, onDone }: { timeZone: string; onDone: () => void }) {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
   // "Today" in the braider's zone, so the date picker's min/default match the
   // zone the block is actually stored and displayed in.
-  const today = formatInZone(new Date(), timeZone, 'yyyy-MM-dd');
+  const today = formatInZone(new Date(), timeZone, 'yyyy-MM-dd', locale);
   const [date, setDate] = useState(today);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');

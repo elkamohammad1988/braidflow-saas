@@ -28,8 +28,8 @@ export const reminderClientSubject = (p: ReminderClientProps) =>
 
 export function ReminderClientEmail(p: ReminderClientProps) {
   const isSoon = p.proximity === '2h';
-  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a');
-  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a', 'en');
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.scheduledAt,
     p.timeZone
   )}`;
@@ -47,7 +47,7 @@ export function ReminderClientEmail(p: ReminderClientProps) {
 
       <DetailRow label="Service" value={p.serviceName} />
       <DetailRow label="When" value={whenLabel} />
-      <DetailRow label="Balance" value={formatMoney(p.balanceCents)} />
+      <DetailRow label="Balance" value={formatMoney(p.balanceCents, 'en')} />
 
       <Divider />
 

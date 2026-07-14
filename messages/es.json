@@ -6,6 +6,7 @@
     "dashboard": "Panel",
     "myBookings": "Mis reservas",
     "viewSite": "Ver sitio",
+    "home": "Inicio",
     "language": "Idioma",
     "theme": {
       "switchToDark": "Cambiar a modo oscuro",
@@ -680,6 +681,12 @@
     "securedByStripe": "Pagos protegidos por Stripe"
   },
   "booking": {
+    "validation": {
+      "service": "Elige un servicio para continuar.",
+      "time": "Elige una hora para tu cita.",
+      "name": "Escribe tu nombre para que tu trenzadora sepa quién reserva.",
+      "email": "Escribe un correo válido — ahí llegará tu confirmación."
+    },
     "anythingHeading": "Algo que debamos saber",
     "balanceAtAppointment": "Saldo en la cita",
     "bookAppointment": "Reserva tu cita",
@@ -963,5 +970,24 @@
       "continue": "Continuar",
       "connect": "Conectar Stripe"
     }
+  },
+  "meta": {
+    "loginTitle": "Iniciar sesión",
+    "signupTitle": "Crea tu cuenta",
+    "forgotPasswordTitle": "Restablece tu contraseña",
+    "resetPasswordTitle": "Establece una nueva contraseña",
+    "braidersTitle": "Buscar trenzadora",
+    "braidersDescription": "Explora trenzadoras y estilistas de peinados protectores con disponibilidad en tiempo real. Busca en tu ciudad, compara, y un depósito retiene tu turno.",
+    "bookTitle": "Reserva una cita",
+    "braiderNotFound": "Trenzadora no encontrada",
+    "braiderProfileTitle": "{name} — Reserva trenzas",
+    "braiderProfileTitleInCity": "{name} — Reserva trenzas en {city}",
+    "braiderProfileDescription": "Reserva con {name} para trenzas y peinados protectores. Disponibilidad en tiempo real — un depósito retiene tu turno.",
+    "pricingTitle": "Precios",
+    "pricingDescription": "BraidFlow es gratis mientras estamos en beta. Sin cuota mensual, y nos quedamos con el 0% de tus depósitos — te quedas con el 100%.",
+    "termsTitle": "Términos del servicio",
+    "termsDescription": "Los términos que rigen tu uso de BraidFlow, ya seas una clienta que reserva citas o una trenzadora que las acepta.",
+    "privacyTitle": "Política de privacidad",
+    "privacyDescription": "Cómo BraidFlow recopila, usa y protege tu información cuando reservas o aceptas citas."
   }
 }

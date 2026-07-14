@@ -46,7 +46,12 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4">
+      {/* Announce the in-flight submit to screen readers — the button-label swap
+          alone lives in no live region and the disabled button drops focus. */}
+      <span role="status" className="sr-only">
+        {pending ? t('login.signingIn') : ''}
+      </span>
       <Input name="email" type="email" label={t('login.form.email')} autoComplete="email" required />
       <Input
         name="password"

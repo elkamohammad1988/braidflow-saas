@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useId,
   type ReactNode,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes
@@ -77,7 +78,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   { className, label, hint, error, id, ...rest },
   ref
 ) {
-  const fieldId = id ?? rest.name;
+  // Fall back to a stable auto-id so a control given a `label`/`hint` but no
+  // `name`/`id` still gets its label + description programmatically associated
+  // (useId is SSR-safe, so no hydration mismatch).
+  const autoId = useId();
+  const fieldId = id ?? rest.name ?? autoId;
   return (
     <FieldShell id={fieldId} label={label} hint={hint} error={error}>
       <textarea
@@ -107,7 +112,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   { className, label, hint, error, id, children, ...rest },
   ref
 ) {
-  const fieldId = id ?? rest.name;
+  const autoId = useId();
+  const fieldId = id ?? rest.name ?? autoId;
   return (
     <FieldShell id={fieldId} label={label} hint={hint} error={error}>
       <div className="relative">

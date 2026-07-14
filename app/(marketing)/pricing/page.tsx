@@ -2,17 +2,21 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Check, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { Reveal } from '@/components/motion/reveal';
 import { Magnetic } from '@/components/motion/magnetic';
 import { AtelierBackdrop } from '@/components/marketing/atelier-backdrop';
+import { JsonLd } from '@/components/shared/json-ld';
 
-export const metadata: Metadata = {
-  title: 'Pricing — BraidFlow',
-  description:
-    'BraidFlow is free while we’re in beta. No monthly fee, and we take 0% of your deposits — you keep 100%.',
-  alternates: { canonical: '/pricing' }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('pricingTitle'),
+    description: t('pricingDescription'),
+    alternates: { canonical: '/pricing' }
+  };
+}
 
 // Everything listed here is shipped and working today. Paid plans are not built
 // yet, so this page makes no claim about trials, booking limits, team seats,
@@ -30,6 +34,31 @@ export default function PricingPage() {
   const t = useTranslations('pricing');
   return (
     <>
+      {/* Structured data: the (free) plan as a SoftwareApplication Offer, and the
+          FAQ as an FAQPage so both are eligible for rich results. Built from the
+          same translations the page renders, so it never drifts. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'SoftwareApplication',
+              name: 'BraidFlow',
+              applicationCategory: 'BusinessApplication',
+              operatingSystem: 'Web',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: faqs.map((item) => ({
+                '@type': 'Question',
+                name: t(`faqs.${item.key}.q`),
+                acceptedAnswer: { '@type': 'Answer', text: t(`faqs.${item.key}.a`) }
+              }))
+            }
+          ]
+        }}
+      />
       <section className="relative mx-auto max-w-5xl px-6 pb-10 pt-20 text-center md:pb-12 md:pt-24">
         <Reveal>
           <span className="label inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-2 text-clay-text shadow-card">
@@ -84,7 +113,7 @@ export default function PricingPage() {
                   {(t.raw('included') as string[]).map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-clay-soft ring-1 ring-gold/25 dark:text-gold-bright">
-                        <Check className="h-3 w-3" strokeWidth={2.5} />
+                        <Check aria-hidden className="h-3 w-3" strokeWidth={2.5} />
                       </span>
                       <span className="text-ivory/85">{feature}</span>
                     </li>

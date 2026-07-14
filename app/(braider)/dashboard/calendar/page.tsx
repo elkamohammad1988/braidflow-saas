@@ -1,17 +1,19 @@
 import { TZDate } from '@date-fns/tz';
 import { addDays, endOfDay, startOfWeek } from 'date-fns';
+import { CalendarDays } from 'lucide-react';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { cn, formatMoney } from '@/lib/utils';
 import { formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function CalendarPage() {
   const { user } = await requireBraider();
   const database = db();
   const t = await getTranslations('dashboard');
+  const locale = await getLocale();
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -39,11 +41,11 @@ export default async function CalendarPage() {
   if (error) throw error;
 
   type Booking = NonNullable<typeof bookings>[number];
-  const todayKey = formatInZone(new Date(), tz, 'yyyy-MM-dd');
+  const todayKey = formatInZone(new Date(), tz, 'yyyy-MM-dd', locale);
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const byDay = new Map<string, Booking[]>();
   bookings?.forEach((b) => {
-    const key = formatInZone(b.scheduled_at, tz, 'yyyy-MM-dd');
+    const key = formatInZone(b.scheduled_at, tz, 'yyyy-MM-dd', locale);
     if (!byDay.has(key)) byDay.set(key, []);
     byDay.get(key)!.push(b);
   });
@@ -54,11 +56,13 @@ export default async function CalendarPage() {
   return (
     <div>
       <PageHeader
+        icon={CalendarDays}
         title={t('calendar.title')}
-        description={`${formatInZone(weekStart, tz, 'MMM d')} – ${formatInZone(
+        description={`${formatInZone(weekStart, tz, 'MMM d', locale)} – ${formatInZone(
           addDays(weekStart, 6),
           tz,
-          'MMM d'
+          'MMM d',
+          locale
         )}`}
         action={
           <div className="flex items-center gap-6">
@@ -73,7 +77,7 @@ export default async function CalendarPage() {
             <div className="h-9 w-px bg-line" aria-hidden />
             <div>
               <p className="font-display text-2xl font-medium leading-none tabular-nums text-ink">
-                {formatMoney(weekTotal)}
+                {formatMoney(weekTotal, locale)}
               </p>
               <p className="mt-1.5 text-xs text-ink-muted">{t('calendar.bookedValue')}</p>
             </div>
@@ -84,7 +88,7 @@ export default async function CalendarPage() {
       {/* Legend */}
       <div className="mt-6 flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-subtle">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-moss" /> {t('status.confirmed')}
+          <span className="h-2 w-2 rounded-full bg-moss-bright" /> {t('status.confirmed')}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-clay" /> {t('status.awaitingDeposit')}
@@ -96,7 +100,7 @@ export default async function CalendarPage() {
           agenda list instead of overflowing the viewport. */}
       <div className="mt-4 hidden gap-3 lg:grid lg:grid-cols-7">
         {days.map((day) => {
-          const key = formatInZone(day, tz, 'yyyy-MM-dd');
+          const key = formatInZone(day, tz, 'yyyy-MM-dd', locale);
           const items = byDay.get(key) ?? [];
           const isToday = key === todayKey;
           const isPast = key < todayKey;
@@ -117,7 +121,7 @@ export default async function CalendarPage() {
                     isToday ? 'text-clay-text' : isPast ? 'text-ink-subtle' : 'text-ink-muted'
                   )}
                 >
-                  {formatInZone(day, tz, 'EEE')}
+                  {formatInZone(day, tz, 'EEE', locale)}
                 </p>
                 <span
                   className={cn(
@@ -129,7 +133,7 @@ export default async function CalendarPage() {
                         : 'text-ink'
                   )}
                 >
-                  {formatInZone(day, tz, 'd')}
+                  {formatInZone(day, tz, 'd', locale)}
                 </span>
                 {/* "Today" is signalled visually by the ring + gold pill only;
                     give SR/low-vision users the same cue on the 7-column grid. */}
@@ -149,7 +153,7 @@ export default async function CalendarPage() {
                       {b.status === 'confirmed' ? t('status.confirmed') : t('status.awaitingDeposit')}:{' '}
                     </span>
                     <p className="font-mono text-[11px] font-medium tabular-nums text-ink">
-                      {formatInZone(b.scheduled_at, tz, 'h:mm a')}
+                      {formatInZone(b.scheduled_at, tz, 'h:mm a', locale)}
                     </p>
                     <p className="mt-0.5 truncate text-xs font-medium text-ink">
                       {b.profiles?.full_name ?? b.guest_name}
@@ -166,7 +170,7 @@ export default async function CalendarPage() {
 
               {items.length > 0 && (
                 <p className="mt-2 border-t border-line pt-1.5 text-end font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
-                  {formatMoney(dayTotal)}
+                  {formatMoney(dayTotal, locale)}
                 </p>
               )}
             </div>
@@ -179,7 +183,7 @@ export default async function CalendarPage() {
           cards. */}
       <div className="mt-4 space-y-2.5 lg:hidden">
         {days.map((day) => {
-          const key = formatInZone(day, tz, 'yyyy-MM-dd');
+          const key = formatInZone(day, tz, 'yyyy-MM-dd', locale);
           const items = byDay.get(key) ?? [];
           const isToday = key === todayKey;
           const isPast = key < todayKey;
@@ -207,12 +211,12 @@ export default async function CalendarPage() {
                         : 'bg-ink/[0.05] text-ink'
                     )}
                   >
-                    {formatInZone(day, tz, 'd')}
+                    {formatInZone(day, tz, 'd', locale)}
                   </span>
                   <div>
-                    <p className="text-sm font-medium text-ink">{formatInZone(day, tz, 'EEEE')}</p>
+                    <p className="text-sm font-medium text-ink">{formatInZone(day, tz, 'EEEE', locale)}</p>
                     <p className="text-xs text-ink-muted">
-                      {formatInZone(day, tz, 'MMM d')}
+                      {formatInZone(day, tz, 'MMM d', locale)}
                       {isToday ? ` · ${t('calendar.today')}` : ''}
                     </p>
                   </div>
@@ -248,9 +252,9 @@ export default async function CalendarPage() {
                       </div>
                       <div className="shrink-0 text-end">
                         <p className="font-mono text-xs font-medium tabular-nums text-ink">
-                          {formatInZone(b.scheduled_at, tz, 'h:mm a')}
+                          {formatInZone(b.scheduled_at, tz, 'h:mm a', locale)}
                         </p>
-                        <p className="text-xs text-ink-muted">{formatMoney(b.price_cents)}</p>
+                        <p className="text-xs text-ink-muted">{formatMoney(b.price_cents, locale)}</p>
                       </div>
                     </li>
                   ))}

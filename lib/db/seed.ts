@@ -90,14 +90,15 @@ export function seed(): Store {
   // days from this week's Monday. e.g. wall(0, 10) → Monday 10:00 in New York.
   const wall = (dayOffset: number, hour: number, minute = 0): string => {
     const day = addDays(monday, dayOffset);
-    return new TZDate(
-      day.getFullYear(),
-      day.getMonth(),
-      day.getDate(),
-      hour,
-      minute,
-      0,
-      BRAIDER_TZ
+    // Return a UTC-Z instant (`…:00.000Z`), NOT `TZDate.toISOString()` — the latter
+    // emits an OFFSET string (`…-04:00`). The in-memory engine compares/sorts
+    // `scheduled_at` LEXICOGRAPHICALLY (lib/db/query.ts), and every runtime writer
+    // (create.ts / reschedule.ts) stores UTC-Z; mixing formats makes seeded rows
+    // sort and range-filter wrong (a booking can vanish from a week view). Collapse
+    // the zoned wall-clock to its absolute instant, then serialize as UTC-Z so the
+    // store-wide invariant documented in create.ts holds.
+    return new Date(
+      new TZDate(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute, 0, BRAIDER_TZ).getTime()
     ).toISOString();
   };
   const daysAgo = (days: number): string => {

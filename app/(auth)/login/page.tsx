@@ -2,12 +2,16 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { LoginForm } from './login-form';
 
-export const metadata: Metadata = {
-  title: 'Sign in',
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('loginTitle'),
+    robots: { index: false, follow: false }
+  };
+}
 
 export default function LoginPage() {
   const t = useTranslations('auth');

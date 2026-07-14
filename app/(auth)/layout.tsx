@@ -76,7 +76,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               map to shared sample personas. Keeps the auth screens truthful. */}
           <div className="mt-8 rounded-card border border-line bg-cream-deep/40 p-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-gold" strokeWidth={2} />
+              <Sparkles aria-hidden className="h-4 w-4 text-gold" strokeWidth={2} />
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
                 {t('demo.title')}
               </p>

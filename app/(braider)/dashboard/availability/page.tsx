@@ -1,3 +1,4 @@
+import { Clock } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
@@ -35,6 +36,7 @@ export default async function AvailabilityPage() {
   return (
     <div>
       <PageHeader
+        icon={Clock}
         title={t('availability.title')}
         description={t('availability.description')}
       />

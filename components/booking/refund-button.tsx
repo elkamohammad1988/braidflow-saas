@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { refundDepositAction } from '@/lib/bookings/refund';
 import { Spinner } from '@/components/ui/spinner';
 import { formatMoney, cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ export function RefundDepositButton({
   className
 }: Props) {
   const t = useTranslations('bookingActions');
+  const locale = useLocale();
   const { confirming, setConfirming, pending, error, run, triggerRef, confirmRef } =
     useConfirmAction<true>(() => refundDepositAction(bookingId));
 
@@ -43,7 +44,7 @@ export function RefundDepositButton({
     <div className="flex flex-col items-end gap-1">
       <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm">
         <span className="text-ink-muted">
-          {t('refundConfirm', { amount: formatMoney(depositCents) })}
+          {t('refundConfirm', { amount: formatMoney(depositCents, locale) })}
         </span>
         <button
           ref={confirmRef}

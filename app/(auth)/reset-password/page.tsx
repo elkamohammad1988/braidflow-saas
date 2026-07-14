@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { KeyRound } from 'lucide-react';
 import { GlassIcon } from '@/components/ui/glass-icon';
 import { isEmailConfigured } from '@/lib/email/config';
 import { ResetPasswordForm } from './reset-password-form';
 
-export const metadata: Metadata = {
-  title: 'Set a new password',
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('resetPasswordTitle'),
+    robots: { index: false, follow: false }
+  };
+}
 
 export default function ResetPasswordPage() {
   const t = useTranslations('auth');

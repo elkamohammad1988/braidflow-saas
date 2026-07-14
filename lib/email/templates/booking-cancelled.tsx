@@ -17,7 +17,7 @@ export const cancelledSubject = (p: CancelledProps) =>
     : `${p.otherPartyName} cancelled their appointment`;
 
 export function BookingCancelledEmail(p: CancelledProps) {
-  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.scheduledAt,
     p.timeZone
   )}`;
@@ -26,7 +26,7 @@ export function BookingCancelledEmail(p: CancelledProps) {
 
   return (
     <EmailShell
-      preview={`Cancelled: ${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d')}`}
+      preview={`Cancelled: ${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d', 'en')}`}
     >
       <H1>{headline}</H1>
 

@@ -8,12 +8,13 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDuration, formatMoney } from '@/lib/utils';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function ServicesPage() {
   const { user } = await requireBraider();
   const database = db();
   const t = await getTranslations('dashboard');
+  const locale = await getLocale();
 
   const { data: services, error } = await database
     .from('services')
@@ -26,6 +27,7 @@ export default async function ServicesPage() {
   return (
     <div>
       <PageHeader
+        icon={Scissors}
         title={t('services.title')}
         description={t('services.description')}
         action={
@@ -60,11 +62,11 @@ export default async function ServicesPage() {
                     <p className="mt-1 break-words text-sm text-ink-muted">{s.description}</p>
                   )}
                   <p className="mt-2 text-xs text-ink-muted">
-                    {formatDuration(s.duration_minutes)} · {t('services.depositLabel')} {formatMoney(s.deposit_cents)}
+                    {formatDuration(s.duration_minutes, locale)} · {t('services.depositLabel')} {formatMoney(s.deposit_cents, locale)}
                   </p>
                 </div>
                 <div className="shrink-0 text-end">
-                  <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents)}</p>
+                  <p className="font-display text-lg tabular-nums text-ink">{formatMoney(s.price_cents, locale)}</p>
                   <Link
                     href={`/dashboard/services/${s.id}`}
                     className="mt-2 inline-flex min-h-[44px] items-center text-sm text-ink-muted hover:text-ink"

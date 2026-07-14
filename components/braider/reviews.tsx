@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 import { Star } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
 import { db } from '@/lib/db/server';
+import { dateFnsLocale } from '@/lib/date-locale';
 import { cn } from '@/lib/utils';
 
 const MAX_VISIBLE = 6;
@@ -22,6 +23,7 @@ export async function BraiderReviews({
   if (count === 0) return null;
 
   const t = await getTranslations('profile');
+  const locale = await getLocale();
   const database = db();
   const avgDisplay = avg.toFixed(1);
 
@@ -55,7 +57,7 @@ export async function BraiderReviews({
             )}
             <figcaption className="mt-4 text-xs text-ink-muted">
               {r.client?.full_name?.split(' ')[0] ?? t('clientFallback')} ·{' '}
-              {format(new Date(r.created_at), 'MMM yyyy')}
+              {format(new Date(r.created_at), 'MMM yyyy', { locale: dateFnsLocale(locale) })}
             </figcaption>
           </figure>
         ))}

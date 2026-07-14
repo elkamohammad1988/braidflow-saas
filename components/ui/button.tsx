@@ -20,7 +20,7 @@ const variants: Record<Variant, string> = {
     'bg-paper text-ink border border-line-strong shadow-card hover:-translate-y-[1px] hover:border-clay/45 hover:bg-onyx-soft hover:shadow-lifted active:translate-y-0',
   ghost: 'text-ink-muted hover:bg-clay/10 hover:text-ink',
   danger:
-    'bg-gradient-to-b from-danger-strong to-danger-bright text-white shadow-[0_1px_0_rgba(255,235,230,0.25)_inset,0_8px_24px_-8px_rgb(var(--color-danger-bright)/0.5),0_2px_8px_-2px_rgb(var(--color-danger)/0.45)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0'
+    'bg-gradient-to-b from-danger-strong to-danger-bright text-on-accent shadow-[0_1px_0_rgba(255,235,230,0.25)_inset,0_8px_24px_-8px_rgb(var(--color-danger-bright)/0.5),0_2px_8px_-2px_rgb(var(--color-danger)/0.45)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-0'
 };
 
 // Compacted ~20%: tighter horizontal padding, 40px default target.

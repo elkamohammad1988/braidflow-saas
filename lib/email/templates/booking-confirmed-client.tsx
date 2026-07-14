@@ -25,13 +25,13 @@ export const confirmedClientSubject = (p: ConfirmedClientProps) =>
   `You're booked with ${p.businessName}`;
 
 export function BookingConfirmedClientEmail(p: ConfirmedClientProps) {
-  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.scheduledAt,
     p.timeZone
   )}`;
   return (
     <EmailShell
-      preview={`${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d')} — confirmed`}
+      preview={`${p.serviceName} on ${formatInZone(p.scheduledAt, p.timeZone, 'MMM d', 'en')} — confirmed`}
     >
       <H1>You're on the books.</H1>
       <P>
@@ -44,10 +44,10 @@ export function BookingConfirmedClientEmail(p: ConfirmedClientProps) {
       <DetailRow label="Service" value={p.serviceName} />
       <DetailRow label="When" value={whenLabel} />
       <DetailRow label="Braider" value={p.businessName} />
-      <DetailRow label="Deposit paid" value={formatMoney(p.depositCents)} />
+      <DetailRow label="Deposit paid" value={formatMoney(p.depositCents, 'en')} />
       <DetailRow
         label="Balance at appointment"
-        value={formatMoney(p.priceCents - p.depositCents)}
+        value={formatMoney(p.priceCents - p.depositCents, 'en')}
       />
 
       <Divider />

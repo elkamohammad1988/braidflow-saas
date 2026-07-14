@@ -1,5 +1,6 @@
 import { TZDate } from '@date-fns/tz';
 import { format, isToday, isTomorrow } from 'date-fns';
+import { dateFnsLocale } from './date-locale';
 
 // All appointment times are displayed in the BRAIDER's timezone — that's where
 // the appointment physically happens — regardless of where the viewer is. These
@@ -12,8 +13,13 @@ function zoned(instant: Date | string, timeZone: string): TZDate {
 }
 
 /** Format an absolute instant using a specific IANA zone's wall clock. */
-export function formatInZone(instant: Date | string, timeZone: string, fmt: string): string {
-  return format(zoned(instant, timeZone), fmt);
+export function formatInZone(
+  instant: Date | string,
+  timeZone: string,
+  fmt: string,
+  locale: string
+): string {
+  return format(zoned(instant, timeZone), fmt, { locale: dateFnsLocale(locale) });
 }
 
 /** Short zone abbreviation for an instant, DST-aware (e.g. "EST", "PDT"). */
@@ -25,18 +31,29 @@ export function zoneAbbreviation(instant: Date | string, timeZone: string): stri
   return part?.value ?? '';
 }
 
-export function relativeDayLabel(instant: Date | string, timeZone: string) {
+// The literal 'Today'/'Tomorrow' words these helpers emit are the only strings
+// not covered by date-fns, so they're translated here (rather than via a message
+// file). Any unknown locale falls back to English.
+const RELATIVE_DAY_LABELS: Record<string, { today: string; tomorrow: string }> = {
+  en: { today: 'Today', tomorrow: 'Tomorrow' },
+  fr: { today: "Aujourd'hui", tomorrow: 'Demain' },
+  ar: { today: 'اليوم', tomorrow: 'غدًا' },
+  es: { today: 'Hoy', tomorrow: 'Mañana' },
+  'zh-CN': { today: '今天', tomorrow: '明天' }
+};
+
+export function relativeDayLabel(instant: Date | string, timeZone: string, locale: string) {
   const d = zoned(instant, timeZone);
+  const labels = RELATIVE_DAY_LABELS[locale] ?? { today: 'Today', tomorrow: 'Tomorrow' };
   // isToday/isTomorrow compare against "now" in the same (zoned) context.
-  if (isToday(d)) return 'Today';
-  if (isTomorrow(d)) return 'Tomorrow';
-  return format(d, 'EEE, MMM d');
+  if (isToday(d)) return labels.today;
+  if (isTomorrow(d)) return labels.tomorrow;
+  return format(d, 'EEE, MMM d', { locale: dateFnsLocale(locale) });
 }
 
-export function formatAppointment(instant: Date | string, timeZone: string) {
+export function formatAppointment(instant: Date | string, timeZone: string, locale: string) {
   const d = zoned(instant, timeZone);
-  return `${relativeDayLabel(instant, timeZone)} · ${format(d, 'h:mm a')} ${zoneAbbreviation(
-    instant,
-    timeZone
-  )}`;
+  return `${relativeDayLabel(instant, timeZone, locale)} · ${format(d, 'h:mm a', {
+    locale: dateFnsLocale(locale)
+  })} ${zoneAbbreviation(instant, timeZone)}`;
 }

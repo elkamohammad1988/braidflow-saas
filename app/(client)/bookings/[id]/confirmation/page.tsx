@@ -1,6 +1,7 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { SuccessCheck } from '@/components/motion/success-check';
 import { formatAppointment } from '@/lib/format-date';
 import { dbAdmin } from '@/lib/db/server';
@@ -14,6 +15,11 @@ import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { ConfirmationPoller } from './poller';
 
+// Private per-booking page reached via a signed guest token; robots.txt already
+// disallows /bookings, and this belt-and-suspenders noindex keeps it out of any
+// index even if the URL leaks.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 export default async function ConfirmationPage({
   params,
   searchParams
@@ -22,6 +28,7 @@ export default async function ConfirmationPage({
   searchParams: { redirect_status?: string; t?: string; d?: string };
 }) {
   const t = await getTranslations('confirmation');
+  const locale = await getLocale();
   const token = searchParams.t;
   // Demo: rebuild + confirm the booking onto this instance from the signed
   // snapshot if it was created/confirmed on another. No-op with real Stripe.
@@ -82,7 +89,8 @@ export default async function ConfirmationPage({
                 <dd className="text-end font-medium text-ink">
                   {formatAppointment(
                     booking.scheduled_at,
-                    booking.braiders?.timezone ?? DEFAULT_TIMEZONE
+                    booking.braiders?.timezone ?? DEFAULT_TIMEZONE,
+                    locale
                   )}
                 </dd>
               </div>
@@ -92,13 +100,13 @@ export default async function ConfirmationPage({
                   {t('depositPaid')}
                 </dt>
                 <dd className="font-display text-base font-medium text-ink">
-                  {formatMoney(booking.deposit_cents)}
+                  {formatMoney(booking.deposit_cents, locale)}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <dt className="text-ink-muted">{t('balanceAtAppointment')}</dt>
                 <dd className="text-ink">
-                  {formatMoney(booking.price_cents - booking.deposit_cents)}
+                  {formatMoney(booking.price_cents - booking.deposit_cents, locale)}
                 </dd>
               </div>
             </div>

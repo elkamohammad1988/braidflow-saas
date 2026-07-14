@@ -1,15 +1,30 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import Image from 'next/image';
 import { IMAGE_BLUR, galleryForBraider } from '@/lib/media';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight, Star } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/lib/db/server';
 import { Button } from '@/components/ui/button';
 import { BraiderReviews } from '@/components/braider/reviews';
 import { JsonLd } from '@/components/shared/json-ld';
 import { formatDuration, formatMoney } from '@/lib/utils';
+
+// One fetch per request, shared by generateMetadata and the page body via React
+// `cache()` — `generateMetadata` and the component run in the same request, so
+// this collapses what were two identical-key `braiders` reads into one. The
+// select is the page's superset (metadata just reads a subset of the columns).
+const getBraiderBySlug = cache((slug: string) =>
+  db()
+    .from('braiders')
+    .select(
+      'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, charges_enabled, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
+    )
+    .eq('slug', slug)
+    .maybeSingle()
+);
 
 // Intent: ISR this public profile every 60s. Note it is currently INERT — the
 // app resolves locale from a cookie in the root layout (i18n/request.ts reads
@@ -23,19 +38,17 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const database = db();
-  const { data: braider } = await database
-    .from('braiders')
-    .select('business_name, bio, city, hero_image_url')
-    .eq('slug', params.slug)
-    .maybeSingle();
+  const t = await getTranslations('meta');
+  const { data: braider } = await getBraiderBySlug(params.slug);
 
-  if (!braider) return { title: 'Braider not found' };
+  if (!braider) return { title: t('braiderNotFound') };
 
-  const title = `${braider.business_name} — Book braids${braider.city ? ` in ${braider.city}` : ''}`;
+  const title = braider.city
+    ? t('braiderProfileTitleInCity', { name: braider.business_name, city: braider.city })
+    : t('braiderProfileTitle', { name: braider.business_name });
   const description =
     braider.bio?.slice(0, 155) ??
-    `Book ${braider.business_name} for braids and protective styles. Real-time availability — a deposit holds your slot.`;
+    t('braiderProfileDescription', { name: braider.business_name });
 
   return {
     title,
@@ -45,24 +58,22 @@ export async function generateMetadata({
       title,
       description,
       type: 'profile',
-      images: braider.hero_image_url ? [{ url: braider.hero_image_url }] : undefined
+      images: braider.hero_image_url
+        ? [{ url: braider.hero_image_url, alt: braider.business_name }]
+        : undefined
     }
   };
 }
 
 export default async function BraiderProfile({ params }: { params: { slug: string } }) {
   const t = await getTranslations('profile');
-  const database = db();
-  const { data: braider, error } = await database
-    .from('braiders')
-    .select(
-      'id, slug, business_name, bio, city, hero_image_url, instagram_handle, accepting_bookings, charges_enabled, services(id, name, description, duration_minutes, price_cents, deposit_cents, is_active)'
-    )
-    .eq('slug', params.slug)
-    .maybeSingle();
+  const locale = await getLocale();
+  const { data: braider, error } = await getBraiderBySlug(params.slug);
 
   if (error) throw error;
   if (!braider) notFound();
+
+  const database = db();
 
   const services = (braider.services ?? []).filter((s) => s.is_active);
   // Bookable only when accepting AND Stripe can take charges for them.
@@ -93,7 +104,7 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
           ? { address: { '@type': 'PostalAddress', addressLocality: braider.city } }
           : {}),
         ...(prices.length
-          ? { priceRange: `${formatMoney(Math.min(...prices))}–${formatMoney(Math.max(...prices))}` }
+          ? { priceRange: `${formatMoney(Math.min(...prices), locale)}–${formatMoney(Math.max(...prices), locale)}` }
           : {}),
         ...(reviewCount
           ? {
@@ -289,13 +300,13 @@ export default async function BraiderProfile({ params }: { params: { slug: strin
                     )}
                     <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
                       {t('durationDeposit', {
-                        duration: formatDuration(s.duration_minutes),
-                        deposit: formatMoney(s.deposit_cents)
+                        duration: formatDuration(s.duration_minutes, locale),
+                        deposit: formatMoney(s.deposit_cents, locale)
                       })}
                     </p>
                   </div>
                   <p className="shrink-0 font-display text-xl font-medium tabular-nums text-ink">
-                    {formatMoney(s.price_cents)}
+                    {formatMoney(s.price_cents, locale)}
                   </p>
                 </li>
               ))}

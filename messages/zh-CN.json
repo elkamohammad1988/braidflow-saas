@@ -6,6 +6,7 @@
     "dashboard": "仪表板",
     "myBookings": "我的预约",
     "viewSite": "查看网站",
+    "home": "首页",
     "language": "语言",
     "theme": {
       "switchToDark": "切换到深色模式",
@@ -680,6 +681,12 @@
     "securedByStripe": "支付由 Stripe 保障"
   },
   "booking": {
+    "validation": {
+      "service": "请选择一项服务以继续。",
+      "time": "请为你的预约选择时间。",
+      "name": "请输入你的姓名，让编发师知道是谁预约。",
+      "email": "请输入有效的邮箱——确认信息将发送到这里。"
+    },
     "anythingHeading": "有什么需要我们知道的",
     "balanceAtAppointment": "余款于预约时支付",
     "bookAppointment": "预约你的服务",
@@ -963,5 +970,24 @@
       "continue": "继续",
       "connect": "连接 Stripe"
     }
+  },
+  "meta": {
+    "loginTitle": "登录",
+    "signupTitle": "创建你的账户",
+    "forgotPasswordTitle": "重置你的密码",
+    "resetPasswordTitle": "设置新密码",
+    "braidersTitle": "寻找编发师",
+    "braidersDescription": "浏览编发师和保护性发型造型师，查看实时档期。搜索你的城市、比较，用一笔定金锁定你的时段。",
+    "bookTitle": "预约服务",
+    "braiderNotFound": "未找到编发师",
+    "braiderProfileTitle": "{name} — 预约编发",
+    "braiderProfileTitleInCity": "{name} — 在{city}预约编发",
+    "braiderProfileDescription": "预约 {name} 做编发和保护性发型。实时档期——一笔定金即可锁定你的时段。",
+    "pricingTitle": "价格",
+    "pricingDescription": "BraidFlow 在测试期间免费。没有月费，我们不抽取你定金的任何比例——你留 100%。",
+    "termsTitle": "服务条款",
+    "termsDescription": "在你作为预约客户或接受预约的编发师使用 BraidFlow 时所适用的条款。",
+    "privacyTitle": "隐私政策",
+    "privacyDescription": "BraidFlow 在你预约或接受预约时如何收集、使用和保护你的信息。"
   }
 }
