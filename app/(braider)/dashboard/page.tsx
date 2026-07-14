@@ -32,7 +32,7 @@ import { formatMoney } from '@/lib/utils';
 import { InitialsAvatar } from '@/components/shared/initials-avatar';
 import { formatAppointment, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function DashboardOverview({
   searchParams
@@ -42,6 +42,7 @@ export default async function DashboardOverview({
   const { user, profile } = await requireBraider();
   const database = db();
   const t = await getTranslations('dashboard');
+  const locale = await getLocale();
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -174,13 +175,13 @@ export default async function DashboardOverview({
           tone="ink"
           label={t('overview.stats.bookedThisWeek')}
           value={upcomingThisWeek.length.toString()}
-          hint={`${formatInZone(weekStart, tz, 'MMM d')} – ${formatInZone(weekEnd, tz, 'MMM d')}`}
+          hint={`${formatInZone(weekStart, tz, 'MMM d', locale)} – ${formatInZone(weekEnd, tz, 'MMM d', locale)}`}
         />
         <Stat
           icon={Wallet}
           tone="moss"
           label={t('overview.stats.revenueThisMonth')}
-          value={formatMoney(monthRevenue)}
+          value={formatMoney(monthRevenue, locale)}
           hint={t('overview.stats.revenueHint')}
         />
         <Stat
@@ -230,7 +231,7 @@ export default async function DashboardOverview({
                   <p className="truncate text-sm text-ink-muted">{b.services?.name}</p>
                 </div>
                 <div className="hidden text-end sm:block">
-                  <p className="text-sm text-ink">{formatAppointment(b.scheduled_at, tz)}</p>
+                  <p className="text-sm text-ink">{formatAppointment(b.scheduled_at, tz, locale)}</p>
                 </div>
                 <Badge tone={b.status === 'confirmed' ? 'success' : 'warning'} dot>
                   {b.status === 'confirmed' ? t('status.confirmed') : t('status.deposit')}

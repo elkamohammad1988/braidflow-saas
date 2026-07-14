@@ -1,7 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn, formatDuration, formatMoney } from '@/lib/utils';
 
 export type Service = {
@@ -21,6 +21,7 @@ type Props = {
 
 export function ServiceList({ services, selectedId, onSelect }: Props) {
   const t = useTranslations('booking');
+  const locale = useLocale();
   return (
     <ul className="space-y-2.5">
       {services.map((s) => {
@@ -60,13 +61,13 @@ export function ServiceList({ services, selectedId, onSelect }: Props) {
                   )}
                   <p className="mt-2 ps-6 text-xs text-ink-subtle">
                     {t('durationDeposit', {
-                      duration: formatDuration(s.duration_minutes),
-                      deposit: formatMoney(s.deposit_cents)
+                      duration: formatDuration(s.duration_minutes, locale),
+                      deposit: formatMoney(s.deposit_cents, locale)
                     })}
                   </p>
                 </div>
                 <p className="shrink-0 font-display text-lg tabular-nums text-ink">
-                  {formatMoney(s.price_cents)}
+                  {formatMoney(s.price_cents, locale)}
                 </p>
               </div>
             </button>

@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { SignupForm } from './signup-form';
 
-export const metadata: Metadata = {
-  title: 'Create your account',
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('signupTitle'),
+    robots: { index: false, follow: false }
+  };
+}
 
 type SearchParams = { role?: string };
 

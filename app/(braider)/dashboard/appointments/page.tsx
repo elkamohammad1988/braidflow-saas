@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { isPast } from 'date-fns';
-import { CalendarPlus } from 'lucide-react';
+import { CalendarPlus, CalendarCheck } from 'lucide-react';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
 import { PageHeader } from '@/components/shared/page-header';
@@ -14,7 +14,7 @@ import { formatMoney } from '@/lib/utils';
 import { relativeDayLabel, formatInZone } from '@/lib/format-date';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { depositStateFromPayments, DEPOSIT_LABEL_KEY } from '@/lib/payments/status';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 const TONE = {
   pending_payment: 'warning',
@@ -102,6 +102,7 @@ export default async function AppointmentsPage() {
   const database = db();
   const t = await getTranslations('dashboard');
   const td = await getTranslations('deposit');
+  const locale = await getLocale();
 
   const { data: braiderRow } = await database
     .from('braiders')
@@ -127,7 +128,7 @@ export default async function AppointmentsPage() {
 
   return (
     <div>
-      <PageHeader title={t('appointments.title')} description={t('appointments.description')} />
+      <PageHeader icon={CalendarCheck} title={t('appointments.title')} description={t('appointments.description')} />
 
       <div className="mt-6">
         {!appointments || appointments.length === 0 ? (
@@ -165,10 +166,10 @@ export default async function AppointmentsPage() {
                       <tr key={a.id} className="transition-colors hover:bg-ink/[0.04]">
                         <td className="px-5 py-3">
                           <p className="font-medium text-ink">
-                            {relativeDayLabel(a.scheduled_at, tz)}
+                            {relativeDayLabel(a.scheduled_at, tz, locale)}
                           </p>
                           <p className="text-xs tabular-nums text-ink-muted">
-                            {formatInZone(a.scheduled_at, tz, 'h:mm a')}
+                            {formatInZone(a.scheduled_at, tz, 'h:mm a', locale)}
                           </p>
                         </td>
                         <td className="px-5 py-3">
@@ -182,7 +183,7 @@ export default async function AppointmentsPage() {
                         <td className="px-5 py-3 text-ink-muted">{a.services?.name}</td>
                         <td className="px-5 py-3">{statusBadges(status, deposit, t, td)}</td>
                         <td className="px-5 py-3 text-end tabular-nums text-ink">
-                          {formatMoney(a.price_cents)}
+                          {formatMoney(a.price_cents, locale)}
                         </td>
                         <td className="px-5 py-3 text-end">
                           {bookingActions(a, status, upcoming, deposit, t)}
@@ -210,14 +211,14 @@ export default async function AppointmentsPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-medium text-ink">
-                          {relativeDayLabel(a.scheduled_at, tz)}
+                          {relativeDayLabel(a.scheduled_at, tz, locale)}
                         </p>
                         <p className="text-xs tabular-nums text-ink-muted">
-                          {formatInZone(a.scheduled_at, tz, 'h:mm a')}
+                          {formatInZone(a.scheduled_at, tz, 'h:mm a', locale)}
                         </p>
                       </div>
                       <p className="shrink-0 font-medium tabular-nums text-ink">
-                        {formatMoney(a.price_cents)}
+                        {formatMoney(a.price_cents, locale)}
                       </p>
                     </div>
 

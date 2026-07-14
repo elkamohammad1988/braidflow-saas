@@ -93,7 +93,12 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4">
+      {/* Announce the in-flight submit to screen readers — the disabled button
+          drops focus and the label swap lives in no live region. */}
+      <span role="status" className="sr-only">
+        {pending ? t('forgot.sendingLink') : ''}
+      </span>
       <Input name="email" type="email" label={t('forgot.form.email')} autoComplete="email" required />
       {error && (
         <p role="alert" className="text-sm text-danger">

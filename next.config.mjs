@@ -10,9 +10,18 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 // framing (clickjacking) and plugins, and locks <base>/form targets. Stripe and
 // Sentry hosts are allow-listed so switching on real payments/monitoring works
 // without loosening the policy.
+const isDev = process.env.NODE_ENV === 'development';
+
+// React Fast Refresh (HMR) evaluates strings as JavaScript in `next dev`, which
+// needs 'unsafe-eval'. Add it in development ONLY — production must never ship
+// 'unsafe-eval'.
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com"
+  : "script-src 'self' 'unsafe-inline' https://js.stripe.com";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://*.stripe.com",
   "font-src 'self' data:",
@@ -71,7 +80,17 @@ const nextConfig = {
     instrumentationHook: true
   },
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // The guest booking pages carry a capability token in the URL (`?t=…`).
+      // The global `strict-origin-when-cross-origin` already keeps the query
+      // string from crossing origins; pin these routes to `no-referrer` so the
+      // token can't leak in a Referer at all (same-origin or downgrade included).
+      {
+        source: '/bookings/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }]
+      }
+    ];
   }
 };
 

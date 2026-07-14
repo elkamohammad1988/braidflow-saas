@@ -87,6 +87,11 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
     scheduledAt: new Date(booking.scheduled_at),
     now: new Date()
   });
+  // Whether money was actually at stake. An unpaid hold has no charged deposit,
+  // so its cancellation must NOT be logged as a "forfeit" — that would be
+  // misleading chargeback-defense evidence. Starts from the read status and is
+  // flipped true only if the PI-cancel race path below finds the deposit charged.
+  let depositCharged = deposit?.status === 'succeeded';
 
   async function settleChargedDeposit(d: RefundDecision) {
     if (!d.refund) return; // forfeit — braider keeps the deposit per policy
@@ -96,6 +101,15 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
       // support can settle it manually rather than silently keeping the money.
       log.error('auto-refund failed', { bookingId, error: outcome.error });
       captureException(new Error('Auto-refund on cancellation failed'), {
+        bookingId,
+        stage: 'cancel.refund'
+      });
+    } else if ('skipped' in outcome && outcome.skipped !== 'already_refunded') {
+      // Policy said refund and the deposit was charged, yet nothing settled — an
+      // unexpected reconciliation gap. Alert so support settles it manually rather
+      // than the client silently losing the deposit.
+      log.error('auto-refund skipped unexpectedly', { bookingId, skipped: outcome.skipped });
+      captureException(new Error('Auto-refund on cancellation skipped'), {
         bookingId,
         stage: 'cancel.refund'
       });
@@ -116,12 +130,31 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
         await stripe.paymentIntents.cancel(deposit.stripe_payment_intent_id);
         await admin.from('payments').update({ status: 'failed' }).eq('id', deposit.id);
       } catch (err) {
-        // Stripe rejects the cancel when the intent already succeeded — i.e. the
-        // client paid in the race window. The deposit is now charged, so apply the
-        // refund policy to it.
-        log.error('PI cancel failed, settling charged deposit', { bookingId, ...errorInfo(err) });
-        await settleChargedDeposit(decision);
-        captureException(err, { bookingId, stage: 'cancel.settle' });
+        // Stripe rejects a cancel when the intent already succeeded — i.e. the
+        // client paid in the race window. Don't assume, though: a transient API
+        // error throws the same way. Confirm the intent's real state, and only
+        // treat the deposit as charged when Stripe says it truly succeeded.
+        log.error('PI cancel failed, reconciling intent state', { bookingId, ...errorInfo(err) });
+        let charged = false;
+        try {
+          const intent = await stripe.paymentIntents.retrieve(deposit.stripe_payment_intent_id);
+          charged = intent.status === 'succeeded';
+        } catch (retrieveErr) {
+          captureException(retrieveErr, { bookingId, stage: 'cancel.reconcile' });
+        }
+        if (charged) {
+          // The deposit really was collected in the race window. Reconcile the
+          // local row — the payment_intent.succeeded webhook may not have landed
+          // yet, and issueDepositRefund guards on a `succeeded` deposit — then
+          // settle per policy. The refund stays idempotent on its stable key.
+          depositCharged = true;
+          await admin.from('payments').update({ status: 'succeeded' }).eq('id', deposit.id);
+          await settleChargedDeposit(decision);
+        } else {
+          // Cancel failed for another reason and the intent is NOT charged —
+          // surface it loudly rather than fabricating a charge or a refund.
+          captureException(err, { bookingId, stage: 'cancel.settle' });
+        }
       }
     }
   }
@@ -136,11 +169,18 @@ export async function cancelBookingAction(bookingId: string, token?: string) {
       cancelled_by: cancelledBy,
       previous_status: booking.status,
       scheduled_at: booking.scheduled_at,
-      // Record the policy outcome — this is the evidence trail for chargeback
-      // defense when a within-window cancellation forfeits the deposit.
-      deposit_refunded: decision.refund,
-      refund_reason: decision.reason,
-      refund_window_hours: decision.windowHours
+      // Record the policy outcome only when a deposit was actually charged — it's
+      // the evidence trail for chargeback defense when a within-window
+      // cancellation forfeits the deposit. For an unpaid hold nothing was at
+      // stake, so log that instead of a spurious "forfeit".
+      ...(depositCharged
+        ? {
+            deposit_charged: true,
+            deposit_refunded: decision.refund,
+            refund_reason: decision.reason,
+            refund_window_hours: decision.windowHours
+          }
+        : { deposit_charged: false })
     }
   });
 

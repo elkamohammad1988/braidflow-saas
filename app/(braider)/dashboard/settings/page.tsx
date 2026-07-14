@@ -1,3 +1,4 @@
+import { Settings } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { requireBraider } from '@/lib/auth/session';
 import { db } from '@/lib/db/server';
@@ -31,7 +32,7 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title={t('settings.title')} description={t('settings.description')} />
+      <PageHeader icon={Settings} title={t('settings.title')} description={t('settings.description')} />
 
       {bookingUrl && (
         <Card className="mt-6">

@@ -6,8 +6,9 @@ import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Card, CardBody } from '@/components/ui/card';
 import { formatMoney } from '@/lib/utils';
+import { dateFnsLocale } from '@/lib/date-locale';
 import { InitialsAvatar } from '@/components/shared/initials-avatar';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 type ClientRow = {
   id: string;
@@ -23,6 +24,7 @@ export default async function ClientsPage() {
   const { user } = await requireBraider();
   const database = db();
   const t = await getTranslations('dashboard');
+  const locale = await getLocale();
 
   const { data: bookings, error } = await database
     .from('bookings')
@@ -83,7 +85,7 @@ export default async function ClientsPage() {
 
   return (
     <div>
-      <PageHeader title={t('clients.title')} description={t('clients.description')} />
+      <PageHeader icon={Users} title={t('clients.title')} description={t('clients.description')} />
 
       <div className="mt-6 space-y-3">
         {clients.length === 0 ? (
@@ -95,27 +97,31 @@ export default async function ClientsPage() {
         ) : (
           clients.map((c) => (
             <Card key={c.id} className="transition-colors duration-300 hover:border-clay/25">
-              <CardBody className="flex items-center gap-4">
-                <InitialsAvatar name={c.name} size="lg" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-ink">{c.name}</p>
-                  {c.phone && (
-                    <p className="truncate text-sm tabular-nums text-ink-muted">{c.phone}</p>
-                  )}
+              <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                <div className="flex min-w-0 flex-1 items-center gap-4">
+                  <InitialsAvatar name={c.name} size="lg" />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-ink">{c.name}</p>
+                    {c.phone && (
+                      <p className="truncate text-sm tabular-nums text-ink-muted">{c.phone}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="min-w-0 text-end text-sm text-ink-muted">
+                <div className="min-w-0 ps-16 text-start text-sm text-ink-muted sm:ps-0 sm:text-end">
                   {c.visits > 0 ? (
                     <>
                       <p className="tabular-nums">
                         {t('clients.visits', { count: c.visits })} ·{' '}
                         <span className="font-medium text-ink">
-                          {formatMoney(c.lifetimeCents)}
+                          {formatMoney(c.lifetimeCents, locale)}
                         </span>{' '}
                         {t('clients.lifetime')}
                       </p>
                       {c.lastVisit && (
                         <p className="mt-0.5 text-xs tabular-nums">
-                          {t('clients.lastSeen', { date: format(c.lastVisit, 'MMM d, yyyy') })}
+                          {t('clients.lastSeen', {
+                            date: format(c.lastVisit, 'MMM d, yyyy', { locale: dateFnsLocale(locale) })
+                          })}
                         </p>
                       )}
                     </>

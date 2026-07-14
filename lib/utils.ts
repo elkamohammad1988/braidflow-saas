@@ -6,19 +6,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatMoney(cents: number, currency = CURRENCY_DISPLAY) {
-  return new Intl.NumberFormat('en-US', {
+export function formatMoney(cents: number, locale: string, currency = CURRENCY_DISPLAY) {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: cents % 100 === 0 ? 0 : 2
   }).format(cents / 100);
 }
 
-export function formatDuration(minutes: number) {
-  if (minutes < 60) return `${minutes} min`;
+export function formatDuration(minutes: number, locale: string) {
+  const unit = (value: number, u: 'hour' | 'minute') =>
+    new Intl.NumberFormat(locale, { style: 'unit', unit: u, unitDisplay: 'short' }).format(value);
+  if (minutes < 60) return unit(minutes, 'minute');
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m === 0 ? `${h} hr` : `${h} hr ${m} min`;
+  return m === 0 ? unit(h, 'hour') : `${unit(h, 'hour')} ${unit(m, 'minute')}`;
 }
 
 /** Up-to-two-letter monogram from a name, for avatar fallbacks. */

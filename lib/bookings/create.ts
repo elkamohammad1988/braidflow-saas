@@ -12,6 +12,7 @@ import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { CURRENCY } from '@/lib/constants';
 import { isSlotBookable } from './slot-check';
 import { fetchOverlapBookings } from './overlap';
+import { expireStaleHolds } from './expire-holds';
 import { createBookingSchema, type CreateBookingInput } from './validation';
 import { generateGuestToken } from './guest-token';
 
@@ -95,6 +96,12 @@ export async function createBookingAction(input: CreateBookingInput) {
     return { error: 'This braider hasn\'t finished setting up payments yet. Please check back soon.' };
   }
   const connectedAccountId = braider.stripe_account_id;
+
+  // Release this braider's abandoned holds before the overlap check so an
+  // expired hold (client never paid) can't block a real booking until the daily
+  // cron runs. Reuses the cron's exact safe logic (cancels the PI first in real
+  // mode), so a hold whose payment actually landed is never released here.
+  await expireStaleHolds(admin, { braiderId: service.braider_id, limit: 20 });
 
   // Pull the braider's bookings around the requested day for the overlap check
   // (see fetchOverlapBookings for the zone-boundary padding rationale).

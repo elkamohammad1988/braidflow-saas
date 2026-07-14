@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { LegalShell, LegalSection } from '@/components/shared/legal';
 
-export const metadata: Metadata = {
-  title: 'Terms of Service',
-  description:
-    'The terms that govern your use of BraidFlow as a client booking appointments or a braider accepting them.',
-  alternates: { canonical: '/terms' }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('termsTitle'),
+    description: t('termsDescription'),
+    alternates: { canonical: '/terms' }
+  };
+}
 
 export default function TermsPage() {
   const t = useTranslations('legal');

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -11,6 +12,11 @@ import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { RescheduleFlow } from './reschedule-flow';
 
 const WINDOW_DAYS = 28;
+
+// Private per-booking page reached via a signed guest token; robots.txt already
+// disallows /bookings, and this belt-and-suspenders noindex keeps it out of any
+// index even if the URL leaks.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function ReschedulePage({
   params,
@@ -117,7 +123,7 @@ export default async function ReschedulePage({
       </Link>
 
       <div className="mt-6">
-        <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink-muted">
+        <p className="text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">
           {t('rescheduleLabel')}
         </p>
         <h1 className="mt-2 font-display text-4xl text-ink">{t('pickNewTime')}</h1>

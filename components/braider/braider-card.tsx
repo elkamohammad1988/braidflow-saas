@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, MapPin, Star } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { IMAGE_BLUR } from '@/lib/media';
 import { formatMoney } from '@/lib/utils';
@@ -26,6 +26,7 @@ export function BraiderCard({
   reviewCount = 0
 }: Props) {
   const t = useTranslations('directory');
+  const locale = useLocale();
   return (
     <Link href={`/braiders/${slug}`} className="group block rounded-card">
       <Card interactive className="overflow-hidden">
@@ -69,7 +70,7 @@ export function BraiderCard({
           )}
           {startingFromCents != null && (
             <span className="absolute end-3 top-3 rounded-full bg-paper/95 px-2.5 py-1 font-mono text-[11px] font-semibold text-ink shadow-card ring-1 ring-gold/20 backdrop-blur">
-              {t('fromPrice', { price: formatMoney(startingFromCents) })}
+              {t('fromPrice', { price: formatMoney(startingFromCents, locale) })}
             </span>
           )}
         </div>

@@ -52,10 +52,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Mobile top bar + scrollable nav */}
       <header className="sticky top-0 z-30 border-b border-line bg-cream/80 backdrop-blur-xl md:hidden">
         <div className="flex h-16 items-center justify-between px-5">
-          <Link href="/" aria-label="BraidFlow home">
+          <Link href="/" aria-label={t('common.home')}>
             <Logo />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <LanguageSwitcher />
             <ThemeToggle />
             <InitialsAvatar name={profile.full_name} size="sm" fallback="B" />
             <SignOutLink />
@@ -69,7 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="mx-auto flex max-w-[1440px]">
         {/* Desktop sidebar */}
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-line bg-cream-deep/40 px-3.5 py-5 md:flex">
-          <Link href="/" aria-label="BraidFlow home" className="px-2 transition-opacity hover:opacity-80">
+          <Link href="/" aria-label={t('common.home')} className="px-2 transition-opacity hover:opacity-80">
             <Logo />
           </Link>
 

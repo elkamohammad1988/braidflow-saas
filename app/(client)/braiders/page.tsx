@@ -9,12 +9,14 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { Reveal } from '@/components/motion/reveal';
 import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Find a braider',
-  description:
-    'Browse braiders and protective-style stylists with real-time availability. Search your city, compare, and a deposit holds your slot.',
-  alternates: { canonical: '/braiders' }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('braidersTitle'),
+    description: t('braidersDescription'),
+    alternates: { canonical: '/braiders' }
+  };
+}
 
 type Sort = 'rating' | 'price' | 'newest';
 

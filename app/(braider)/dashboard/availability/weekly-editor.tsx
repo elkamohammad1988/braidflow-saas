@@ -49,6 +49,17 @@ export function WeeklyEditor({ rules }: { rules: Rule[] }) {
 function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule[] }) {
   const t = useTranslations('dashboard');
   const [adding, setAdding] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  // The add-form moves focus into itself on open; when it closes it unmounts and
+  // the trigger re-mounts, so return focus there instead of dropping to <body>.
+  // Guarded by a ref so it only fires after a close, never on initial mount.
+  const restoreFocus = useRef(false);
+  useEffect(() => {
+    if (!adding && restoreFocus.current) {
+      addButtonRef.current?.focus();
+      restoreFocus.current = false;
+    }
+  }, [adding]);
   return (
     <div className="py-4">
       <div className="flex items-center justify-between gap-4">
@@ -63,6 +74,7 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
         </div>
         {!adding && (
           <button
+            ref={addButtonRef}
             type="button"
             onClick={() => setAdding(true)}
             className="shrink-0 text-sm font-medium text-ink hover:underline underline-offset-4"
@@ -75,7 +87,10 @@ function DayRow({ day, label, rules }: { day: number; label: string; rules: Rule
       {adding && (
         <AddRangeForm
           day={day}
-          onDone={() => setAdding(false)}
+          onDone={() => {
+            restoreFocus.current = true;
+            setAdding(false);
+          }}
         />
       )}
     </div>
@@ -135,7 +150,7 @@ function AddRangeForm({ day, onDone }: { day: number; onDone: () => void }) {
   }
 
   return (
-    <div className="mt-3 flex flex-wrap items-end gap-3 ps-24">
+    <div className="mt-3 flex flex-wrap items-end gap-3 ps-0 sm:ps-24">
       <label className="text-xs text-ink-muted">
         {t('availability.from')}
         <input

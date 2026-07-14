@@ -2,14 +2,17 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { LegalShell, LegalSection } from '@/components/shared/legal';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description:
-    'How BraidFlow collects, uses, and protects your information when you book or accept appointments.',
-  alternates: { canonical: '/privacy' }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('privacyTitle'),
+    description: t('privacyDescription'),
+    alternates: { canonical: '/privacy' }
+  };
+}
 
 export default function PrivacyPage() {
   const t = useTranslations('legal');

@@ -7,6 +7,8 @@ import { recordAuditLog } from '@/lib/audit/log';
 import { rateLimit, clientIpKey } from '@/lib/rate-limit';
 import { isSlotBookable } from './slot-check';
 import { fetchOverlapBookings } from './overlap';
+import { expireStaleHolds } from './expire-holds';
+import { decideDepositRefund } from './cancellation-policy';
 import { authorizeBookingMutation } from './access';
 
 type Result =
@@ -62,6 +64,27 @@ export async function rescheduleBookingAction(
     return { error: "That's the same time as now." };
   }
 
+  // Deposit-forfeit integrity. Once a CONFIRMED booking (deposit charged) is
+  // inside the cancellation window, its deposit is at stake — cancelling now
+  // forfeits it. Allowing a client to reschedule from here to a far-future slot
+  // would let them then cancel for a full refund, defeating the no-show deposit.
+  // So a client may not reschedule a confirmed booking once inside the window;
+  // their only in-policy option is to cancel (which applies the forfeit). A
+  // braider moving their own booking, and unpaid holds (no deposit at risk), are
+  // exempt.
+  if (isClient && booking.status === 'confirmed') {
+    const { refund } = decideDepositRefund({
+      cancelledBy: 'client',
+      scheduledAt: new Date(booking.scheduled_at),
+      now: new Date()
+    });
+    if (!refund) {
+      return {
+        error: 'This appointment is too close to reschedule online. Please contact your braider to make a change.'
+      };
+    }
+  }
+
   // Re-validate the requested slot against the braider's live availability. The
   // request is fully untrusted — exactly as in createBookingAction — so we
   // re-derive bookable slots from scratch. Slot re-derivation excludes existing
@@ -81,6 +104,10 @@ export async function rescheduleBookingAction(
   if (isClient && !braider.accepting_bookings) {
     return { error: 'This braider isn\'t accepting bookings right now.' };
   }
+
+  // Release the braider's abandoned holds first (same rationale as create.ts) so
+  // the move isn't blocked by an expired hold the daily cron hasn't swept yet.
+  await expireStaleHolds(admin, { braiderId: booking.braider_id, limit: 20 });
 
   // Same padded-window overlap fetch as create.ts, excluding this booking so it
   // can't block its own move (see fetchOverlapBookings).

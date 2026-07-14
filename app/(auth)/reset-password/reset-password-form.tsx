@@ -35,7 +35,12 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} aria-busy={pending} className="space-y-4">
+      {/* Announce the in-flight submit to screen readers — the disabled button
+          drops focus and the label swap lives in no live region. */}
+      <span role="status" className="sr-only">
+        {pending ? t('reset.saving') : ''}
+      </span>
       <Input
         name="password"
         type="password"

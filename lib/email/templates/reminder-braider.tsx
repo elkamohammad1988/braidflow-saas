@@ -27,8 +27,8 @@ export const reminderBraiderSubject = (p: ReminderBraiderProps) =>
 
 export function ReminderBraiderEmail(p: ReminderBraiderProps) {
   const isSoon = p.proximity === '2h';
-  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a');
-  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const time = formatInZone(p.scheduledAt, p.timeZone, 'h:mm a', 'en');
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.scheduledAt,
     p.timeZone
   )}`;

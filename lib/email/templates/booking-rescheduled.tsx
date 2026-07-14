@@ -12,7 +12,7 @@ export type RescheduledProps = {
 };
 
 export const rescheduledSubject = (p: RescheduledProps) => {
-  const newDate = formatInZone(p.newScheduledAt, p.timeZone, "MMM d 'at' h:mm a");
+  const newDate = formatInZone(p.newScheduledAt, p.timeZone, "MMM d 'at' h:mm a", 'en');
   return p.audience === 'client'
     ? `Your appointment moved to ${newDate}`
     : `${p.otherPartyName} moved their appointment`;
@@ -20,15 +20,15 @@ export const rescheduledSubject = (p: RescheduledProps) => {
 
 export function BookingRescheduledEmail(p: RescheduledProps) {
   const abbr = zoneAbbreviation(p.newScheduledAt, p.timeZone);
-  const wasLabel = `${formatInZone(p.previousScheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const wasLabel = `${formatInZone(p.previousScheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.previousScheduledAt,
     p.timeZone
   )}`;
-  const nowLabel = `${formatInZone(p.newScheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${abbr}`;
+  const nowLabel = `${formatInZone(p.newScheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${abbr}`;
 
   return (
     <EmailShell
-      preview={`Moved to ${formatInZone(p.newScheduledAt, p.timeZone, "MMM d 'at' h:mm a")}`}
+      preview={`Moved to ${formatInZone(p.newScheduledAt, p.timeZone, "MMM d 'at' h:mm a", 'en')}`}
     >
       <H1>The appointment moved.</H1>
       <P>

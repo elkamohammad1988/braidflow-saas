@@ -492,10 +492,10 @@ function HeroPreview() {
             </div>
             <div className="mt-1.5 flex items-center gap-3 font-mono text-[11px] text-ink-muted">
               <span className="inline-flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> {t('preview.duration')}
+                <Clock aria-hidden className="h-3.5 w-3.5" /> {t('preview.duration')}
               </span>
               <span className="inline-flex items-center gap-1">
-                <Wallet className="h-3.5 w-3.5" /> {t('preview.deposit')}
+                <Wallet aria-hidden className="h-3.5 w-3.5" /> {t('preview.deposit')}
               </span>
             </div>
           </div>
@@ -526,7 +526,7 @@ function HeroPreview() {
               <p className="font-display text-lg font-medium leading-tight">$40.00</p>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-gold-bright to-gold px-3.5 py-1.5 text-xs font-semibold text-on-accent">
-              <CreditCard className="h-3.5 w-3.5" />
+              <CreditCard aria-hidden className="h-3.5 w-3.5" />
               {t('preview.payButton')}
             </span>
           </div>
@@ -536,7 +536,7 @@ function HeroPreview() {
       {/* floating confirmation chip */}
       <div className="absolute -bottom-5 -start-5 hidden items-center gap-2 rounded-full border border-line bg-paper px-4 py-2.5 shadow-lifted sm:flex">
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/12 text-moss ring-1 ring-moss/15">
-          <CalendarCheck className="h-3.5 w-3.5" strokeWidth={2.2} />
+          <CalendarCheck aria-hidden className="h-3.5 w-3.5" strokeWidth={2.2} />
         </span>
         <span className="text-xs font-medium text-ink">{t('preview.secured')}</span>
       </div>

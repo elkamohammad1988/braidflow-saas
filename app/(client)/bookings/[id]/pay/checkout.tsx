@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { loadStripe, type Appearance } from '@stripe/stripe-js';
 import {
   Elements,
@@ -126,6 +126,7 @@ function CheckoutForm({
   returnQuery: string;
 }) {
   const t = useTranslations('pay');
+  const locale = useLocale();
   const stripe = useStripe();
   const elements = useElements();
   const [ready, setReady] = useState(false);
@@ -195,7 +196,7 @@ function CheckoutForm({
             {t('charging')}
           </>
         ) : (
-          t('payDeposit', { amount: formatMoney(depositCents) })
+          t('payDeposit', { amount: formatMoney(depositCents, locale) })
         )}
       </Button>
 

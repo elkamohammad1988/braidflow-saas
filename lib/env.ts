@@ -114,6 +114,22 @@ const envSchema = z
           'session cookies are signed with the public demo fallback and are forgeable.'
       });
     }
+    // Real auth is the moment cookies become the ONLY thing standing between a
+    // visitor and someone else's account — regardless of whether Stripe is wired.
+    // If the operator has replaced the demo persona-auth (I_REPLACED_DEMO_AUTH),
+    // the public fallback signing key would let anyone forge a braider session, so
+    // require a real AUTH_SECRET here too, not just under live Stripe keys. The
+    // keyless/`sk_test_` demo (which never sets this flag) is unaffected.
+    if (env.I_REPLACED_DEMO_AUTH === 'true' && !env.AUTH_SECRET) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['AUTH_SECRET'],
+        message:
+          'AUTH_SECRET is required once demo auth is replaced (I_REPLACED_DEMO_AUTH=true) — without ' +
+          'it, session cookies are signed with the public demo fallback (lib/crypto/signing.ts) and ' +
+          'any visitor could forge a session. Set AUTH_SECRET to a long random value.'
+      });
+    }
   });
 
 let validated = false;

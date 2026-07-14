@@ -43,7 +43,10 @@ export function DemoBadge() {
       {open && (
         <div
           id="demo-badge-info"
-          className="absolute bottom-full mb-2 w-[min(20rem,calc(100vw-2rem))] rounded-card border border-line bg-paper p-4 text-start shadow-lifted md:end-0"
+          // On mobile the badge is viewport-centred, so centre the popover on the
+          // same point (the width is capped to the viewport, so it always fits);
+          // on desktop the badge is right-anchored, so pin the popover to end-0.
+          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-[min(20rem,calc(100vw-2rem))] rounded-card border border-line bg-paper p-4 text-start shadow-lifted md:left-auto md:translate-x-0 md:end-0"
         >
           <p className="text-sm font-medium text-ink">{t('demoBadge.title')}</p>
           <p className="mt-1 text-sm leading-relaxed text-ink-muted">

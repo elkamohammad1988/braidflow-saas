@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Check, Lock, ShieldCheck } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ServiceList, type Service } from '@/components/booking/service-list';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
@@ -58,6 +58,7 @@ export function BookingFlow({
   isAuthenticated
 }: Props) {
   const t = useTranslations('booking');
+  const locale = useLocale();
   const [serviceId, setServiceId] = useState<string | undefined>(services[0]?.id);
   const [selectedSlot, setSelectedSlot] = useState<Date | undefined>();
   const [notes, setNotes] = useState('');
@@ -72,7 +73,6 @@ export function BookingFlow({
 
   const detailsDone =
     isAuthenticated || (guestName.trim().length > 0 && EMAIL_RE.test(guestEmail.trim()));
-  const ready = Boolean(serviceId && selectedSlot && detailsDone);
 
   function onSelectService(id: string) {
     setServiceId(id);
@@ -80,8 +80,15 @@ export function BookingFlow({
   }
 
   function submit() {
-    if (!ready || !serviceId || !selectedSlot) return;
     setError(null);
+    // Keep the CTA clickable even when incomplete, and tell the booker exactly
+    // what's missing rather than dead-ending on a silently-disabled button.
+    if (!serviceId) return setError(t('validation.service'));
+    if (!selectedSlot) return setError(t('validation.time'));
+    if (!isAuthenticated) {
+      if (!guestName.trim()) return setError(t('validation.name'));
+      if (!EMAIL_RE.test(guestEmail.trim())) return setError(t('validation.email'));
+    }
     startTransition(async () => {
       const result = await createBookingAction({
         serviceId,
@@ -105,7 +112,7 @@ export function BookingFlow({
   }));
 
   const whenLabel = selectedSlot
-    ? `${formatInZone(selectedSlot, timeZone, 'EEE, MMM d · h:mm a')} ${zoneAbbreviation(
+    ? `${formatInZone(selectedSlot, timeZone, 'EEE, MMM d · h:mm a', locale)} ${zoneAbbreviation(
         selectedSlot,
         timeZone
       )}`
@@ -258,17 +265,17 @@ export function BookingFlow({
               <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm tabular-nums">
                 <div className="flex justify-between text-ink-muted">
                   <dt>{t('serviceTotal')}</dt>
-                  <dd>{formatMoney(selectedService.price_cents)}</dd>
+                  <dd>{formatMoney(selectedService.price_cents, locale)}</dd>
                 </div>
                 <div className="flex justify-between font-medium text-ink">
                   <dt>{t('depositDueNow')}</dt>
                   <dd className="font-display text-base">
-                    {formatMoney(selectedService.deposit_cents)}
+                    {formatMoney(selectedService.deposit_cents, locale)}
                   </dd>
                 </div>
                 <div className="flex justify-between text-ink-muted">
                   <dt>{t('balanceAtAppointment')}</dt>
-                  <dd>{formatMoney(selectedService.price_cents - selectedService.deposit_cents)}</dd>
+                  <dd>{formatMoney(selectedService.price_cents - selectedService.deposit_cents, locale)}</dd>
                 </div>
               </dl>
             )}
@@ -279,7 +286,7 @@ export function BookingFlow({
               </p>
             )}
 
-            <Button onClick={submit} disabled={!ready || isPending} className="mt-6 w-full">
+            <Button onClick={submit} disabled={isPending} className="mt-6 w-full">
               {isPending ? t('reserving') : t('continueToDeposit')}
             </Button>
 
@@ -300,10 +307,10 @@ export function BookingFlow({
               {selectedService ? t('depositDueNow') : t('pickServiceTime')}
             </p>
             <p className="font-display text-xl leading-tight tabular-nums text-ink">
-              {selectedService ? formatMoney(selectedService.deposit_cents) : '—'}
+              {selectedService ? formatMoney(selectedService.deposit_cents, locale) : '—'}
             </p>
           </div>
-          <Button onClick={submit} disabled={!ready || isPending} size="lg" className="shrink-0">
+          <Button onClick={submit} disabled={isPending} size="lg" className="shrink-0">
             {isPending ? t('reserving') : t('continue')}
           </Button>
         </div>

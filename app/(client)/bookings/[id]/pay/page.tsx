@@ -1,7 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { notFound, redirect } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Clock, Lock, Check } from 'lucide-react';
 import { dbAdmin } from '@/lib/db/server';
 import { getDepositClientSecret } from '@/lib/stripe/get-client-secret';
@@ -11,6 +12,7 @@ import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import { DEFAULT_TIMEZONE } from '@/lib/timezones';
 import { formatInZone } from '@/lib/format-date';
 import { Button } from '@/components/ui/button';
+import { Alert } from '@/components/ui/alert';
 import { DemoCheckout } from './demo-checkout';
 import { formatMoney } from '@/lib/utils';
 
@@ -20,6 +22,11 @@ import { formatMoney } from '@/lib/utils';
 // make the real Checkout actually render, keeping the /pay route lean in demo mode.
 const Checkout = dynamic(() => import('./checkout').then((m) => m.Checkout));
 
+// Private per-booking payment page reached via a signed guest token; robots.txt
+// already disallows /bookings, and this belt-and-suspenders noindex keeps it out
+// of any index even if the URL leaks.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 export default async function PayPage({
   params,
   searchParams
@@ -28,6 +35,7 @@ export default async function PayPage({
   searchParams: { t?: string; d?: string };
 }) {
   const t = await getTranslations('pay');
+  const locale = await getLocale();
   const token = searchParams.t;
   // Demo: rebuild the booking onto this instance if it was created on another
   // (serverless instances don't share the in-memory store). No-op with real Stripe.
@@ -114,10 +122,9 @@ export default async function PayPage({
         {t('payYourDeposit')}
       </h1>
 
-      <div className="mt-5 flex items-center gap-2.5 rounded-lg border border-clay/20 bg-clay/[0.07] px-4 py-2.5 text-sm text-ink">
-        <Clock className="h-4 w-4 shrink-0 text-clay-text" strokeWidth={2} />
+      <Alert tone="info" icon={Clock} className="mt-5">
         {t('slotHeld')}
-      </div>
+      </Alert>
 
       <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_320px]">
         {demo ? (
@@ -140,35 +147,35 @@ export default async function PayPage({
           <div className="rounded-card border border-line bg-paper p-6 shadow-soft">
             <p className="font-medium text-ink">{booking.services?.name}</p>
             <p className="mt-1 text-sm text-ink-muted">
-              {formatInZone(booking.scheduled_at, tz, 'EEEE, MMMM d')}
+              {formatInZone(booking.scheduled_at, tz, 'EEEE, MMMM d', locale)}
             </p>
             <p className="text-sm text-ink-muted">
-              {formatInZone(booking.scheduled_at, tz, 'h:mm a')}
+              {formatInZone(booking.scheduled_at, tz, 'h:mm a', locale)}
             </p>
 
             <dl className="mt-5 space-y-2.5 border-t border-line pt-4 text-sm tabular-nums">
               <div className="flex justify-between text-ink-muted">
                 <dt>{t('serviceTotal')}</dt>
-                <dd>{formatMoney(booking.price_cents)}</dd>
+                <dd>{formatMoney(booking.price_cents, locale)}</dd>
               </div>
               <div className="flex items-baseline justify-between font-medium text-ink">
                 <dt>{t('depositDueNow')}</dt>
-                <dd className="font-display text-lg">{formatMoney(booking.deposit_cents)}</dd>
+                <dd className="font-display text-lg">{formatMoney(booking.deposit_cents, locale)}</dd>
               </div>
               <div className="flex justify-between text-ink-muted">
                 <dt>{t('balanceAtAppointment')}</dt>
-                <dd>{formatMoney(booking.price_cents - booking.deposit_cents)}</dd>
+                <dd>{formatMoney(booking.price_cents - booking.deposit_cents, locale)}</dd>
               </div>
             </dl>
           </div>
 
           <div className="space-y-2.5 rounded-card border border-line bg-paper/60 p-4 text-xs text-ink-muted">
             <p className="flex items-start gap-2">
-              <Lock className="mt-px h-3.5 w-3.5 shrink-0 text-ink-subtle" strokeWidth={2} />
+              <Lock aria-hidden className="mt-px h-3.5 w-3.5 shrink-0 text-ink-subtle" strokeWidth={2} />
               {t('cardSecured')}
             </p>
             <p className="flex items-start gap-2">
-              <Check className="mt-px h-3.5 w-3.5 shrink-0 text-moss" strokeWidth={2.5} />
+              <Check aria-hidden className="mt-px h-3.5 w-3.5 shrink-0 text-moss" strokeWidth={2.5} />
               {t('freeCancellation', { hours: CANCELLATION_REFUND_WINDOW_HOURS })}
             </p>
           </div>

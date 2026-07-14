@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes } from 'react';
+import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { fieldInvalid, fieldSurface, describedById } from './field';
 
@@ -12,7 +12,11 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
   { className, label, hint, error, id, ...rest },
   ref
 ) {
-  const inputId = id ?? rest.name;
+  // Fall back to a stable auto-id so a control given a `label`/`hint` but no
+  // `name`/`id` still gets its label + description programmatically associated
+  // (useId is SSR-safe, so no hydration mismatch).
+  const autoId = useId();
+  const inputId = id ?? rest.name ?? autoId;
   const descId = describedById(inputId, Boolean(hint || error));
   return (
     <div className="block">

@@ -6,6 +6,7 @@
     "dashboard": "لوحة التحكم",
     "myBookings": "حجوزاتي",
     "viewSite": "عرض الموقع",
+    "home": "الرئيسية",
     "language": "اللغة",
     "theme": {
       "switchToDark": "التبديل إلى الوضع الداكن",
@@ -680,6 +681,12 @@
     "securedByStripe": "المدفوعات مؤمَّنة عبر Stripe"
   },
   "booking": {
+    "validation": {
+      "service": "اختاري خدمة للمتابعة.",
+      "time": "اختاري وقتًا لموعدك.",
+      "name": "أدخلي اسمك حتى تعرف مصفِّفتك من يحجز.",
+      "email": "أدخلي بريدًا إلكترونيًا صحيحًا — سيصلك التأكيد عليه."
+    },
     "anythingHeading": "أي شيء ينبغي أن نعرفه",
     "balanceAtAppointment": "الرصيد المتبقّي في الموعد",
     "bookAppointment": "احجزي موعدك",
@@ -963,5 +970,24 @@
       "continue": "متابعة",
       "connect": "ربط Stripe"
     }
+  },
+  "meta": {
+    "loginTitle": "تسجيل الدخول",
+    "signupTitle": "أنشئي حسابك",
+    "forgotPasswordTitle": "إعادة تعيين كلمة مرورك",
+    "resetPasswordTitle": "تعيين كلمة مرور جديدة",
+    "braidersTitle": "ابحثي عن مصفِّفة",
+    "braidersDescription": "تصفّحي المصفِّفات وأخصائيات التسريحات الواقية مع أوقات توفّر لحظية. ابحثي في مدينتك، وقارني، ويحجز العربون موعدك.",
+    "bookTitle": "احجزي موعدًا",
+    "braiderNotFound": "المصفِّفة غير موجودة",
+    "braiderProfileTitle": "{name} — احجزي جلسة ضفائر",
+    "braiderProfileTitleInCity": "{name} — احجزي جلسة ضفائر في {city}",
+    "braiderProfileDescription": "احجزي مع {name} لتسريحات الضفائر والتسريحات الواقية. أوقات توفّر لحظية — يحجز العربون موعدك.",
+    "pricingTitle": "الأسعار",
+    "pricingDescription": "BraidFlow مجّاني خلال فترة النسخة التجريبية. لا رسوم شهرية، ولا نقتطع أي نسبة من عرابينك — تحتفظين بنسبة 100٪.",
+    "termsTitle": "شروط الخدمة",
+    "termsDescription": "الشروط التي تحكم استخدامك لـ BraidFlow، سواء كنتِ عميلة تحجز المواعيد أو مصفِّفة تقبلها.",
+    "privacyTitle": "سياسة الخصوصية",
+    "privacyDescription": "كيف تجمع BraidFlow معلوماتك وتستخدمها وتحميها عندما تحجزين المواعيد أو تقبلينها."
   }
 }

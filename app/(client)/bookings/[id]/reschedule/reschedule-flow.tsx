@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { SuccessCheck } from '@/components/motion/success-check';
 import { SlotPicker } from '@/components/booking/slot-picker';
 import { Button } from '@/components/ui/button';
@@ -40,8 +40,9 @@ export function RescheduleFlow({
   token
 }: Props) {
   const t = useTranslations('reschedule');
+  const locale = useLocale();
   const fmt = (d: Date) =>
-    `${formatInZone(d, timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(d, timeZone)}`;
+    `${formatInZone(d, timeZone, "EEE, MMM d 'at' h:mm a", locale)} ${zoneAbbreviation(d, timeZone)}`;
   const router = useRouter();
   const [selectedSlot, setSelectedSlot] = useState<Date | undefined>();
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +103,7 @@ export function RescheduleFlow({
         </div>
 
         <section>
-          <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-ink-muted">
+          <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-ink-muted">
             {t('newTime')}
           </h2>
           <SlotPicker

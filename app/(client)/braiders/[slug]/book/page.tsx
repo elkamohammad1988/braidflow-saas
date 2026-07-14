@@ -6,15 +6,19 @@ import { addDays, startOfDay, subDays } from 'date-fns';
 import { getTranslations } from 'next-intl/server';
 import { dbAdmin, db } from '@/lib/db/server';
 import { computeSlotsForDay } from '@/lib/bookings/availability';
+import { staleHoldCutoffIso } from '@/lib/bookings/hold-ttl';
 import { CANCELLATION_REFUND_WINDOW_HOURS } from '@/lib/constants';
 import type { Metadata } from 'next';
 import { BookingFlow } from './booking-flow';
 
 // A transactional funnel step, not indexable content.
-export const metadata: Metadata = {
-  title: 'Book an appointment',
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('meta');
+  return {
+    title: t('bookTitle'),
+    robots: { index: false, follow: false }
+  };
+}
 
 // Availability changes constantly and the query reads private braider data with
 // no request cookies (so it isn't implicitly dynamic) — render on every request.
@@ -89,13 +93,22 @@ export default async function BookPage({ params }: { params: { slug: string } })
   // per-slot overlap, so over-fetching is free — under-fetching would let the
   // picker offer an already-taken edge slot that then fails at submit. Mirrors the
   // padded window in create.ts / reschedule.ts.
-  const { data: bookings } = await admin
+  const { data: bookingsRaw } = await admin
     .from('bookings')
-    .select('scheduled_at, duration_minutes, status')
+    .select('scheduled_at, duration_minutes, status, created_at')
     .eq('braider_id', braider.id)
     .in('status', ['pending_payment', 'confirmed'])
     .gte('scheduled_at', subDays(today, 1).toISOString())
     .lt('scheduled_at', addDays(horizon, 1).toISOString());
+
+  // Don't let an abandoned hold squat a slot in the picker. A `pending_payment`
+  // hold older than the TTL is effectively expired (the cron/lazy-release will
+  // formally cancel it, and the create action releases it before booking), so
+  // treat it as free here rather than showing the slot as taken for up to a day.
+  const staleCutoff = staleHoldCutoffIso();
+  const bookings = (bookingsRaw ?? []).filter(
+    (b) => b.status !== 'pending_payment' || (b.created_at ?? '') >= staleCutoff
+  );
 
   const slotsByDayForService = (durationMinutes: number) =>
     Array.from({ length: WINDOW_DAYS }, (_, i) => {

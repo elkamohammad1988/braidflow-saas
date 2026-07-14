@@ -26,13 +26,13 @@ export const receivedBraiderSubject = (p: ReceivedBraiderProps) =>
   `${p.clientName.split(' ')[0]} just booked ${p.serviceName}`;
 
 export function BookingReceivedBraiderEmail(p: ReceivedBraiderProps) {
-  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a")} ${zoneAbbreviation(
+  const whenLabel = `${formatInZone(p.scheduledAt, p.timeZone, "EEE, MMM d 'at' h:mm a", 'en')} ${zoneAbbreviation(
     p.scheduledAt,
     p.timeZone
   )}`;
   return (
     <EmailShell
-      preview={`New booking — ${formatInZone(p.scheduledAt, p.timeZone, 'EEE, MMM d, h:mm a')}`}
+      preview={`New booking — ${formatInZone(p.scheduledAt, p.timeZone, 'EEE, MMM d, h:mm a', 'en')}`}
     >
       <H1>New booking.</H1>
       <P>
@@ -45,11 +45,11 @@ export function BookingReceivedBraiderEmail(p: ReceivedBraiderProps) {
       {p.clientPhone && <DetailRow label="Phone" value={p.clientPhone} />}
       <DetailRow label="Service" value={p.serviceName} />
       <DetailRow label="When" value={whenLabel} />
-      <DetailRow label="Total" value={formatMoney(p.priceCents)} />
-      <DetailRow label="Deposit collected" value={formatMoney(p.depositCents)} />
+      <DetailRow label="Total" value={formatMoney(p.priceCents, 'en')} />
+      <DetailRow label="Deposit collected" value={formatMoney(p.depositCents, 'en')} />
       <DetailRow
         label="Balance due at appointment"
-        value={formatMoney(p.priceCents - p.depositCents)}
+        value={formatMoney(p.priceCents - p.depositCents, 'en')}
       />
 
       <Divider />

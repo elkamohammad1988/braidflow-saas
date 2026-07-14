@@ -19,7 +19,7 @@ export const refundedSubject = (_p: RefundedProps) => `Your deposit refund is on
 
 export function DepositRefundedEmail(p: RefundedProps) {
   return (
-    <EmailShell preview={`${formatMoney(p.amountCents)} refund from ${p.businessName}`}>
+    <EmailShell preview={`${formatMoney(p.amountCents, 'en')} refund from ${p.businessName}`}>
       <H1>Your refund is on the way.</H1>
       <P>
         Hi {p.clientFirstName}, {p.businessName} just refunded the deposit for your{' '}
@@ -30,7 +30,7 @@ export function DepositRefundedEmail(p: RefundedProps) {
 
       <DetailRow label="Service" value={p.serviceName} />
       <DetailRow label="From" value={p.businessName} />
-      <DetailRow label="Refund amount" value={formatMoney(p.amountCents)} />
+      <DetailRow label="Refund amount" value={formatMoney(p.amountCents, 'en')} />
 
       <Divider />
 

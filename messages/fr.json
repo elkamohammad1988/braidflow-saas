@@ -6,6 +6,7 @@
     "dashboard": "Tableau de bord",
     "myBookings": "Mes réservations",
     "viewSite": "Voir le site",
+    "home": "Accueil",
     "language": "Langue",
     "theme": {
       "switchToDark": "Passer en mode sombre",
@@ -171,7 +172,7 @@
       "seePricing": "Voir les tarifs"
     },
     "preview": {
-      "name": "Nia's Braids",
+      "name": "Tresses de Nia",
       "location": "Knotless · Brooklyn, NY",
       "status": "Réservation",
       "service": "Tresses knotless — moyennes",
@@ -680,6 +681,12 @@
     "securedByStripe": "Paiements sécurisés par Stripe"
   },
   "booking": {
+    "validation": {
+      "service": "Choisissez une prestation pour continuer.",
+      "time": "Choisissez un horaire pour votre rendez-vous.",
+      "name": "Saisissez votre nom pour que votre coiffeuse sache qui réserve.",
+      "email": "Saisissez un e-mail valide — votre confirmation y sera envoyée."
+    },
     "anythingHeading": "Ce que nous devrions savoir",
     "balanceAtAppointment": "Solde au rendez-vous",
     "bookAppointment": "Réservez votre rendez-vous",
@@ -963,5 +970,24 @@
       "continue": "Continuer",
       "connect": "Connecter Stripe"
     }
+  },
+  "meta": {
+    "loginTitle": "Se connecter",
+    "signupTitle": "Créez votre compte",
+    "forgotPasswordTitle": "Réinitialisez votre mot de passe",
+    "resetPasswordTitle": "Définir un nouveau mot de passe",
+    "braidersTitle": "Trouver une tresseuse",
+    "braidersDescription": "Parcourez des tresseuses et des spécialistes des coiffures protectrices avec des disponibilités en temps réel. Cherchez dans votre ville, comparez, et un acompte retient votre créneau.",
+    "bookTitle": "Prendre rendez-vous",
+    "braiderNotFound": "Tresseuse introuvable",
+    "braiderProfileTitle": "{name} — Réservez des tresses",
+    "braiderProfileTitleInCity": "{name} — Réservez des tresses à {city}",
+    "braiderProfileDescription": "Réservez {name} pour des tresses et des coiffures protectrices. Disponibilités en temps réel — un acompte retient votre créneau.",
+    "pricingTitle": "Tarifs",
+    "pricingDescription": "BraidFlow est gratuit pendant notre bêta. Aucun abonnement mensuel, et nous prenons 0 % de vos acomptes — vous gardez 100 %.",
+    "termsTitle": "Conditions d’utilisation",
+    "termsDescription": "Les conditions qui régissent votre utilisation de BraidFlow, que vous soyez une cliente qui réserve des rendez-vous ou une tresseuse qui les accepte.",
+    "privacyTitle": "Politique de confidentialité",
+    "privacyDescription": "Comment BraidFlow collecte, utilise et protège vos informations lorsque vous réservez ou acceptez des rendez-vous."
   }
 }

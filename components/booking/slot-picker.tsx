@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatInZone, zoneAbbreviation } from '@/lib/format-date';
 import type { Slot } from '@/lib/bookings/availability';
@@ -18,7 +18,8 @@ type Props = {
 
 export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) {
   const t = useTranslations('booking');
-  const dayKey = (d: Date) => formatInZone(d, timeZone, 'yyyy-MM-dd');
+  const locale = useLocale();
+  const dayKey = (d: Date) => formatInZone(d, timeZone, 'yyyy-MM-dd', locale);
 
   // Default to the first day that actually has openings, so the picker never
   // greets the client with an empty "no availability" state when a later day is
@@ -58,10 +59,10 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
               )}
             >
               <span className="text-[11px] font-medium uppercase tracking-wider opacity-80">
-                {formatInZone(date, timeZone, 'EEE')}
+                {formatInZone(date, timeZone, 'EEE', locale)}
               </span>
               <span className="font-display text-lg leading-none">
-                {formatInZone(date, timeZone, 'd')}
+                {formatInZone(date, timeZone, 'd', locale)}
               </span>
             </button>
           );
@@ -70,7 +71,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
 
       {activeDay && (
         <p className="mb-3 text-sm text-ink">
-          <span className="font-medium">{formatInZone(activeDay.date, timeZone, 'EEEE, MMMM d')}</span>
+          <span className="font-medium">{formatInZone(activeDay.date, timeZone, 'EEEE, MMMM d', locale)}</span>
           <span className="text-ink-subtle"> · {zoneAbbreviation(activeDay.date, timeZone)}</span>
         </p>
       )}
@@ -78,7 +79,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
       {activeSlots.length === 0 ? (
         <div
           key={activeKey}
-          className="rounded-card border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
+          className="rounded-xl2 border border-dashed border-line-strong bg-cream/40 px-4 py-10 text-center"
         >
           <p className="text-sm font-medium text-ink">{t('noOpenings')}</p>
           <p className="mt-1 text-sm text-ink-muted">{t('tryOtherDates')}</p>
@@ -103,7 +104,7 @@ export function SlotPicker({ slotsByDay, selected, onSelect, timeZone }: Props) 
                     : 'border-line-strong bg-paper text-ink hover:-translate-y-px hover:border-clay/40 hover:bg-gold/[0.05] hover:shadow-card'
                 )}
               >
-                {formatInZone(slot.start, timeZone, 'h:mm a')}
+                {formatInZone(slot.start, timeZone, 'h:mm a', locale)}
               </button>
             );
           })}

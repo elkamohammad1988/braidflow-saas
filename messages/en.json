@@ -6,6 +6,7 @@
     "dashboard": "Dashboard",
     "myBookings": "My bookings",
     "viewSite": "View site",
+    "home": "Home",
     "language": "Language",
     "theme": {
       "switchToDark": "Switch to dark mode",
@@ -680,6 +681,12 @@
     "securedByStripe": "Payments secured by Stripe"
   },
   "booking": {
+    "validation": {
+      "service": "Choose a service to continue.",
+      "time": "Pick a time for your appointment.",
+      "name": "Enter your name so your braider knows who's booking.",
+      "email": "Enter a valid email — your confirmation lands there."
+    },
     "anythingHeading": "Anything we should know",
     "balanceAtAppointment": "Balance at appointment",
     "bookAppointment": "Book your appointment",
@@ -963,5 +970,24 @@
       "continue": "Continue",
       "connect": "Connect Stripe"
     }
+  },
+  "meta": {
+    "loginTitle": "Sign in",
+    "signupTitle": "Create your account",
+    "forgotPasswordTitle": "Reset your password",
+    "resetPasswordTitle": "Set a new password",
+    "braidersTitle": "Find a braider",
+    "braidersDescription": "Browse braiders and protective-style stylists with real-time availability. Search your city, compare, and a deposit holds your slot.",
+    "bookTitle": "Book an appointment",
+    "braiderNotFound": "Braider not found",
+    "braiderProfileTitle": "{name} — Book braids",
+    "braiderProfileTitleInCity": "{name} — Book braids in {city}",
+    "braiderProfileDescription": "Book {name} for braids and protective styles. Real-time availability — a deposit holds your slot.",
+    "pricingTitle": "Pricing",
+    "pricingDescription": "BraidFlow is free while we’re in beta. No monthly fee, and we take 0% of your deposits — you keep 100%.",
+    "termsTitle": "Terms of Service",
+    "termsDescription": "The terms that govern your use of BraidFlow as a client booking appointments or a braider accepting them.",
+    "privacyTitle": "Privacy Policy",
+    "privacyDescription": "How BraidFlow collects, uses, and protects your information when you book or accept appointments."
   }
 }
