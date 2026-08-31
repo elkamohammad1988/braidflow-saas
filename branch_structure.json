@@ -1,0 +1,24 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "chore/production-hardening-audit",
+    "dependabot/npm_and_yarn/development-3ec4a6df2d",
+    "dependabot/npm_and_yarn/production-f504722a6f",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "chore/production-hardening-audit": "main",
+    "dependabot/npm_and_yarn/development-3ec4a6df2d": "main",
+    "dependabot/npm_and_yarn/production-f504722a6f": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "chore/production-hardening-audit",
+    "dependabot/npm_and_yarn/development-3ec4a6df2d",
+    "dependabot/npm_and_yarn/production-f504722a6f",
+    "origin"
+  ]
+}
